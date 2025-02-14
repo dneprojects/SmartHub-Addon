@@ -1,11 +1,12 @@
 from datetime import datetime
+from glob import glob
 import struct
 import const
 import asyncio
 import os
 from asyncio.streams import StreamReader, StreamWriter
 
-from const import RT_CMDS, API_CATEGS
+from const import DATA_FILES_ADDON_DIR, DATA_FILES_DIR, RT_CMDS, API_CATEGS
 from const import API_ADMIN as spec
 import logging
 from logging.handlers import RotatingFileHandler
@@ -19,6 +20,7 @@ from setup_hdlr import SetupHdlr
 from admin_hdlr import AdminHdlr
 from router import HbtnRouter
 from event_server import EventServer
+from config_commons import format_hmd
 
 # GPIO23, Pin 16: switch input, unpressed == 1
 # GPIO13, Pin 33: red
@@ -62,6 +64,7 @@ class ApiServer:
         self.token = os.getenv("SUPERVISOR_TOKEN")
         self.is_addon: bool = self.sm_hub.is_addon
         self.release_block_next = False  # Set if middleware should release block next
+        self._last_check_day = self.get_last_backupday()
 
     async def get_initial_status(self):
         """Starts router object and reads complete system status"""
@@ -93,7 +96,8 @@ class ApiServer:
                 self.logger.debug(
                     f"Waited for {block_time} seconds in blocked operate mode"
                 )
-
+            # Check if new backup is needed
+            await self.cyclic_backup()
             # Read api command from network
             pre = await ip_reader.readexactly(3)
             self._api_cmd_processing = True
@@ -275,7 +279,7 @@ class ApiServer:
             now = datetime.now()
             self.logger.info("_________________________________")
             self.logger.info("Starting intialization")
-            self.logger.info(f'   {now.strftime("%d.%m.%Y, %H:%M")}')
+            self.logger.info(f"   {now.strftime('%d.%m.%Y, %H:%M')}")
             self.logger.debug(
                 "   Stopping EventSrv task, setting Srv mode for initialization, doing rollover"
             )
@@ -376,6 +380,92 @@ class ApiServer:
         self._client_ip = self.ip_writer.get_extra_info("peername")[0]
         return True
         # SmartHub running with Home Assistant, use internal websocket
+
+    async def prepare_system_backup(self):
+        """Get complete system backup data string."""
+
+        separator = "---\n"
+        rtr = self.routers[0]
+        settings = rtr.get_router_settings()
+        file_content = settings.smr
+        str_data = ""
+        for byt in file_content:
+            str_data += f"{byt};"
+        str_data += "\n"
+        str_data += rtr.pack_descriptions()
+        str_data += separator
+        for mod in rtr.modules:
+            settings = mod.get_module_settings()
+            str_data += format_hmd(settings.smg, settings.list)
+            str_data += separator
+        return str_data
+
+    async def cyclic_backup(self):
+        """Check, perform, and clean up cyclic system backups."""
+        if self.is_addon:
+            backup_path = DATA_FILES_ADDON_DIR
+        else:
+            backup_path = DATA_FILES_DIR
+        root_filename = backup_path + "sysbackup_"
+        time_now = datetime.now()
+        curr_month = 0
+        month_of_recent_week = 0
+
+        if self._last_check_day == time_now.day:
+            return
+        file_name = root_filename + datetime.now().strftime("%Y_%m_%d") + "_d.hcf"
+        try:
+            str_data = await self.prepare_system_backup()
+            with open(file_name, "w") as fid:
+                fid.write(str_data)
+            self._last_check_day = time_now.day
+        except Exception as err_msg:
+            self.logger.error(f"Backup failed: {err_msg}")
+        # clean up
+        dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
+        dayly_backup_file_list.sort()
+        if time_now.weekday() == 0:
+            # monday morning 0:01
+            new_week_file = dayly_backup_file_list[0].rename("_d.hcf", "_w.hcf")
+            os.copy(dayly_backup_file_list[0], new_week_file)
+            while len(dayly_backup_file_list) > 7:
+                os.remove(dayly_backup_file_list[0])
+                dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
+                dayly_backup_file_list.sort()
+            weekly_backup_file_list = glob(f"{backup_path}*_w.hcf")
+            weekly_backup_file_list.sort()
+            curr_month = time_now.month
+            month_of_recent_week = self.get_month(weekly_backup_file_list[-2])
+            if (month_of_recent_week < curr_month) or (
+                (month_of_recent_week == 12) and (curr_month == 1)
+            ):
+                # new month
+                new_month_file = weekly_backup_file_list[0].rename("_w.hcf", "_m.hcf")
+                os.copy(weekly_backup_file_list[0], new_month_file)
+                if len(weekly_backup_file_list) > 5:
+                    # recent of new month plus minimum 4 older weeks
+                    os.remove(weekly_backup_file_list[0])
+                    weekly_backup_file_list = glob(f"{backup_path}*_w.hcf")
+                    weekly_backup_file_list.sort()
+
+    def get_month(self, file_name: str) -> int:
+        """Parse filename and return month as integer."""
+        file_parts = file_name.split("_")
+        return int(file_parts[2])
+
+    def get_last_backupday(self) -> int:
+        """Return day of last backup."""
+        if self.is_addon:
+            backup_path = DATA_FILES_ADDON_DIR
+        else:
+            backup_path = DATA_FILES_DIR
+        try:
+            dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
+            dayly_backup_file_list.sort()
+            file_parts = dayly_backup_file_list[-1].split("_")
+            return int(file_parts[3])
+        except Exception as err_msg:
+            return 0  # datetime.now().day
 
 
 class ApiServerMin(ApiServer):

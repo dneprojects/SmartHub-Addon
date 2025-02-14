@@ -12,6 +12,7 @@ ings.setrequirements.txt
 *.1
 *.2
 *.3
+*.hcf
 __pycache__/
 nul
 launch.json

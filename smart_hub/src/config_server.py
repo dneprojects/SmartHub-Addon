@@ -239,23 +239,12 @@ class ConfigServer:
             return show_not_authorized(request.app)
         file_name = request.query["file"]
         file_name = file_name.split(".")[0]
-        rtr = request.app["api_srv"].routers[0]
-        separator = "---\n"
+        api_srv = request.app["api_srv"]
+        rtr = api_srv.routers[0]
         if "SysDownload" in request.query.keys():
             # System backup
+            str_data = await api_srv.backup_system()
             file_name += ".hcf"
-            settings = rtr.get_router_settings()
-            file_content = settings.smr
-            str_data = ""
-            for byt in file_content:
-                str_data += f"{byt};"
-            str_data += "\n"
-            str_data += rtr.pack_descriptions()
-            str_data += separator
-            for mod in rtr.modules:
-                settings = mod.get_module_settings()
-                str_data += format_hmd(settings.smg, settings.list)
-                str_data += separator
         else:
             # Module download
             addr_str = request.query["ModDownload"]
