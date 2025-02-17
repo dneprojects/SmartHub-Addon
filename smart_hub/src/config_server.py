@@ -346,7 +346,7 @@ class ConfigServer:
             for mod in mod_list:
                 if mod.typ == mod_type:
                     upd_list.append(mod)
-            return show_update_modules(upd_list, fw_vers, mod_type_str)
+            return show_update_modules(upd_list, fw_vers, mod_type_str, app.logger)
         else:
             with open(rtr.update_fw_file, "rb") as fid:
                 rtr.fw_upload = fid.read()
@@ -384,7 +384,7 @@ class ConfigServer:
             for mod in mod_list:
                 if mod.typ == mod_type:
                     upd_list.append(mod)
-            return show_update_modules(upd_list, fw_vers, mod_type_str)
+            return show_update_modules(upd_list, fw_vers, mod_type_str, app.logger)
         else:
             mod_type = rtr.fw_upload[:2]
             mod_type_str = MODULE_CODES[mod_type.decode()]
@@ -396,7 +396,7 @@ class ConfigServer:
                 return show_hub_overview(app)
             elif module._typ == mod_type:
                 app.logger.info(f"Firmware file for module {module._name} uploaded")
-                return show_update_modules([module], fw_vers, mod_type_str)
+                return show_update_modules([module], fw_vers, mod_type_str, app.logger)
             else:
                 app.logger.error(
                     f"Firmware file for {MODULE_CODES[mod_type.decode()]} uploaded, not compatible with module {module._name}"

@@ -306,7 +306,7 @@ def is_outdated(cur_fw: str, new_fw: str, logger) -> bool:
         return False
 
 
-def show_update_modules(mod_list, new_fw: str, mod_type: str) -> web.Response:
+def show_update_modules(mod_list, new_fw: str, mod_type: str, logger) -> web.Response:
     """Prepare modules page with update candidates."""
     page = get_html("modules.html")
     page = page.replace(
@@ -318,7 +318,7 @@ def show_update_modules(mod_list, new_fw: str, mod_type: str) -> web.Response:
     for module in mod_list:
         pic_file, title = get_module_image(module.typ)
         images += '<div class="figd_grid">\n'
-        if is_outdated(module.fw, new_fw):
+        if is_outdated(module.fw, new_fw, logger):
             images += f'<input type="checkbox" class="mod_chk" id="chk_{module.id}" name="chk_{module.id}" value="{module.id}" checked>\n'
         else:
             images += f'<input type="checkbox" class="mod_chk" id="chk_{module.id}" name="chk_{module.id}" value="{module.id}">\n'
