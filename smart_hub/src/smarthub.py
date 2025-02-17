@@ -421,7 +421,7 @@ async def main(ev_loop):
         while (rt_serial is None) and (retry_serial >= 0):
             if retry_serial < retry_max:
                 logger.warning(
-                    f"   Initialization of serial connection failed, retry {retry_max-retry_serial}"
+                    f"   Initialization of serial connection failed, retry {retry_max - retry_serial}"
                 )
             for bd_rate in range(len(RT_BAUDRATE)):
                 rt_serial = await init_serial(bd_rate, logger)  # lower baud rate
