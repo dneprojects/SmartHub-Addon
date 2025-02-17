@@ -147,7 +147,7 @@ class HbtnModule:
         crc_str = (chr((crc - (crc & 0xFF)) >> 8) + chr(crc & 0xFF)).encode("iso8859-1")
         if self.status[MirrIdx.SMC_CRC : MirrIdx.SMC_CRC + 2] != crc_str:
             self.logger.warning(
-                f"      Module {self._id} CRC mismatch: status CRC: {self.status[MirrIdx.SMC_CRC:MirrIdx.SMC_CRC+2]} - calculated SMC CRC: {crc_str}"
+                f"      Module {self._id} CRC mismatch: status CRC: {self.status[MirrIdx.SMC_CRC : MirrIdx.SMC_CRC + 2]} - calculated SMC CRC: {crc_str}"
             )
         self.status = (
             self.status[: MirrIdx.SMC_CRC]
@@ -198,7 +198,7 @@ class HbtnModule:
             with open(fw_file, "rb") as fid:
                 fw_bytes = fid.read()
             new_fw = fw_bytes[-27:-5].decode("iso8859-1").strip()
-        if file_found and is_outdated(curr_fw, new_fw):
+        if file_found and is_outdated(curr_fw, new_fw, self.logger):
             self.update_available = True
             self.update_fw_file = fw_file
             self.update_version = new_fw

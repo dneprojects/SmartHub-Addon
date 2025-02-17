@@ -78,10 +78,10 @@ def show_homepage(app) -> web.Response:
         app["side_menu"], "", api_srv.is_offline or api_srv._pc_mode
     )
     info_obj = api_srv.sm_hub.get_info_obj()
-    mem_str = f'{info_obj["hardware"]["memory"]["total"]}, genutzt {info_obj["hardware"]["memory"]["percent"]}'.replace(
+    mem_str = f"{info_obj['hardware']['memory']['total']}, genutzt {info_obj['hardware']['memory']['percent']}".replace(
         "%", "%25"
     )
-    sd_str = f'{info_obj["hardware"]["disk"]["total"]}, genutzt {info_obj["hardware"]["disk"]["percent"]}'.replace(
+    sd_str = f"{info_obj['hardware']['disk']['total']}, genutzt {info_obj['hardware']['disk']['percent']}".replace(
         "%", "%25"
     )
     page = page.replace("<!-- SideMenu -->", side_menu)
@@ -167,24 +167,24 @@ def show_hub_overview(app) -> web.Response:
     props = "<h3>Eigenschaften</h3>\n"
     props += "<table>\n"
     props += f'<tr><td style="width:140px;">Typ:</td><td>{info_obj["software"]["type"]}</td></tr>\n'
-    props += f'<tr><td>Version:</td><td>{info_obj["software"]["version"]}</td></tr>\n'
+    props += f"<tr><td>Version:</td><td>{info_obj['software']['version']}</td></tr>\n"
     props += f"<tr><td>Letzter Start:</td><td>{smhub.start_datetime}</td></tr>\n"
-    props += f'<tr><td>Logging:</td><td>Ausgabe: {LOGGING_LEVELS[info_obj["software"]["loglevel"]["console"]]}, Datei: {LOGGING_LEVELS[info_obj["software"]["loglevel"]["file"]]}</td></tr>\n'
+    props += f"<tr><td>Logging:</td><td>Ausgabe: {LOGGING_LEVELS[info_obj['software']['loglevel']['console']]}, Datei: {LOGGING_LEVELS[info_obj['software']['loglevel']['file']]}</td></tr>\n"
     props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
-    props += f'<tr><td>Hardware:</td><td>{info_obj["hardware"]["platform"]["type"]} #{info_obj["hardware"]["platform"]["serial"]}</td></tr>\n'
-    props += f'<tr><td>CPU:</td><td>{info_obj["hardware"]["cpu"]["type"]}, Takt {info_obj["hardware"]["cpu"]["frequency max"]}</td></tr>\n'
-    props += f'<tr><td>Auslastung:</td><td>{info_obj["hardware"]["cpu"]["load"]}, akt. Takt {info_obj["hardware"]["cpu"]["frequency current"]}, Temperatur {info_obj["hardware"]["cpu"]["temperature"]}</td></tr>\n'
-    props += f'<tr><td>Arbeitsspeicher:</td><td>{info_obj["hardware"]["memory"]["total"]}, genutzt {info_obj["hardware"]["memory"]["percent"]}</td></tr>\n'
-    props += f'<tr><td>Dateispeicher:&nbsp;</td><td>{info_obj["hardware"]["disk"]["total"]}, genutzt {info_obj["hardware"]["disk"]["percent"]}</td></tr>\n'
+    props += f"<tr><td>Hardware:</td><td>{info_obj['hardware']['platform']['type']} #{info_obj['hardware']['platform']['serial']}</td></tr>\n"
+    props += f"<tr><td>CPU:</td><td>{info_obj['hardware']['cpu']['type']}, Takt {info_obj['hardware']['cpu']['frequency max']}</td></tr>\n"
+    props += f"<tr><td>Auslastung:</td><td>{info_obj['hardware']['cpu']['load']}, akt. Takt {info_obj['hardware']['cpu']['frequency current']}, Temperatur {info_obj['hardware']['cpu']['temperature']}</td></tr>\n"
+    props += f"<tr><td>Arbeitsspeicher:</td><td>{info_obj['hardware']['memory']['total']}, genutzt {info_obj['hardware']['memory']['percent']}</td></tr>\n"
+    props += f"<tr><td>Dateispeicher:&nbsp;</td><td>{info_obj['hardware']['disk']['total']}, genutzt {info_obj['hardware']['disk']['percent']}</td></tr>\n"
     props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
-    props += f'<tr><td>Netzwerk:</td><td>{info_obj["hardware"]["network"]["ip"]}, Host {info_obj["hardware"]["network"]["host"]}</td></tr>\n'
+    props += f"<tr><td>Netzwerk:</td><td>{info_obj['hardware']['network']['ip']}, Host {info_obj['hardware']['network']['host']}</td></tr>\n"
     if (
         info_obj["hardware"]["network"]["mac"]
         == info_obj["hardware"]["network"]["lan mac"]
     ):
-        props += f'<tr><td>Verbindung:</td><td>LAN, MAC Adresse {info_obj["hardware"]["network"]["mac"]}</td></tr>\n'
+        props += f"<tr><td>Verbindung:</td><td>LAN, MAC Adresse {info_obj['hardware']['network']['mac']}</td></tr>\n"
     else:
-        props += f'<tr><td>Verbindung:</td><td>WLAN, MAC Adresse {info_obj["hardware"]["network"]["mac"]}</td></tr>\n'
+        props += f"<tr><td>Verbindung:</td><td>WLAN, MAC Adresse {info_obj['hardware']['network']['mac']}</td></tr>\n"
     props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
     props += f"<tr><td>Home Assistant Version:</td><td>{api_srv.ha_version}</td></tr>\n"
     props += f"<tr><td>Habitron Version:</td><td>{api_srv.hbtint_version}</td></tr>\n"
@@ -269,37 +269,41 @@ def show_update_router(rtr, new_fw: str) -> web.Response:
     return web.Response(text=page, content_type="text/html", charset="utf-8")
 
 
-def is_outdated(cur_fw: str, new_fw: str) -> bool:
+def is_outdated(cur_fw: str, new_fw: str, logger) -> bool:
     """Compare two firmware strings and return update status."""
-    cur_fw_fields = cur_fw.strip().split()
-    new_fw_fields = new_fw.strip().split()
-    # cur_vers = float(cur_fw_fields[-2][1:])
-    # new_vers = float(new_fw_fields[-2][1:])
-    cur_date = cur_fw_fields[-1]
-    new_date = new_fw_fields[-1]
-    cur_year = cur_date.split("/")[1][:4]
-    cur_month = cur_date.split("/")[0][-2:]
-    new_year = new_date.split("/")[1][:4]
-    new_month = new_date.split("/")[0][-2:]
-    if int(new_year) > int(cur_year):
-        return True
-    if (int(new_year) == int(cur_year)) and (int(new_month) > int(cur_month)):
-        return True
-    # if (
-    #     (int(new_year) == int(cur_year))
-    #     and (int(new_month) == int(cur_month))
-    #     and new_vers > cur_vers
-    # ):
-    #     return True
-    if (
-        (int(new_year) == int(cur_year))
-        and (int(new_month) == int(cur_month))
-        and (len(new_date.split("/")[1]) > 4)
-    ):
-        return True
-    # if (new_date == cur_date) and ():
-    #     return True
-    return False
+    try:
+        cur_fw_fields = cur_fw.strip().split()
+        new_fw_fields = new_fw.strip().split()
+        # cur_vers = float(cur_fw_fields[-2][1:])
+        # new_vers = float(new_fw_fields[-2][1:])
+        cur_date = cur_fw_fields[-1]
+        new_date = new_fw_fields[-1]
+        cur_year = cur_date.split("/")[1][:4]
+        cur_month = cur_date.split("/")[0][-2:]
+        new_year = new_date.split("/")[1][:4]
+        new_month = new_date.split("/")[0][-2:]
+        if int(new_year) > int(cur_year):
+            return True
+        if (int(new_year) == int(cur_year)) and (int(new_month) > int(cur_month)):
+            return True
+        # if (
+        #     (int(new_year) == int(cur_year))
+        #     and (int(new_month) == int(cur_month))
+        #     and new_vers > cur_vers
+        # ):
+        #     return True
+        if (
+            (int(new_year) == int(cur_year))
+            and (int(new_month) == int(cur_month))
+            and (len(new_date.split("/")[1]) > 4)
+        ):
+            return True
+        # if (new_date == cur_date) and ():
+        #     return True
+        return False
+    except Exception as err_msg:
+        logger.warning(f"Error checking versions: {err_msg}")
+        return False
 
 
 def show_update_modules(mod_list, new_fw: str, mod_type: str) -> web.Response:

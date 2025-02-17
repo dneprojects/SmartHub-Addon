@@ -97,7 +97,7 @@ class HbtnRouter:
             with open(fw_file, "rb") as fid:
                 fw_bytes = fid.read()
             new_fw = fw_bytes[-27:-5].decode().strip()
-        if file_found and is_outdated(curr_fw, new_fw):
+        if file_found and is_outdated(curr_fw, new_fw, self.logger):
             self.update_available = True
             self.update_fw_file = fw_file
             self.update_version = new_fw
