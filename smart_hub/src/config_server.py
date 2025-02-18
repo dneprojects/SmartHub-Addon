@@ -478,12 +478,16 @@ class ConfigServer:
 
     @routes.get("/update_status")
     async def get_update_status(request: web.Request) -> web.Response:  # type: ignore
-        inspect_header(request)
-        app = request.app
-        stat = app["api_srv"].routers[0].hdlr.upd_stat_dict
-        return web.Response(
-            text=json.dumps(stat), content_type="text/plain", charset="utf-8"
-        )
+        try:
+            inspect_header(request)
+            app = request.app
+            stat = app["api_srv"].routers[0].hdlr.upd_stat_dict
+            return web.Response(
+                text=json.dumps(stat), content_type="text/plain", charset="utf-8"
+            )
+        except Exception as err_msg:
+            app.logger.warning("Error handling update status:" + err_msg)
+            return web.HTTPNoContent()
 
     @routes.get(path="/Documentation")
     async def show_doccenter(request: web.Request) -> web.Response:  # type: ignore
