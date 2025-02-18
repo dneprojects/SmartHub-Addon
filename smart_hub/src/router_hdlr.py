@@ -701,16 +701,19 @@ class RtHdlr(HdlrBase):
         self, pkg_low: int, pkg_high: int, max_count: int
     ) -> None:
         """Send firmware upload counter to ip client."""
-        stat_msg = (
-            API_RESPONSE.rtfw_flash_stat.replace("<rtr>", chr(self.rt_id))
-            .replace("<pkgs>", chr(max_count + 1))
-            .replace("<pkgl>", chr(pkg_low))
-            .replace("<pkgh>", chr(pkg_high))
-        )
-        await self.api_srv.hdlr.send_api_response(
-            stat_msg,
-            RT_STAT_CODES.PKG_OK,
-        )
+        try:
+            stat_msg = (
+                API_RESPONSE.rtfw_flash_stat.replace("<rtr>", chr(self.rt_id))
+                .replace("<pkgs>", chr(max_count + 1))
+                .replace("<pkgl>", chr(pkg_low))
+                .replace("<pkgh>", chr(pkg_high))
+            )
+            await self.api_srv.hdlr.send_api_response(
+                stat_msg,
+                RT_STAT_CODES.PKG_OK,
+            )
+        except Exception as err_msg:
+            self.logger.error("Router update status failed: " + err_msg)
 
     async def log_rtr_fw_update_protocol(
         self, pkg_low: int, pkg_high: int, max_count: int
@@ -720,7 +723,7 @@ class RtHdlr(HdlrBase):
         progress = int(100 * cur_pkg / max_count)
         if progress > self._last_progress:
             self.logger.info(
-                f"Router update progress: {cur_pkg} of {max_count +1} : {progress} %"
+                f"Router update progress: {cur_pkg} of {max_count + 1} : {progress} %"
             )
             self._last_progress = progress
 
@@ -790,12 +793,15 @@ class RtHdlr(HdlrBase):
         self, pckg: int, no_pkgs: int, code: int
     ) -> None:
         """Send firmware upload status protocol to ip client."""
-        stat_msg = (
-            API_RESPONSE.bin_upload_stat.replace("<rtr>", chr(self.rt_id))
-            .replace("<pkg>", chr(pckg))
-            .replace("<pkgs>", chr(no_pkgs + 1))
-        )
-        await self.api_srv.hdlr.send_api_response(stat_msg, code)
+        try:
+            stat_msg = (
+                API_RESPONSE.bin_upload_stat.replace("<rtr>", chr(self.rt_id))
+                .replace("<pkg>", chr(pckg))
+                .replace("<pkgs>", chr(no_pkgs + 1))
+            )
+            await self.api_srv.hdlr.send_api_response(stat_msg, code)
+        except Exception as err_msg:
+            self.logger.error("Router update status failed: " + err_msg)
 
     async def stat_mod_fw_upload_protocol(
         self, pckg: int, no_pkgs: int, code: int
