@@ -1,5 +1,6 @@
 from datetime import datetime
 from glob import glob
+import shutil
 import struct
 import const
 import asyncio
@@ -72,6 +73,7 @@ class ApiServer:
         self.evnt_srv = EventServer(self)
         await self.set_initial_server_mode()
         await self.routers[0].get_full_system_status()
+        await self.cyclic_backup()
         self.logger.info(
             f"API server, router, and {len(self.routers[0].modules)} modules initialized"
         )
@@ -402,56 +404,54 @@ class ApiServer:
 
     async def cyclic_backup(self):
         """Check, perform, and clean up cyclic system backups."""
+        time_now = datetime.now()
+        if self._last_check_day == time_now.day:
+            return
+
         if self.is_addon:
             backup_path = DATA_FILES_ADDON_DIR
         else:
             backup_path = DATA_FILES_DIR
         root_filename = backup_path + "sysbackup_"
-        time_now = datetime.now()
-        curr_month = 0
-        month_of_recent_week = 0
-
-        if self._last_check_day == time_now.day:
-            return
         file_name = root_filename + datetime.now().strftime("%Y_%m_%d") + "_d.hcf"
+
         try:
             str_data = await self.prepare_system_backup()
             with open(file_name, "w") as fid:
                 fid.write(str_data)
             self._last_check_day = time_now.day
+            self.logger.info(f"Saved '{file_name.split('/')[1]}' backup file")
         except Exception as err_msg:
             self.logger.error(f"Backup failed: {err_msg}")
+
         # clean up
         dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
         dayly_backup_file_list.sort()
         if time_now.weekday() == 0:
-            # monday morning 0:01
-            new_week_file = dayly_backup_file_list[0].rename("_d.hcf", "_w.hcf")
-            os.copy(dayly_backup_file_list[0], new_week_file)
+            # monday morning 0:01: copy oldest day to weekly file
+            new_week_file = dayly_backup_file_list[0].replace("_d.hcf", "_w.hcf")
+            shutil.copy2(dayly_backup_file_list[0], new_week_file)
             while len(dayly_backup_file_list) > 7:
                 os.remove(dayly_backup_file_list[0])
                 dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
                 dayly_backup_file_list.sort()
             weekly_backup_file_list = glob(f"{backup_path}*_w.hcf")
             weekly_backup_file_list.sort()
-            curr_month = time_now.month
-            month_of_recent_week = self.get_month(weekly_backup_file_list[-2])
-            if (month_of_recent_week < curr_month) or (
-                (month_of_recent_week == 12) and (curr_month == 1)
-            ):
-                # new month
-                new_month_file = weekly_backup_file_list[0].rename("_w.hcf", "_m.hcf")
-                os.copy(weekly_backup_file_list[0], new_month_file)
-                if len(weekly_backup_file_list) > 5:
-                    # recent of new month plus minimum 4 older weeks
-                    os.remove(weekly_backup_file_list[0])
-                    weekly_backup_file_list = glob(f"{backup_path}*_w.hcf")
-                    weekly_backup_file_list.sort()
-
-    def get_month(self, file_name: str) -> int:
-        """Parse filename and return month as integer."""
-        file_parts = file_name.split("_")
-        return int(file_parts[2])
+            if len(weekly_backup_file_list) > 5:
+                # recent of new month plus minimum 4 older weeks
+                os.remove(weekly_backup_file_list[0])
+                weekly_backup_file_list = glob(f"{backup_path}*_w.hcf")
+                weekly_backup_file_list.sort()
+            self.logger.info(
+                f"Saved '{weekly_backup_file_list[-1].split('/')[1]}' as weekly backup file"
+            )
+        if time_now.day == 1:
+            # first day of a month: copy current day to monthly file
+            new_month_file = weekly_backup_file_list[-1].replace("_w.hcf", "_m.hcf")
+            shutil.copy2(dayly_backup_file_list[-1], new_month_file)
+            self.logger.info(
+                f"Saved '{new_month_file.split('/')[1]}' as monthly backup file"
+            )
 
     def get_last_backupday(self) -> int:
         """Return day of last backup."""
@@ -464,7 +464,7 @@ class ApiServer:
             dayly_backup_file_list.sort()
             file_parts = dayly_backup_file_list[-1].split("_")
             return int(file_parts[3])
-        except Exception as err_msg:
+        except Exception:
             return 0  # datetime.now().day
 
 

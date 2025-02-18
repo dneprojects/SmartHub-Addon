@@ -351,14 +351,14 @@ class AutomationAction:
             elif self.action_code in [31]:  # %-value into register
                 actn_desc = f"{self.action_args[0]} ablegen"
             elif actn_target.startswith("Sammel"):
-                actn_target = f"{actn_target.split()[0]} {self.get_dict_entry('coll_cmds',self.action_args[0])}"
+                actn_target = f"{actn_target.split()[0]} {self.get_dict_entry('coll_cmds', self.action_args[0])}"
                 actn_desc = ""
             elif actn_target.startswith("Alarm"):
                 actn_target = f"{actn_target.split()[0]} {self.action_args[0]} {actn_target.split()[1]}"
                 actn_desc = ""
             elif actn_target.startswith("Meldung"):
                 actn_target = (
-                    f"Meldung {self.get_dict_entry('messages',self.action_args[0])}"
+                    f"Meldung {self.get_dict_entry('messages', self.action_args[0])}"
                 )
                 if self.action_code == 58:
                     actn_desc = f"für {self.action_args[1]} Min. setzen"
@@ -561,7 +561,7 @@ class AutomationAction:
         for lgc in app["settings"].logic:
             for lgci in range(lgc.inputs):
                 inp_idx = 165 + (lgc.nmbr - 1) * 8 + lgci
-                opt_str += f'<option value="{inp_idx}">{lgc.name} - Input {lgci + 1}</option>\n'
+                opt_str += f'<option value="{inp_idx}">{lgc.longname} - Input {lgci + 1}</option>\n'
         page = page.replace(
             '<option value="">-- Logikeingang wählen --</option>', opt_str
         )
@@ -573,7 +573,7 @@ class AutomationAction:
         for cnt in app["settings"].counters:
             no_counters += 1
             max_cnt.append(app["settings"].status[MirrIdx.LOGIC - 2 + cnt.nmbr * 3])
-            opt_str += f'<option value="{cnt.nmbr}">{cnt.name}</option>\n'
+            opt_str += f'<option value="{cnt.nmbr}">{cnt.longname}</option>\n'
             counter_numbers.append(cnt.nmbr)
         page = page.replace('<option value="">-- AcZähler wählen --</option>', opt_str)
         page = page.replace(

@@ -96,7 +96,7 @@ class ModuleSettings:
             IfDescriptor("", i + 1, -1) for i in range(self.properties["outputs_dimm"])
         ]
         self.flags: list[IfDescriptor] = []
-        self.counters: list[IfDescriptor] = []
+        self.counters: list[LgcDescriptor] = []
         self.logic: list[LgcDescriptor] = []
         self.messages: list[IfDescriptor] = []
         self.dir_cmds: list[IfDescriptor] = []
@@ -119,9 +119,10 @@ class ModuleSettings:
             if conf[MirrIdx.LOGIC + 3 * l_idx] == 5:
                 # counter found
                 self.counters.append(
-                    IfDescriptor(
+                    LgcDescriptor(
                         f"Counter{conf[MirrIdx.LOGIC + 3 * l_idx + 1]}_{l_idx + 1}",
                         l_idx + 1,
+                        5,
                         conf[MirrIdx.LOGIC + 3 * l_idx + 1],
                     )
                 )
@@ -400,7 +401,7 @@ class ModuleSettings:
         for cnt in self.counters:
             status = replace_bytes(
                 status,
-                b"\x05" + int.to_bytes(cnt.type),  # type 5 counter + max_count
+                b"\x05" + int.to_bytes(cnt.inputs),  # type 5 counter + max_count
                 MirrIdx.LOGIC + 3 * (cnt.nmbr - 1),
             )
         for lgk in self.logic:
@@ -419,6 +420,11 @@ class ModuleSettings:
                 stat_byte = b"U"
             status = replace_bytes(status, stat_byte, MirrIdx.OUTDOOR_MODE)
         return status
+
+    def lgc_setname(self, lunit: LgcDescriptor, lname: str):
+        """Set name and longname."""
+        lunit.name = lname
+        lunit.longname = f"{lname} [{LGC_TYPES[lunit.type]} {lunit.inputs}]"
 
     def get_names(self) -> bool:
         """Get names of entities from list, initialize interfaces."""
@@ -514,12 +520,12 @@ class ModuleSettings:
                             # Description of counters
                             for cnt in self.counters:
                                 if cnt.nmbr == arg_code - 109:
-                                    cnt.name = text
+                                    self.lgc_setname(cnt, text)
                                     break
                             # Description of logic units
                             for lgc in self.logic:
                                 if lgc.nmbr == arg_code - 109:
-                                    lgc.name = text
+                                    self.lgc_setname(lgc, text)
                                     break
                         elif arg_code in range(120, 136):
                             # Description of flags

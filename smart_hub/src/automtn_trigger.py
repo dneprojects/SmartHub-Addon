@@ -1,4 +1,4 @@
-from const import MirrIdx
+from const import LgcDescriptor, MirrIdx
 from const import FingerNames
 
 EventCodes = {
@@ -252,6 +252,7 @@ class AutomationTrigger:
         self.autmn_dict["leds"] = {}
         self.autmn_dict["flags"] = {}
         self.autmn_dict["logic"] = {}
+        self.autmn_dict["counters"] = {}
         self.autmn_dict["messages"] = {}
         self.autmn_dict["dir_cmds"] = {}
         self.autmn_dict["vis_cmds"] = {}
@@ -263,7 +264,9 @@ class AutomationTrigger:
         for a_key in self.autmn_dict.keys():
             for if_desc in getattr(settings, a_key):
                 self.autmn_dict[a_key][if_desc.nmbr] = ""
-                if len(if_desc.name) > 0:
+                if isinstance(if_desc, LgcDescriptor) and len(if_desc.longname) > 0:
+                    self.autmn_dict[a_key][if_desc.nmbr] += f"{if_desc.longname}"
+                elif len(if_desc.name) > 0:
                     self.autmn_dict[a_key][if_desc.nmbr] += f"{if_desc.name}"
         self.autmn_dict["user_modes"] = {1: "User1", 2: "User2"}
         self.autmn_dict["user_modes"][1] = settings.user1_name
@@ -478,7 +481,7 @@ class AutomationTrigger:
                     trig_command += f" {self.get_dict_entry('buttons', event_arg)}"
                     self.unit = event_arg
                 else:
-                    trig_command += f" {self.get_dict_entry('inputs',event_arg - 8)}"
+                    trig_command += f" {self.get_dict_entry('inputs', event_arg - 8)}"
                     self.unit = event_arg - 8
             elif (
                 self.event_code in EventsSets[SelTrgCodes["flag"]]
@@ -518,9 +521,9 @@ class AutomationTrigger:
                             self.value = event_arg - 95 - cnt_i * 16
                             event_arg = cnt_i + 1
                             self.event_arg_name = self.get_dict_entry(
-                                "logic", event_arg
+                                "counters", event_arg
                             )
-                            trig_command = f"Counter {self.event_arg_name}"
+                            trig_command = f"Zähler {self.event_arg_name}"
                             event_desc = f"Wert {self.value} erreicht"
                             break
             elif self.event_code in EventsSets[SelTrgCodes["dimmval"]]:
@@ -753,7 +756,7 @@ class AutomationTrigger:
         for inp in self.settings.inputs:
             if (inp.type == 1) and (len(inp.name.strip()) > 0):
                 opt_str += (
-                    f'<option value="{inp.nmbr+no_buttons}">{inp.name}</option>\n'
+                    f'<option value="{inp.nmbr + no_buttons}">{inp.name}</option>\n'
                 )
         page = page.replace('<option value="">-- Taster wählen --</option>', opt_str)
 
@@ -763,7 +766,7 @@ class AutomationTrigger:
             if (inp.type > 1) and (len(inp.name.strip()) > 0):
                 no_switches += 1
                 opt_str += (
-                    f'<option value="{inp.nmbr+no_buttons}">{inp.name}</option>\n'
+                    f'<option value="{inp.nmbr + no_buttons}">{inp.name}</option>\n'
                 )
         page = page.replace('<option value="">-- Schalter wählen --</option>', opt_str)
         if no_switches == 0:
@@ -812,7 +815,7 @@ class AutomationTrigger:
         opt_str = '<option value="">-- Logikfunktion wählen --</option>'
         for lgc in self.settings.logic:
             if len(lgc.name.strip()) > 0:
-                opt_str += f'<option value="{lgc.nmbr + 80}">{lgc.name}</option>'
+                opt_str += f'<option value="{lgc.nmbr + 80}">{lgc.longname}</option>'
         page = page.replace(
             '<option value="">-- Logikfunktion wählen --</option>', opt_str
         )
@@ -913,10 +916,10 @@ class AutomationTrigger:
         opt_str = '<option value="">-- Zähler wählen --</option>'
         max_cnt = []
         no_counters = 0
-        for cnt in self.settings.logic:
+        for cnt in self.settings.counters:
             no_counters += 1
             max_cnt.append(self.settings.status[MirrIdx.LOGIC - 2 + cnt.nmbr * 3])
-            opt_str += f'<option value="{cnt.nmbr}">{cnt.name}</option>\n'
+            opt_str += f'<option value="{cnt.nmbr}">{cnt.longname}</option>\n'
         page = page.replace('<option value="">-- TrZähler wählen --</option>', opt_str)
         page = page.replace(
             "max_count = [16, 16, 16, 16, 16, 16, 16, 16, 16, 16]",
@@ -963,7 +966,6 @@ class AutomationTrigger:
             self.event_arg2 = 0
         if self.event_code == SelTrgCodes["logic"]:
             self.event_id = 8
-            self.event_code = 6
             if form_data["trigger_logic2"][0] == "1":
                 self.event_arg1 = self.automation.get_sel(form_data, "trigger_logic")
                 self.event_arg2 = 0

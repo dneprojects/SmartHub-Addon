@@ -2,6 +2,7 @@ import logging
 from automtn_trigger import AutomationTrigger
 from automtn_condition import AutomationCondition
 from automtn_action import AutomationAction
+from const import LgcDescriptor
 
 
 class AutomationsSet:
@@ -42,7 +43,9 @@ class AutomationsSet:
         for a_key in self.autmn_dict.keys():
             for if_desc in getattr(settings, a_key):
                 self.autmn_dict[a_key][if_desc.nmbr] = ""
-                if len(if_desc.name) > 0:
+                if isinstance(if_desc, LgcDescriptor) and len(if_desc.longname) > 0:
+                    self.autmn_dict[a_key][if_desc.nmbr] += f"{if_desc.longname}"
+                elif len(if_desc.name) > 0:
                     self.autmn_dict[a_key][if_desc.nmbr] += f"{if_desc.name}"
         self.autmn_dict["user_modes"] = {1: "User1", 2: "User2"}
         self.autmn_dict["user_modes"][1] = settings.user1_name
@@ -250,6 +253,7 @@ class AutomationDefinition:
                     l_name = self.get_logic_name(unit_no)
                     out_desc = f"Logikeingang {inp_no} von {l_name}"
                 else:
+                    l_name = self.get_counter_name(unit_no)
                     if inp_no == 1:
                         out_desc = f"Zähler '{l_name}' hoch zählen"
                     elif inp_no == 2:
@@ -268,13 +272,21 @@ class AutomationDefinition:
                 return unit_no + 1, inp_no, lg_unit.name
         return unit_no + 1, inp_no, ""
 
+    def get_counter_name(self, unit_no: int) -> str:
+        """Return name of counter unit"""
+        l_units = self.settings.counters
+        for lg_unit in l_units:
+            if lg_unit.nmbr == unit_no:
+                return lg_unit.longname
+        return f"Unit {unit_no}"
+
     def get_logic_name(self, unit_no: int) -> str:
-        """Return name of lgoc unit"""
+        """Return name of logic unit"""
         l_units = self.settings.logic
         for lg_unit in l_units:
             if lg_unit.nmbr == unit_no:
-                return lg_unit.name
-        return f"Unit {unit_no }"
+                return lg_unit.longname
+        return f"Unit {unit_no}"
 
     def get_mode_desc(self, md_no: int) -> str:
         """Return description for mode number."""

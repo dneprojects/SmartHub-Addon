@@ -258,7 +258,7 @@ async def show_router_overview(main_app, popup_msg="") -> web.Response:
     mod_err_str = ""
     for err_cnt in range(rtr.comm_errors[2]):
         err_code = rtr.comm_errors[4 + 2 * err_cnt]
-        mod_err_str += f'Modul {rtr.comm_errors[3 + 2*err_cnt]}: <a title="{RT_ERROR_CODE[err_code]}">F{err_code}</a>; '
+        mod_err_str += f'Modul {rtr.comm_errors[3 + 2 * err_cnt]}: <a title="{RT_ERROR_CODE[err_code]}">F{err_code}</a>; '
     if mod_err_str == "":
         mod_err_str = "-"
     else:
@@ -467,7 +467,7 @@ def fill_settings_template(main_app, title, subtitle, step, settings, key: str) 
     if key == "fingers":
         finger_dict_str = "const fngrNames = {\n"
         for f_i in range(10):
-            finger_dict_str += f'  {f_i+1}: "{FingerNames[f_i + 1]}",\n'
+            finger_dict_str += f'  {f_i + 1}: "{FingerNames[f_i + 1]}",\n'
         finger_dict_str += "}\n"
         page = page.replace("const fngrNames = {}", finger_dict_str)
         if main_app["api_srv"].is_offline:
@@ -501,7 +501,7 @@ def get_module_properties(mod) -> str:
     props = "<h3>Eigenschaften</h3>\n"
     props += "<table>\n"
     props += f'<tr><td style="width:80px;">Adresse:</td><td>{mod._id}</td></tr>\n'
-    props += f"<tr><td>Kanalpaar:</td><td>{mod._channel*2 - 1} + {mod._channel*2}</td></tr>\n"
+    props += f"<tr><td>Kanalpaar:</td><td>{mod._channel * 2 - 1} + {mod._channel * 2}</td></tr>\n"
     props += f"<tr><td>Bereich:</td><td>{mod.get_area_name()}</td></tr>\n"
     props += f"<tr><td>Gruppe:</td><td>{mod.get_group_name()}</td></tr>\n"
     props += f"<tr><td>Hardware:</td><td>{mod._serial}</td></tr>\n"
@@ -1106,6 +1106,12 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                 pass  # group 0 not removable
             else:
                 tbl += f'<td><input type="checkbox" class="sel_element" name="sel_{ci}" title="{title_txt}" value="{ci}"></td>'
+        if key in ["counters", "logic"]:
+            if key == "logic":
+                hlp_txt = "Logiktyp / Eingänge"
+            else:
+                hlp_txt = "Zähler / Maximalwert"
+            tbl += f'<td title="{hlp_txt}">[{tbl_data[ci].longname.split("[")[1]}</td>'
         tbl += "</tr>\n"
     if key in [
         "glob_flags",
@@ -1243,9 +1249,10 @@ def parse_response_form(main_app, form_data):
                 elif key in ["counters"]:
                     max_cnt = int(form_data["ModSettings"][0].split("-")[-1])
                     settings.__getattribute__(key).append(
-                        IfDescriptor(
+                        LgcDescriptor(
                             f"Counter{max_cnt}_{int(form_data[form_key][0])}",
                             int(form_data[form_key][0]),
+                            5,
                             max_cnt,
                         )
                     )
@@ -1298,6 +1305,11 @@ def parse_response_form(main_app, form_data):
                 settings.__getattribute__(key)[int(indices[0])].name = form_data[
                     form_key
                 ][0]
+                if key in ["logic", "counter"]:
+                    elem = settings.__getattribute__(key)[int(indices[0])]
+                    elem.longname = (
+                        f"{elem.name} [{LGC_TYPES[elem.type]} {elem.inputs}]"
+                    )
             elif indices[1] == 0 and key not in ["day_sched", "night_sched"]:
                 settings.__getattribute__(key)[int(indices[0])].name = form_data[
                     form_key
@@ -1675,11 +1687,11 @@ def prepare_log_table(log_list) -> str:
     tbl += indent(6) + "<tbody>\n"
     for entry in log_list:
         tbl += indent(6) + '<tr id="atm-tr">\n'
-        tbl += indent(7) + f'<td>{entry["no"]}</td>\n'
-        tbl += indent(7) + f'<td>{entry["date"]}</td>\n'
-        tbl += indent(7) + f'<td>{entry["time"]}</td>\n'
-        tbl += indent(7) + f'<td>{entry["user"]}</td>\n'
-        tbl += indent(7) + f'<td>{entry["finger"]}</td>\n'
+        tbl += indent(7) + f"<td>{entry['no']}</td>\n"
+        tbl += indent(7) + f"<td>{entry['date']}</td>\n"
+        tbl += indent(7) + f"<td>{entry['time']}</td>\n"
+        tbl += indent(7) + f"<td>{entry['user']}</td>\n"
+        tbl += indent(7) + f"<td>{entry['finger']}</td>\n"
         tbl += indent(6) + "</tr>\n"
     tbl += indent(6) + "</tbody>\n"
     tbl += indent(5) + "</table>\n"
@@ -1694,7 +1706,7 @@ def log_download(main_app):
     str_data = ""
     ekey_protocol = main_app["ekey_log"]
     for entry in ekey_protocol:
-        str_data += f'{entry["no"]},{entry["date"]},{entry["time"]},{entry["user"]},{entry["finger"]}\n'
+        str_data += f"{entry['no']},{entry['date']},{entry['time']},{entry['user']},{entry['finger']}\n"
     return web.Response(
         headers=MultiDict(
             {"Content-Disposition": f"Attachment; filename = {file_name}"}

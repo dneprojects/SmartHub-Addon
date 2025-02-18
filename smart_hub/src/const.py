@@ -2,7 +2,7 @@
 
 from typing import Final
 
-SMHUB_VERSION = "2.2.3"
+SMHUB_VERSION = "2.2.4"
 
 OWN_IP = "192.168.178.110"
 ANY_IP = "0.0.0.0"
@@ -870,6 +870,7 @@ class LgcDescriptor(IfDescriptor):
     def __init__(self, iname, inmbr, itype, iinputs) -> None:
         super().__init__(iname, inmbr, itype)
         self.inputs: int = iinputs
+        self.longname: str = f"{iname} [{LGC_TYPES[itype]} {iinputs}]"
 
 
 LGC_TYPES: dict[int, str] = {
@@ -877,6 +878,7 @@ LGC_TYPES: dict[int, str] = {
     2: "NAND",
     3: "OR",
     4: "NOR",
+    5: "CNT",
 }
 
 FingerNames: dict[int, str] = {
