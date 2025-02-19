@@ -838,7 +838,7 @@ class RtHdlr(HdlrBase):
                 await asyncio.sleep(1)
                 await self.handle_router_cmd_resp(self.rt_id, RT_CMDS.MOD_FLASH_STAT)
                 await progress_fun(mod, self.rt_msg._resp_msg.decode("iso8859-1"))
-
+            await asyncio.sleep(0.5)
             await self.handle_router_cmd_resp(self.rt_id, RT_CMDS.MOD_FLASH_STAT)
             await progress_fun(mod, self.rt_msg._resp_msg.decode("iso8859-1"))
             self.logger.info(f"Update of module {mod} finished")
