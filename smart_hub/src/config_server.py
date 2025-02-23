@@ -113,7 +113,7 @@ class ConfigServer:
             api_srv = request.app["api_srv"]
             rt_no = api_srv.routers[0]._id
             if api_srv.release_block_next:
-                api_srv.block_network_if(rt_no, False)
+                await api_srv.block_network_if(rt_no, False)
                 api_srv.release_block_next = False
             response = await handler(request)
             return response

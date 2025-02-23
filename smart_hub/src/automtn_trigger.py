@@ -507,7 +507,7 @@ class AutomationTrigger:
                     trig_command = f"Globaler Merker {self.event_arg_name}"
                     event_desc = set_str
                 elif event_arg in range(81, 91):
-                    # self.event_id = 8
+                    self.event_id = 8
                     self.unit = event_arg - 80
                     self.event_arg_name = self.get_dict_entry("logic", self.unit)
                     trig_command = f"Logikfunktion {self.event_arg_name}"
