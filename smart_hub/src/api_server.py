@@ -429,8 +429,9 @@ class ApiServer:
         dayly_backup_file_list.sort()
         if time_now.weekday() == 0:
             # monday morning 0:01: copy oldest day to weekly file
-            new_week_file = dayly_backup_file_list[0].replace("_d.hcf", "_w.hcf")
-            shutil.copy2(dayly_backup_file_list[0], new_week_file)
+            new_week_file = dayly_backup_file_list[-1].replace("_d.hcf", "_w.hcf")
+            with open(new_week_file, "w") as fid:
+                fid.write(str_data)
             while len(dayly_backup_file_list) > 7:
                 os.remove(dayly_backup_file_list[0])
                 dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
@@ -447,8 +448,9 @@ class ApiServer:
             )
         if time_now.day == 1:
             # first day of a month: copy current day to monthly file
-            new_month_file = weekly_backup_file_list[-1].replace("_w.hcf", "_m.hcf")
-            shutil.copy2(dayly_backup_file_list[-1], new_month_file)
+            new_month_file = dayly_backup_file_list[-1].replace("_w.hcf", "_m.hcf")
+            with open(new_month_file, "w") as fid:
+                fid.write(str_data)
             self.logger.info(
                 f"Saved '{new_month_file.split('/')[1]}' as monthly backup file"
             )
