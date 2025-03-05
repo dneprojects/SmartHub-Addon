@@ -420,22 +420,26 @@ class ApiServer:
             with open(file_name, "w") as fid:
                 fid.write(str_data)
             self._last_check_day = time_now.day
-            self.logger.info(f"Saved '{file_name.split('/')[1]}' backup file")
+            self.logger.info(f"Saved '{file_name.split('/')[-1]}' backup file")
         except Exception as err_msg:
             self.logger.error(f"Backup failed: {err_msg}")
 
         # clean up
         dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
         dayly_backup_file_list.sort()
+        while len(dayly_backup_file_list) > 7:
+            if os.path.exists(dayly_backup_file_list[0]):
+                os.remove(dayly_backup_file_list[0])
+            else:
+                self.logger.warning(f"The file '{dayly_backup_file_list[0]}' does not exist, can't be deleted")
+            dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
+            dayly_backup_file_list.sort()
         if time_now.weekday() == 0:
-            # monday morning 0:01: copy oldest day to weekly file
+            # monday morning 0:01: save today to weekly file
             new_week_file = dayly_backup_file_list[-1].replace("_d.hcf", "_w.hcf")
             with open(new_week_file, "w") as fid:
                 fid.write(str_data)
-            while len(dayly_backup_file_list) > 7:
-                os.remove(dayly_backup_file_list[0])
-                dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
-                dayly_backup_file_list.sort()
+
             weekly_backup_file_list = glob(f"{backup_path}*_w.hcf")
             weekly_backup_file_list.sort()
             if len(weekly_backup_file_list) > 5:
@@ -444,15 +448,16 @@ class ApiServer:
                 weekly_backup_file_list = glob(f"{backup_path}*_w.hcf")
                 weekly_backup_file_list.sort()
             self.logger.info(
-                f"Saved '{weekly_backup_file_list[-1].split('/')[1]}' as weekly backup file"
+                f"Saved '{weekly_backup_file_list[-1].split('/')[-1]}' as weekly backup file"
             )
+
         if time_now.day == 1:
-            # first day of a month: copy current day to monthly file
-            new_month_file = dayly_backup_file_list[-1].replace("_w.hcf", "_m.hcf")
+            # first day of a month: save today to monthly file
+            new_month_file = dayly_backup_file_list[-1].replace("_d.hcf", "_m.hcf")
             with open(new_month_file, "w") as fid:
                 fid.write(str_data)
             self.logger.info(
-                f"Saved '{new_month_file.split('/')[1]}' as monthly backup file"
+                f"Saved '{new_month_file.split('/')[-1]}' as monthly backup file"
             )
 
     def get_last_backupday(self) -> int:
