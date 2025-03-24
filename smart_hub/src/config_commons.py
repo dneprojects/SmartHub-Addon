@@ -220,6 +220,15 @@ def show_hub_overview(app) -> web.Response:
             ">-- Modultyp --<",
             ">alle aktuell<",
         )
+    local_backup_files = api_srv.get_unique_backup_list()
+    opt_str = ""
+    for file_date in local_backup_files.keys():
+        opt_str += (
+            f'\n<option value="{local_backup_files[file_date]}">{file_date}</option>'
+        )
+    html_str = html_str.replace(
+        ">-- Lokales Backup --</option>", ">-- Lokales Backup --</option>" + opt_str
+    )
     html_str = html_str.replace("<!-- SideMenu -->", side_menu)
     return web.Response(text=html_str, content_type="text/html", charset="utf-8")
 
@@ -236,7 +245,15 @@ def show_modules(app) -> web.Response:
     images = ""
     for module in modules:
         pic_file, title = get_module_image(module._typ)
-        images += f'<div class="figd_grid"><a href="module-{module._id}"><div class="fig_grid"><img src="configurator_files/{pic_file}" alt="{module._name}"><p class="mod_subtext">{module._name}</p></div></a></div>\n'
+        images += '<div class="figd_grid">'
+        images += f'<a href="module-{module._id}">'
+        images += '<div class="fig_grid">'
+        images += f'<img src="configurator_files/{pic_file}" alt="{module._name}">'
+        images += "</div>\n"
+        images += '<div class="lbl_grid">'
+        images += f'<span class="addr_txt">{module._id}</span>'
+        images += f'<p class="mod_subtext">{module._name}</p>'
+        images += "</div></a></div>\n"
     page = page.replace("<!-- ImageGrid -->", images)
     return web.Response(text=page, content_type="text/html", charset="utf-8")
 
@@ -318,13 +335,20 @@ def show_update_modules(mod_list, new_fw: str, mod_type: str, logger) -> web.Res
     for module in mod_list:
         pic_file, title = get_module_image(module.typ)
         images += '<div class="figd_grid">\n'
+        images += '<div class="fig_upd_grid">'
+        images += f'<img src="configurator_files/{pic_file}" alt="{module.name}">'
+        images += "</div>\n"
+        images += '<div class="lbl_grid">'
         if is_outdated(module.fw, new_fw, logger):
             images += f'<input type="checkbox" class="mod_chk" id="chk_{module.id}" name="chk_{module.id}" value="{module.id}" checked>\n'
         else:
             images += f'<input type="checkbox" class="mod_chk" id="chk_{module.id}" name="chk_{module.id}" value="{module.id}">\n'
-        images += f'<label for="chk_{module.id}">\n'
-        images += f'<img src="configurator_files/{pic_file}" alt="{module.name}"><br>{module.name}\n'
+        images += f'<span class="addr_txt">{module.id}</span>'
+        images += '<div style="align-content: end;">'
+        images += f'<p class="mod_subtext">{module.name}</p>'
         images += f'<p class="fw_subtext" id="stat_{module.id}">{module.fw}</p>\n'
+        images += "</div>\n"
+        images += "</div>\n"
         images += "</label>\n"
         images += "</div>\n"
     images += "</div>\n"

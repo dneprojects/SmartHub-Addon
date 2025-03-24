@@ -273,6 +273,30 @@ class ConfigServer:
             body=str_data,
         )
 
+    @routes.post("/loc_restore")
+    async def get_localupload(request: web.Request) -> web.Response:  # type: ignore
+        inspect_header(request)
+        if client_not_authorized(request):
+            return show_not_authorized(request.app)
+        app = request.app
+        data = await request.post()
+        backup_file = data["loc_backup_select"]  # type: ignore
+        with open(backup_file, "r") as file:
+            content_str = file.read()
+        content_parts = content_str.split("---\n")
+        if content_parts[-1] == "":
+            content_parts = content_parts[:-1]
+        app.logger.info("Local backup file uploaded")
+        await send_to_router(app, content_parts[0])
+        for mod_addr in app["api_srv"].routers[0].mod_addrs:
+            for cont_part in content_parts[1:]:
+                if mod_addr == int(cont_part.split(";")[0]):
+                    break
+            await send_to_module(app, cont_part, mod_addr)
+            app.logger.info(f"Module configuration file for module {mod_addr} uploaded")
+        init_side_menu(app)
+        return show_modules(app)
+
     @routes.post("/upload")
     async def get_upload(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)

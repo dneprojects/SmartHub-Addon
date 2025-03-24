@@ -303,7 +303,13 @@ def show_modules_overview(app) -> web.Response:
     for mod in rtr.modules:
         m_type = mod._typ
         pic_file, title = get_module_image(m_type)
-        images += f'<div class="figd_grid" name="test_mod_img" id=test-{mod._id}><a href="test/start-{mod._id}"><div class="fig_grid"><img src="configurator_files/{pic_file}" alt="{mod._name}"><p class="mod_subtext">{mod._name}</p></div></a></div>\n'
+        images += f'<div class="figd_grid" name="test_mod_img" id=test-{mod._id}><a href="test/start-{mod._id}">'
+        images += f'<div class="fig_grid"><img src="configurator_files/{pic_file}" alt="{mod._name}">'
+        images += "</div>\n"
+        images += '<div class="lbl_grid">'
+        images += f'<span class="addr_txt">{mod._id}</span>'
+        images += f'<p class="mod_subtext">{mod._name}</p>'
+        images += "</div></a></div>\n"
     page = page.replace("<!-- ImageGrid -->", images)
     page = page.replace("const mod_addrs = [];", f"const mod_addrs = {rtr.mod_addrs};")
     return web.Response(text=page, content_type="text/html", charset="utf-8")
@@ -342,7 +348,7 @@ async def show_router_testpage(main_app, popup_msg="") -> web.Response:
     mod_err_str = ""
     for err_cnt in range(rtr.comm_errors[2]):
         err_code = rtr.comm_errors[4 + 2 * err_cnt]
-        mod_err_str += f'Modul {rtr.comm_errors[3 + 2*err_cnt]}: <a title="{RT_ERROR_CODE[err_code]}">F{err_code}</a>; '
+        mod_err_str += f'Modul {rtr.comm_errors[3 + 2 * err_cnt]}: <a title="{RT_ERROR_CODE[err_code]}">F{err_code}</a>; '
     if mod_err_str == "":
         mod_err_str = "-"
     else:
@@ -384,10 +390,10 @@ async def show_router_testpage(main_app, popup_msg="") -> web.Response:
         props += f'<tr><td>Modulrückmeldungen:</td><td><a title="{mod_boot_status_txt}">{mod_fdback_str}</a></td></tr>\n'
     props += f"<tr><td>Modulfehler:</td><td>{mod_err_str}</td></tr>\n"
     props += f"<tr><td>Letzter Modulfehler:</td><td>{last_err_str}</td></tr>\n"
-    props += f"<tr><td>Fehler Speicherbank 1-2:</td><td>{chan_stat[2]+chan_stat[3]*256} | {chan_stat[4]+chan_stat[5]*256}</td></tr>\n"
+    props += f"<tr><td>Fehler Speicherbank 1-2:</td><td>{chan_stat[2] + chan_stat[3] * 256} | {chan_stat[4] + chan_stat[5] * 256}</td></tr>\n"
     props += f"<tr><td>Timeouts Kanäle 1-4:</td><td>{chan_stat[7]} | {chan_stat[8]} | {chan_stat[9]} | {chan_stat[10]}</td></tr>\n"
     props += f"<tr><td>Fehler Masterring:</td><td>{chan_stat[11]}</td></tr>\n"
-    props += f"<tr><td>Einschaltvorgänge:</td><td>{chan_stat[14]+chan_stat[15]*256}</td></tr>\n"
+    props += f"<tr><td>Einschaltvorgänge:</td><td>{chan_stat[14] + chan_stat[15] * 256}</td></tr>\n"
     props += f"<tr><td>Spannungen 5 V | 24 V:</td><td>{v_5} V | {v_24} V</td></tr>\n"
     props += f"<tr><td>Kanalströme 1-4:</td><td>{i_1} mA | {i_2} mA | {i_3} mA | {i_4} mA</td></tr>\n"
     props += f"<tr><td>Kanalströme 5-8:</td><td>{i_5} mA | {i_6} mA | {i_7} mA | {i_8} mA</td></tr>\n"

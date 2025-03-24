@@ -146,9 +146,17 @@
             </div>
           </form>
           <h3>Konfiguration laden (Wiederherstellung)</h3>
+          <form id="loc_restore" action="loc_restore" method="post">
+            <div style="position: relative;">
+            <select id="file_button_l" title="Lokales Backup auswählen" name="loc_backup_select">
+              <option value="">-- Lokales Backup --</option>
+            </select>
+              <button name="SysRestore" id="file_button" type="submit" value="Sys">Upload</button>
+            </div>
+          </form>
           <form id="file_upload" action="upload" enctype="multipart/form-data" method="post">
             <div style="position: relative;">
-              <input id="file_updwnload" name="file" type="file" value="my_system.hcf" accept=".hcf" />
+              <input id="sys_upload" name="file" type="file" value="my_system.hcf" accept=".hcf" />
               <button name="SysUpload" id="file_button" type="submit" value="Sys">Upload</button>
             </div>
           </form>

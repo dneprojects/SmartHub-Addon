@@ -237,8 +237,12 @@ img {
         width: 110px;
         font-size: 90%;
     }
-    input#file_updwnload {
+    input#file_updwnload,
+    input#upd_updwnload {
         width:250px;
+    }
+    #file_button_l {
+        width: 255px;
     }
     table {
         font-size: 90%;

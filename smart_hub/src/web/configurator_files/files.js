@@ -6,9 +6,13 @@ const updates_butt = document.getElementById("updates_button");
 const updates_pop = document.getElementById("updates_popup");
 const close_updates_pop = document.getElementById("close_updates_popup");
 const form_doc = document.getElementById("file_doc");
-const mod_type_sel = document.getElementsByName("mod_type_select")[0];
-const sys_download = document.getElementsByName("SysDownload")[0];
-const sys_doc = document.getElementsByName("SysDoc")[0];
+const mod_type_sel = document.getElementsByName("mod_type_select");
+const sys_download = document.getElementsByName("SysDownload");
+const sys_doc = document.getElementsByName("SysDoc");
+const bak_restore = document.getElementsByName("SysRestore");
+const sys_upload = document.getElementsByName("SysUpload");
+const file_button_l = document.getElementById("file_button_l");
+const sys_upload_l = document.getElementById("sys_upload");
 
 if (document.getElementById("form_doc")) {
     form_doc.addEventListener("submit", function () {
@@ -21,6 +25,20 @@ if (document.getElementById("form_upload")) {
     });
 }
 
+if (file_button_l) {
+    file_button_l.addEventListener("change", function () {
+        handle_local_button();
+    });
+    handle_local_button();
+}
+if (sys_upload_l) {
+    sys_upload_l.addEventListener("change", function () {
+        handle_upload_button();
+    });
+    handle_upload_button();
+}
+
+
 if (document.getElementById("config_button")) {
     document.getElementById("config_button").addEventListener("click", function () {
         msg_popup.innerHTML = msg_popup.innerHTML.replace("ContentTitle", "Neue Initialisierung")
@@ -29,12 +47,22 @@ if (document.getElementById("config_button")) {
     });
 }
 if (sys_download) {
-    sys_download.addEventListener("click", function () {
+    sys_download[0].addEventListener("click", function () {
+        file_popup.classList.remove("show");
+    });
+}
+if (bak_restore) {
+    bak_restore[0].addEventListener("click", function () {
+        file_popup.classList.remove("show");
+    });
+}
+if (sys_upload) {
+    sys_upload[0].addEventListener("click", function () {
         file_popup.classList.remove("show");
     });
 }
 if (sys_doc) {
-    sys_doc.addEventListener("click", function () {
+    sys_doc[0].addEventListener("click", function () {
         file_popup.classList.remove("show");
     });
 }
@@ -62,7 +90,7 @@ form_mod_update.addEventListener("submit", function () {
     openMsgPopup();
 });
 if (mod_type_sel) {
-    mod_type_sel.addEventListener("change", function () {
+    mod_type_sel[0].addEventListener("change", function () {
         document.getElementById("loc_mod_fw_update").requestSubmit();
     });
 }
@@ -77,3 +105,19 @@ function openMsgPopup() {
     if (updates_pop)
         updates_pop.classList.remove("show");
 };
+function handle_local_button() {
+    if (file_button_l.selectedIndex)
+        bak_restore[0].disabled = false;
+    else {
+        bak_restore[0].disabled = true;
+    }
+}
+
+function handle_upload_button() {
+    if (sys_upload_l.value == "")
+        sys_upload[0].disabled = true;
+    else {
+        sys_upload[0].disabled = false;
+    }
+
+}

@@ -133,7 +133,8 @@
     width: 100px;
     top: 0;
     margin-right: 0px;
-    margin-left: 10px;
+    margin-left: 0px;
+    margin-bottom: 10px;
     font-family: "Lucida Sans", Arial, Verdana, Helvetica, sans-serif;
     font: 11px arial, helvetica, clean, sans-serif;
 }
@@ -143,9 +144,9 @@
 }
 #file_button_l  {
     height: 22px;
-    width: 245px;
+    width: 365px;
     top: 0;
-    margin-right: 30px;
+    margin-right: 10px;
     margin-left: 0px;
     font-family: "Lucida Sans", Arial, Verdana, Helvetica, sans-serif;
     font: 11px arial, helvetica, clean, sans-serif;

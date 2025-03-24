@@ -2,7 +2,7 @@
 
 from typing import Final
 
-SMHUB_VERSION = "2.2.9"
+SMHUB_VERSION = "2.2.10"
 
 OWN_IP = "192.168.178.110"
 ANY_IP = "0.0.0.0"
@@ -844,6 +844,32 @@ MODULE_FIRMWARE: Final[dict[bytes, str]] = {
     b"\x50\x64": "scbws180",
     b"\x50\x65": "scbs360",
     b"\x50\x66": "scbws2180",
+}
+
+MODULE_FIRMWARE_NEW: Final[dict[bytes, str]] = {
+    b"\x00\x01": "scvmv30",
+    b"\x01\x02": "scrmgv45",
+    b"\x01\x03": "scrmgv46",
+    # b"\x01\x0a": "Smart Controller X",
+    b"\x32\x01": "scrmkv45",
+    b"\x0a\x01": "scout230relais",
+    b"\x0a\x02": "scout230tronic",
+    b"\x0a\x14": "sdmpab",
+    b"\x0a\x15": "sdmpab",
+    b"\x0a\x16": "sdmpab",
+    b"\x0a\x1e": "scsmartio2",
+    b"\x0a\x32": "scout230relais",
+    b"\x0a\x33": "screlaisspv2",
+    b"\x0b\x01": "EM230",
+    b"\x0b\x1e": "EM24",
+    b"\x0b\x1f": "EM25",
+    b"\x14\x01": "ASM",
+    b"\x1e\x01": "FAN232",
+    b"\x1e\x03": "FANGSM",
+    b"\x32\x28": "UMGSENS",
+    b"\x50\x64": "BWS180",
+    b"\x50\x65": "BS360",
+    b"\x50\x66": "BWS2180",
 }
 
 
