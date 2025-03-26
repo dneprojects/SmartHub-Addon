@@ -3,6 +3,7 @@ from glob import glob
 import logging
 from copy import deepcopy as dpcopy
 from const import (
+    MODULE_FIRMWARE_NEW,
     MirrIdx,
     SMGIdx,
     MODULE_CODES,
@@ -187,13 +188,14 @@ class HbtnModule:
             self.update_fw_file = ""
             self.update_version = ""
             return
-        fw_files = FW_FILES_DIR + MODULE_FIRMWARE[self._typ] + "*.bin"
+
         file_found = False
-        # uploaded_fw_file = (
-        #     DATA_FILES_DIR + f"Firmware_{self._typ[0]:02d}_{self._typ[1]:02d}.bin"
-        # )
+        fw_files = FW_FILES_DIR + MODULE_FIRMWARE[self._typ] + "*.bin"
+        fw_file_list = glob(fw_files)
+        fw_files = FW_FILES_DIR + MODULE_FIRMWARE_NEW[self._typ] + "*.bin"
+        fw_file_list += glob(fw_files)
         curr_fw = self.get_sw_version()
-        for fw_file in glob(fw_files):
+        for fw_file in fw_file_list:
             file_found = True
             with open(fw_file, "rb") as fid:
                 fw_bytes = fid.read()

@@ -4,7 +4,7 @@ from openpyxl.styles.alignment import Alignment
 
 from automation import AutomationsSet
 from configuration import ModuleSettingsLight
-from const import DATA_FILES_ADDON_DIR, DATA_FILES_DIR
+from const import DATA_FILES_ADDON_DIR, DATA_FILES_DIR, LGC_TYPES
 import psutil
 
 header_font = Font(b=True, sz=14.0, color="c0372d")
@@ -466,6 +466,13 @@ def document_module(doc, page, mod, idx) -> str:
     page += "          <td></td>\n"
     page += "          <td></td>\n"
     page += "        </tr>\n"
+    if mod.io_properties["inputs"] > 0:
+        page += "        <tr>\n"
+        page += "          <td>Tastendruck kurz:</td>\n"
+        page += f"          <td>{settings.t_short} ms</td>\n"
+        page += "          <td>Tastendruck lang:</td>\n"
+        page += f"          <td>{settings.t_long} ms</td>\n"
+        page += "        </tr>\n"
     page += "      </table>\n"
 
     row = 1
@@ -492,6 +499,12 @@ def document_module(doc, page, mod, idx) -> str:
     row += 1
     ws.cell(row, 1).value = "Bereich:"
     ws.cell(row, 2).value = mod.get_area_name()
+    if mod.io_properties["inputs"] > 0:
+        row += 1
+        ws.cell(row, 1).value = "Tastendruck kurz:"
+        ws.cell(row, 2).value = f"{settings.t_short} ms"
+        ws.cell(row, 3).value = "Tastendruck lang:"
+        ws.cell(row, 4).value = f"{settings.t_long} ms"
 
     if settings is None:
         settings = ModuleSettingsLight(mod)
@@ -633,7 +646,208 @@ def document_module(doc, page, mod, idx) -> str:
         page += "        </tbody>\n"
         page += "      </table>\n"
         row += 1
-
+    if len(settings.users):
+        page += "      <h2>Benutzer</h2>\n"
+        page += "      <table>\n"
+        page += "        <thead>\n"
+        page += "          <tr>\n"
+        page += "            <th>Nr.</th>\n"
+        page += "            <th>Name</th>\n"
+        page += "            <th>Sperre</th>\n"
+        page += "          </tr>\n"
+        page += "        </thead>\n"
+        page += "        <tbody>\n"
+        ws.cell(row, 1).value = "Benutzer"
+        ws.cell(row, 1).font = subheader_font_red
+        row += 1
+        ws = write_col_headers(ws, row)
+        row += 1
+        for usr in settings.users:
+            if usr.type < 0:
+                usr_status = "gesperrt"
+            else:
+                usr_status = ""
+            page += "          <tr>\n"
+            page += f"            <td>{usr.nmbr}</td>\n"
+            page += f"            <td>{clean_name(usr.name)}</td>\n"
+            page += f"            <td>{usr_status}</td>\n"
+            page += "          </tr>\n"
+            ws.cell(row, 1).value = usr.nmbr
+            ws.cell(row, 1).alignment = left_aligned
+            ws.cell(row, 2).value = clean_name(usr.name)
+            ws.cell(row, 3).value = usr_status
+            row += 1
+        page += "        </tbody>\n"
+        page += "      </table>\n"
+        row += 1
+    if len(settings.flags):
+        page += "      <h2>Lokale Merker</h2>\n"
+        page += "      <table>\n"
+        page += "        <thead>\n"
+        page += "          <tr>\n"
+        page += "            <th>Nr.</th>\n"
+        page += "            <th>Name</th>\n"
+        page += "          </tr>\n"
+        page += "        </thead>\n"
+        page += "        <tbody>\n"
+        ws.cell(row, 1).value = "Lokale Merker"
+        ws.cell(row, 1).font = subheader_font_red
+        row += 1
+        ws = write_col_headers(ws, row)
+        row += 1
+        for flg in settings.flags:
+            page += "          <tr>\n"
+            page += f"            <td>{flg.nmbr}</td>\n"
+            page += f"            <td>{clean_name(flg.name)}</td>\n"
+            page += "          </tr>\n"
+            ws.cell(row, 1).value = flg.nmbr
+            ws.cell(row, 1).alignment = left_aligned
+            ws.cell(row, 2).value = clean_name(flg.name)
+            row += 1
+        page += "        </tbody>\n"
+        page += "      </table>\n"
+        row += 1
+    if len(settings.counters):
+        page += "      <h2>Zähler</h2>\n"
+        page += "      <table>\n"
+        page += "        <thead>\n"
+        page += "          <tr>\n"
+        page += "            <th>Nr.</th>\n"
+        page += "            <th>Name</th>\n"
+        page += "            <th>Typ</th>\n"
+        page += "          </tr>\n"
+        page += "        </thead>\n"
+        page += "        <tbody>\n"
+        ws.cell(row, 1).value = "Zähler"
+        ws.cell(row, 1).font = subheader_font_red
+        row += 1
+        ws = write_col_headers(ws, row)
+        row += 1
+        for cnt in settings.counters:
+            page += "          <tr>\n"
+            page += f"            <td>{cnt.nmbr}</td>\n"
+            page += f"            <td>{clean_name(cnt.name)}</td>\n"
+            page += f"            <td>{LGC_TYPES[cnt.type]} {cnt.inputs}</td>\n"
+            page += "          </tr>\n"
+            ws.cell(row, 1).value = cnt.nmbr
+            ws.cell(row, 1).alignment = left_aligned
+            ws.cell(row, 2).value = clean_name(cnt.name)
+            ws.cell(row, 3).value = f"{LGC_TYPES[cnt.type]} {cnt.inputs}"
+            row += 1
+        page += "        </tbody>\n"
+        page += "      </table>\n"
+        row += 1
+    if len(settings.logic):
+        page += "      <h2>Logik</h2>\n"
+        page += "      <table>\n"
+        page += "        <thead>\n"
+        page += "          <tr>\n"
+        page += "            <th>Nr.</th>\n"
+        page += "            <th>Name</th>\n"
+        page += "            <th>Typ</th>\n"
+        page += "          </tr>\n"
+        page += "        </thead>\n"
+        page += "        <tbody>\n"
+        ws.cell(row, 1).value = "Logik"
+        ws.cell(row, 1).font = subheader_font_red
+        row += 1
+        ws = write_col_headers(ws, row)
+        row += 1
+        for lgc in settings.logic:
+            page += "          <tr>\n"
+            page += f"            <td>{lgc.nmbr}</td>\n"
+            page += f"            <td>{clean_name(lgc.name)}</td>\n"
+            page += f"            <td>{LGC_TYPES[lgc.type]} {lgc.inputs}</td>\n"
+            page += "          </tr>\n"
+            ws.cell(row, 1).value = lgc.nmbr
+            ws.cell(row, 1).alignment = left_aligned
+            ws.cell(row, 2).value = clean_name(lgc.name)
+            ws.cell(row, 3).value = f"{LGC_TYPES[lgc.type]} {lgc.inputs}"
+            row += 1
+        page += "        </tbody>\n"
+        page += "      </table>\n"
+        row += 1
+    if len(settings.dir_cmds):
+        page += "      <h2>Direktbefehle</h2>\n"
+        page += "      <table>\n"
+        page += "        <thead>\n"
+        page += "          <tr>\n"
+        page += "            <th>Nr.</th>\n"
+        page += "            <th>Name</th>\n"
+        page += "          </tr>\n"
+        page += "        </thead>\n"
+        page += "        <tbody>\n"
+        ws.cell(row, 1).value = "Direktbefehle"
+        ws.cell(row, 1).font = subheader_font_red
+        row += 1
+        ws = write_col_headers(ws, row)
+        row += 1
+        for cmd in settings.dir_cmds:
+            page += "          <tr>\n"
+            page += f"            <td>{cmd.nmbr}</td>\n"
+            page += f"            <td>{clean_name(cmd.name)}</td>\n"
+            page += "          </tr>\n"
+            ws.cell(row, 1).value = cmd.nmbr
+            ws.cell(row, 1).alignment = left_aligned
+            ws.cell(row, 2).value = clean_name(cmd.name)
+            row += 1
+        page += "        </tbody>\n"
+        page += "      </table>\n"
+        row += 1
+    if len(settings.vis_cmds):
+        page += "      <h2>Visualisierungsbefehle</h2>\n"
+        page += "      <table>\n"
+        page += "        <thead>\n"
+        page += "          <tr>\n"
+        page += "            <th>Nr.</th>\n"
+        page += "            <th>Name</th>\n"
+        page += "          </tr>\n"
+        page += "        </thead>\n"
+        page += "        <tbody>\n"
+        ws.cell(row, 1).value = "Visualisierungsbefehle"
+        ws.cell(row, 1).font = subheader_font_red
+        row += 1
+        ws = write_col_headers(ws, row)
+        row += 1
+        for cmd in settings.vis_cmds:
+            page += "          <tr>\n"
+            page += f"            <td>{cmd.nmbr}</td>\n"
+            page += f"            <td>{clean_name(cmd.name)}</td>\n"
+            page += "          </tr>\n"
+            ws.cell(row, 1).value = cmd.nmbr
+            ws.cell(row, 1).alignment = left_aligned
+            ws.cell(row, 2).value = clean_name(cmd.name)
+            row += 1
+        page += "        </tbody>\n"
+        page += "      </table>\n"
+        row += 1
+    if len(settings.messages):
+        page += "      <h2>Meldungen</h2>\n"
+        page += "      <table>\n"
+        page += "        <thead>\n"
+        page += "          <tr>\n"
+        page += "            <th>Nr.</th>\n"
+        page += "            <th>Text</th>\n"
+        page += "          </tr>\n"
+        page += "        </thead>\n"
+        page += "        <tbody>\n"
+        ws.cell(row, 1).value = "Meldungen"
+        ws.cell(row, 1).font = subheader_font_red
+        row += 1
+        ws = write_col_headers(ws, row)
+        row += 1
+        for msg in settings.messages:
+            page += "          <tr>\n"
+            page += f"            <td>{msg.nmbr}</td>\n"
+            page += f"            <td>{clean_name(msg.name)}</td>\n"
+            page += "          </tr>\n"
+            ws.cell(row, 1).value = msg.nmbr
+            ws.cell(row, 1).alignment = left_aligned
+            ws.cell(row, 2).value = clean_name(msg.name)
+            row += 1
+        page += "        </tbody>\n"
+        page += "      </table>\n"
+        row += 1
     if len(automation_set.local):
         page += "      <h2>Lokale Automatisierungen</h2>\n"
         page += "      <table>\n"

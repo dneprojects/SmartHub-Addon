@@ -238,7 +238,8 @@ img {
         font-size: 90%;
     }
     input#file_updwnload,
-    input#upd_updwnload {
+    input#upd_updwnload, 
+    input#sys_upload {
         width:250px;
     }
     #file_button_l {
