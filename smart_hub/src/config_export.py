@@ -848,6 +848,7 @@ def document_module(doc, page, mod, idx) -> str:
         page += "        </tbody>\n"
         page += "      </table>\n"
         row += 1
+
     if len(automation_set.local):
         page += "      <h2>Lokale Automatisierungen</h2>\n"
         page += "      <table>\n"
@@ -869,17 +870,17 @@ def document_module(doc, page, mod, idx) -> str:
         for atm in automation_set.local:
             page += "          <tr>\n"
             page += f"            <td>{atm_no}</td>\n"
-            page += f"            <td>{atm.trigger.description}</td>\n"
+            page += f"            <td>{clean_name(atm.trigger.description)}</td>\n"
             page += f"            <td>{atm.condition.name}</td>\n"
-            page += f"            <td>{atm.action.description}</td>\n"
+            page += f"            <td>{clean_name(atm.action.description)}</td>\n"
             page += "          </tr>\n"
             ws.cell(row, 1).value = atm_no
             ws.cell(row, 1).alignment = left_aligned
-            ws.cell(row, 2).value = atm.trigger.description
+            ws.cell(row, 2).value = clean_name(atm.trigger.description)
             ws.cell(row, 2).alignment = left_aligned
             ws.cell(row, 3).value = atm.condition.name
             ws.cell(row, 3).alignment = left_aligned
-            ws.cell(row, 4).value = atm.action.description
+            ws.cell(row, 4).value = clean_name(atm.action.description)
             ws.cell(row, 4).alignment = left_aligned
             atm_no += 1
             row += 1
@@ -887,9 +888,9 @@ def document_module(doc, page, mod, idx) -> str:
         page += "      </table>\n"
         row += 1
 
-    if len(automation_set.external):
+    if len(automation_set.external_trg):
         ext_mod_name = ""
-        page += "      <h2>Externe Automatisierungen</h2>\n"
+        page += "      <h2>Automatisierungen mit externem Auslöser</h2>\n"
         page += "      <table>\n"
         page += "        <thead>\n"
         page += "          <tr>\n"
@@ -900,12 +901,12 @@ def document_module(doc, page, mod, idx) -> str:
         page += "          </tr>\n"
         page += "        </thead>\n"
         page += "        <tbody>\n"
-        ws.cell(row, 1).value = "Externe Automatisierungen"
+        ws.cell(row, 1).value = "Automatisierungen mit externem Auslöser"
         ws.cell(row, 1).font = subheader_font_red
         row += 1
         ws = write_atm_ext_headers(ws, row)
         row += 1
-        for atm in automation_set.external:
+        for atm in automation_set.external_trg:
             if mod.get_rtr().get_module(atm.src_mod) is None:
                 curr_mod_name = f"Mod_{atm.src_mod}_not_found"
             else:
@@ -924,17 +925,71 @@ def document_module(doc, page, mod, idx) -> str:
                 page += "          </tr>\n"
             page += "          <tr>\n"
             page += f"            <td>{atm_no}</td>\n"
-            page += f"            <td>{atm.trigger.description}</td>\n"
+            page += f"            <td>{clean_name(atm.trigger.description)}</td>\n"
             page += f"            <td>{atm.condition.name}</td>\n"
-            page += f"            <td>{atm.action.description}</td>\n"
+            page += f"            <td>{clean_name(atm.action.description)}</td>\n"
             page += "          </tr>\n"
             ws.cell(row, 1).value = atm_no
             ws.cell(row, 1).alignment = left_aligned
-            ws.cell(row, 2).value = atm.trigger.description
+            ws.cell(row, 2).value = clean_name(atm.trigger.description)
             ws.cell(row, 2).alignment = left_aligned
             ws.cell(row, 3).value = atm.condition.name
             ws.cell(row, 3).alignment = left_aligned
-            ws.cell(row, 4).value = atm.action.description
+            ws.cell(row, 4).value = clean_name(atm.action.description)
+            ws.cell(row, 4).alignment = left_aligned
+            atm_no += 1
+            row += 1
+        page += "        </tbody>\n"
+        page += "      </table>\n"
+
+    if len(automation_set.external_act):
+        ext_mod_name = ""
+        page += "      <h2>Automatisierungen mit externer Aktion</h2>\n"
+        page += "      <table>\n"
+        page += "        <thead>\n"
+        page += "          <tr>\n"
+        page += "            <th>Nr.</th>\n"
+        page += "            <th>Auslöser</th>\n"
+        page += "            <th>Bedingung</th>\n"
+        page += "            <th>Aktion</th>\n"
+        page += "          </tr>\n"
+        page += "        </thead>\n"
+        page += "        <tbody>\n"
+        ws.cell(row, 1).value = "Automatisierungen mit externer Aktion"
+        ws.cell(row, 1).font = subheader_font_red
+        row += 1
+        ws = write_atm_ext_headers(ws, row)
+        row += 1
+        for atm in automation_set.external_act:
+            if mod.get_rtr().get_module(atm.mod_addr) is None:
+                curr_mod_name = f"Mod_{atm.mod_addr}_not_found"
+            else:
+                curr_mod_name = clean_name(mod.get_rtr().get_module(atm.mod_addr)._name)
+            if ext_mod_name != curr_mod_name:
+                ext_mod_name = curr_mod_name
+                atm_no = 1
+                ws.cell(row, 4).value = f"Modul {atm.mod_addr} '{ext_mod_name}'"
+                ws.cell(row, 4).font = subheader_font
+                row += 1
+                page += "          <tr>\n"
+                page += "            <th></th>\n"
+                page += "            <th></th>\n"
+                page += "            <th></th>\n"
+                page += f"            <th>Modul {atm.mod_addr} '{ext_mod_name}'</th>\n"
+                page += "          </tr>\n"
+            page += "          <tr>\n"
+            page += f"            <td>{atm_no}</td>\n"
+            page += f"            <td>{clean_name(atm.trigger.description)}</td>\n"
+            page += f"            <td>{atm.condition.name}</td>\n"
+            page += f"            <td>{clean_name(atm.action.description)}</td>\n"
+            page += "          </tr>\n"
+            ws.cell(row, 1).value = atm_no
+            ws.cell(row, 1).alignment = left_aligned
+            ws.cell(row, 2).value = clean_name(atm.trigger.description)
+            ws.cell(row, 2).alignment = left_aligned
+            ws.cell(row, 3).value = atm.condition.name
+            ws.cell(row, 3).alignment = left_aligned
+            ws.cell(row, 4).value = clean_name(atm.action.description)
             ws.cell(row, 4).alignment = left_aligned
             atm_no += 1
             row += 1
@@ -978,17 +1033,17 @@ def document_module(doc, page, mod, idx) -> str:
                 page += "          </tr>\n"
             page += "          <tr>\n"
             page += f"            <td>{atm_no}</td>\n"
-            page += f"            <td>{atm.trigger.description}</td>\n"
+            page += f"            <td>{clean_name(atm.trigger.description)}</td>\n"
             page += f"            <td>{atm.condition.name}</td>\n"
-            page += f"            <td>{atm.action.description}</td>\n"
+            page += f"            <td>{clean_name(atm.action.description)}</td>\n"
             page += "          </tr>\n"
             ws.cell(row, 1).value = atm_no
             ws.cell(row, 1).alignment = left_aligned
-            ws.cell(row, 2).value = atm.trigger.description
+            ws.cell(row, 2).value = clean_name(atm.trigger.description)
             ws.cell(row, 2).alignment = left_aligned
             ws.cell(row, 3).value = atm.condition.name
             ws.cell(row, 3).alignment = left_aligned
-            ws.cell(row, 4).value = atm.action.description
+            ws.cell(row, 4).value = clean_name(atm.action.description)
             ws.cell(row, 4).alignment = left_aligned
             atm_no += 1
             row += 1
@@ -1082,4 +1137,5 @@ def add_css_info() -> str:
 
 def clean_name(in_str: str) -> str:
     """Strip control characters from string."""
-    return "".join(i for i in in_str if (i.isprintable() and i != "\xff"))
+    out_str = "".join(i for i in in_str if (i.isprintable() and i != "\xff"))
+    return out_str.strip()

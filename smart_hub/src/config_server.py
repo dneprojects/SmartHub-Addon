@@ -9,6 +9,7 @@ from config_settings import (
     show_router_overview,
     show_module_overview,
 )
+from copy import deepcopy as dpcopy
 import json
 from config_automations import ConfigAutomationsServer
 from config_setup import ConfigSetupServer
@@ -243,7 +244,7 @@ class ConfigServer:
         rtr = api_srv.routers[0]
         if "SysDownload" in request.query.keys():
             # System backup
-            str_data = await api_srv.backup_system()
+            str_data = await api_srv.prepare_system_backup()
             file_name += ".hcf"
         else:
             # Module download
@@ -709,6 +710,7 @@ async def send_to_module(app, content: str, mod_addr: int):
         module.changed = MOD_CHANGED.NEW
     if app["api_srv"].is_offline or module.changed & MOD_CHANGED.NEW:
         module.smg_upload, module.list = seperate_upload(content)
+        module.settings.list = dpcopy(module.list)
         module.calc_SMG_crc(module.smg_upload)
         module.calc_SMC_crc(module.list)
         module._name = module.smg_upload[52 : 52 + 32].decode("iso8859-1").strip()
@@ -731,6 +733,7 @@ async def send_to_module(app, content: str, mod_addr: int):
                 mod_addr
             )  # module.list_upload
             module.calc_SMC_crc(module.list)
+            module.settings.list = dpcopy(module.list)
             app.logger.info("Module list upload from configuration server finished")
         else:
             app.logger.info(

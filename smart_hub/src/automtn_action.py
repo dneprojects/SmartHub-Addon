@@ -511,11 +511,11 @@ class AutomationAction:
         page = page.replace('<option value="">-- Aktion wählen --</option>', opt_str)
 
         opt_str = '<option value="">-- Ausgang wählen --</option>'
-        for outp in app["settings"].outputs:
+        for outp in sel_atm.settings.outputs:
             opt_str += f'<option value="{outp.nmbr}">{outp.name}</option>\n'
         page = page.replace('<option value="">-- AcAusgang wählen --</option>', opt_str)
         opt_str = '<option value="">-- Ausgang wählen --</option>'
-        for outp in app["settings"].outputs:
+        for outp in sel_atm.settings.outputs:
             opt_str += f'<option value="{outp.nmbr}">{outp.name}</option>\n'
         page = page.replace('<option value="">-- ClAusgang wählen --</option>', opt_str)
         opt_str = '<option value="">-- Dimm-Ausgang wählen --</option>'
@@ -540,25 +540,25 @@ class AutomationAction:
             '<option value="">-- Rollladen/Jalousie wählen --</option>', opt_str
         )
         opt_str = '<option value="">-- LED wählen --</option>'
-        for led in app["settings"].leds:
+        for led in sel_atm.settings.leds:
             opt_str += f'<option value="{led.nmbr + 16}">{led.name}</option>\n'
         page = page.replace('<option value="">-- LED wählen --</option>', opt_str)
 
         opt_str = '<option value="">-- Befehl wählen --</option>'
-        for cmd in app["settings"].coll_cmds:
+        for cmd in sel_atm.settings.coll_cmds:
             opt_str += f'<option value="{cmd.nmbr}">{cmd.name}</option>'
         page = page.replace(
             '<option value="">-- AcCKommando wählen --</option>', opt_str
         )
         opt_str = '<option value="">-- Merker wählen --</option>'
-        for flg in app["settings"].flags:
+        for flg in sel_atm.settings.flags:
             opt_str += f'<option value="{flg.nmbr}">{flg.name}</option>\n'
-        for flg in app["settings"].glob_flags:
+        for flg in sel_atm.settings.glob_flags:
             opt_str += f'<option value="{flg.nmbr + 32}">{flg.name}</option>\n'
         page = page.replace('<option value="">-- AcMerker wählen --</option>', opt_str)
 
         opt_str = '<option value="">-- Logikeingang wählen --</option>'
-        for lgc in app["settings"].logic:
+        for lgc in sel_atm.settings.logic:
             for lgci in range(lgc.inputs):
                 inp_idx = 165 + (lgc.nmbr - 1) * 8 + lgci
                 opt_str += f'<option value="{inp_idx}">{lgc.longname} - Input {lgci + 1}</option>\n'
@@ -570,9 +570,9 @@ class AutomationAction:
         max_cnt = []
         counter_numbers = []
         no_counters = 0
-        for cnt in app["settings"].counters:
+        for cnt in sel_atm.settings.counters:
             no_counters += 1
-            max_cnt.append(app["settings"].status[MirrIdx.LOGIC - 2 + cnt.nmbr * 3])
+            max_cnt.append(sel_atm.settings.status[MirrIdx.LOGIC - 2 + cnt.nmbr * 3])
             opt_str += f'<option value="{cnt.nmbr}">{cnt.longname}</option>\n'
             counter_numbers.append(cnt.nmbr)
         page = page.replace('<option value="">-- AcZähler wählen --</option>', opt_str)
@@ -585,9 +585,9 @@ class AutomationAction:
                 f'<option value="{SelActCodes["counter"]}" disabled>{self.actions_dict[SelActCodes["counter"]]}',
             )
 
-        if len(app["settings"].messages) > 0:
+        if len(sel_atm.settings.messages) > 0:
             opt_str = '<option value="">-- Meldung wählen --</option>'
-            for msg in app["settings"].messages:
+            for msg in sel_atm.settings.messages:
                 # only entries in language 1 (german) supported
                 if msg.type == 1:
                     opt_str += f'<option value="{msg.nmbr}">{msg.name}</option>\n'
@@ -600,9 +600,9 @@ class AutomationAction:
                 f'<option value="{SelActCodes["msg"]}" disabled>{self.actions_dict[SelActCodes["msg"]]}',
             )
 
-        if len(app["settings"].gsm_messages) > 0:
+        if len(sel_atm.settings.gsm_messages) > 0:
             opt_str = '<option value="">-- SMS-Meldung wählen --</option>'
-            for msg in app["settings"].gsm_messages:
+            for msg in sel_atm.settings.gsm_messages:
                 # only entries in language 1 (german) supported
                 if msg.type == 1:
                     opt_str += f'<option value="{msg.nmbr}">{msg.name}</option>\n'
@@ -615,9 +615,9 @@ class AutomationAction:
                 f'<option value="{SelActCodes["send"]}" disabled>{self.actions_dict[SelActCodes["send"]]}',
             )
 
-        if len(app["settings"].gsm_numbers) > 0:
+        if len(sel_atm.settings.gsm_numbers) > 0:
             opt_str = '<option value="">-- Telefonnummer wählen --</option>'
-            for nmbr in app["settings"].gsm_numbers:
+            for nmbr in sel_atm.settings.gsm_numbers:
                 # only entries in language 1 (german) supported
                 if nmbr.type == 1:
                     opt_str += f'<option value="{nmbr.nmbr}">{nmbr.name}</option>\n'
@@ -636,7 +636,7 @@ class AutomationAction:
 
         page = page.replace(">User1Mode<", f">{self.autmn_dict['user_modes'][1]}<")
         page = page.replace(">User2Mode<", f">{self.autmn_dict['user_modes'][2]}<")
-        if app["settings"].typ == b"\x32\x01":
+        if sel_atm.settings.typ == b"\x32\x01":
             for led_no in range(1, 5):
                 if len(self.autmn_dict["leds"][led_no]) > 0:
                     page = page.replace(

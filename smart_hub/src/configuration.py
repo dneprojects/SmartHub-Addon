@@ -10,7 +10,7 @@ from const import (
     SMGIdx,
     FingerNames,
 )
-from automation import AutomationsSet
+from automation import AutomationsSet, ExtAutomationDefinition
 
 
 def covertime_2_interptime(cov_time: int) -> tuple[int, int]:
@@ -445,7 +445,7 @@ class ModuleSettings:
             if event_code == 235:  # Beschriftung
                 text = line[8:]
                 text = text.decode("iso8859-1")
-                text = text.strip()
+                text = clean_name(text)
                 arg_code = int(line[3])
                 if int(line[0]) == 252:
                     # Finger users: user, bitmap of fingers as type
@@ -734,7 +734,7 @@ class ModuleSettings:
         for atmn in automations.local:
             if atmn.src_rt == 0:
                 new_list.append(atmn.make_definition())
-        for atmn in automations.external:
+        for atmn in automations.external_trg:
             new_list.append(atmn.make_definition())
         for atmn in automations.forward:
             new_list.append(atmn.make_definition())
@@ -751,6 +751,33 @@ class ModuleSettings:
                     for lchr in line.split(";")[:-1]:
                         new_line += chr(int(lchr))
                     new_list.append(new_line)
+        return self.adapt_list_header(new_list)
+
+    async def set_automations_ext_act(
+        self, ext_atmns: list[ExtAutomationDefinition], src_mod: int
+    ):
+        """Store automation external action entries to list and send to ext. module."""
+        list_lines = self.format_smc(self.list).split("\n")
+
+        new_list = []
+        new_line = ""
+        for lchr in list_lines[0].split(";")[:-1]:
+            new_line += chr(int(lchr))
+        new_list.append(new_line)
+        # copy complete list, except external automations from src_mod
+        for line in list_lines[1:]:
+            if len(line) > 0:
+                tok = line.split(";")
+                if int(tok[0]) != 1 or int(tok[1]) != src_mod:
+                    new_line = ""
+                    for lchr in line.split(";")[:-1]:
+                        new_line += chr(int(lchr))
+                    new_list.append(new_line)
+
+        # insert external automations
+        for atmn in ext_atmns:
+            if atmn.mod_addr == self.id:
+                new_list.append(atmn.make_definition())
         return self.adapt_list_header(new_list)
 
     async def set_list(self) -> bytes:
@@ -1178,3 +1205,9 @@ def set_cover_name(out_name):
     for pf in dwn_names:
         base = base.replace(pf, "")
     return base.strip()
+
+
+def clean_name(in_str: str) -> str:
+    """Strip control characters from string."""
+    out_str = "".join(i for i in in_str if (i.isprintable() and i != "\xff"))
+    return out_str.strip()

@@ -11,11 +11,12 @@ class AutomationsSet:
     def __init__(self, settings):
         """Initialize set of automations."""
         self.local: list[AutomationDefinition] = []
-        self.external: list[AutomationDefinition] = []
+        self.external_trg: list[AutomationDefinition] = []
+        self.external_act: list[AutomationDefinition] = []
         self.forward: list[AutomationDefinition] = []
         self.logger = logging.getLogger(__name__)
         self.settings = settings
-        self.get_autmn_dict(settings)
+        self.autmn_dict = self.get_autmn_dict(settings)
         self.get_automations(settings)
         self.selected = 0
 
@@ -23,33 +24,34 @@ class AutomationsSet:
         """Build dict structure for automation names."""
 
         self.logger.debug("Building automation dictionary")
-        self.autmn_dict = {}
-        self.autmn_dict["inputs"] = {}
-        self.autmn_dict["outputs"] = {}
-        self.autmn_dict["covers"] = {}
-        self.autmn_dict["buttons"] = {}
-        self.autmn_dict["leds"] = {}
-        self.autmn_dict["flags"] = {}
-        self.autmn_dict["logic"] = {}
-        self.autmn_dict["counters"] = {}
-        self.autmn_dict["messages"] = {}
-        self.autmn_dict["dir_cmds"] = {}
-        self.autmn_dict["vis_cmds"] = {}
-        self.autmn_dict["setvalues"] = {}
-        self.autmn_dict["users"] = {}
-        self.autmn_dict["fingers"] = {}
-        self.autmn_dict["glob_flags"] = {}
-        self.autmn_dict["coll_cmds"] = {}
-        for a_key in self.autmn_dict.keys():
+        autmn_dict = {}
+        autmn_dict["inputs"] = {}
+        autmn_dict["outputs"] = {}
+        autmn_dict["covers"] = {}
+        autmn_dict["buttons"] = {}
+        autmn_dict["leds"] = {}
+        autmn_dict["flags"] = {}
+        autmn_dict["logic"] = {}
+        autmn_dict["counters"] = {}
+        autmn_dict["messages"] = {}
+        autmn_dict["dir_cmds"] = {}
+        autmn_dict["vis_cmds"] = {}
+        autmn_dict["setvalues"] = {}
+        autmn_dict["users"] = {}
+        autmn_dict["fingers"] = {}
+        autmn_dict["glob_flags"] = {}
+        autmn_dict["coll_cmds"] = {}
+        for a_key in autmn_dict.keys():
             for if_desc in getattr(settings, a_key):
-                self.autmn_dict[a_key][if_desc.nmbr] = ""
+                autmn_dict[a_key][if_desc.nmbr] = ""
                 if isinstance(if_desc, LgcDescriptor) and len(if_desc.longname) > 0:
-                    self.autmn_dict[a_key][if_desc.nmbr] += f"{if_desc.longname}"
+                    autmn_dict[a_key][if_desc.nmbr] += f"{if_desc.longname}"
                 elif len(if_desc.name) > 0:
-                    self.autmn_dict[a_key][if_desc.nmbr] += f"{if_desc.name}"
-        self.autmn_dict["user_modes"] = {1: "User1", 2: "User2"}
-        self.autmn_dict["user_modes"][1] = settings.user1_name
-        self.autmn_dict["user_modes"][2] = settings.user2_name
+                    autmn_dict[a_key][if_desc.nmbr] += f"{if_desc.name}"
+        autmn_dict["user_modes"] = {1: "User1", 2: "User2"}
+        autmn_dict["user_modes"][1] = settings.user1_name
+        autmn_dict["user_modes"][2] = settings.user2_name
+        return autmn_dict
 
     def get_automations(self, settings):
         """Get automations of Habitron module."""
@@ -80,7 +82,7 @@ class AutomationsSet:
                         AutomationDefinition(line, self.autmn_dict, settings)
                     )
                 elif (src_rt == settings.module.rt_id) or (src_rt == 250):
-                    self.external.append(
+                    self.external_trg.append(
                         ExtAutomationDefinition(line, self.autmn_dict, settings)
                     )
                 elif src_rt < 65:
@@ -91,14 +93,54 @@ class AutomationsSet:
                 self.logger.error(f"Error decoding automation {line}: {err_msg}")
             list = list[line_len : len(list)]  # Strip processed line
         self.local, i = self.sort_automation_list(self.local, 0)
-        self.external, i = self.sort_automation_list(self.external, 0)
+        self.external_trg, i = self.sort_automation_list(self.external_trg, 0)
         self.forward, i = self.sort_automation_list(self.forward, 0)
+        rtr = settings.module.get_rtr()
+        for mod in rtr.modules:
+            if mod.has_automations():
+                self.external_act += self.get_ext_act_automations(
+                    mod.settings, self.settings.id
+                )
         return True
+        return True
+
+    def get_ext_act_automations(self, settings, src_mod_id: int):
+        """Return only external automations of Habitron module for given source module."""
+
+        autmn_dict = self.get_autmn_dict(settings)
+        external_automations = []
+        self.logger.debug(f"Getting external automations for module {src_mod_id}")
+        list = settings.list
+        if len(list) == 0:
+            return False
+        no_lines = int.from_bytes(list[:2], "little")
+        list = list[4 : len(list)]  # Strip 4 header bytes
+        for _ in range(no_lines):
+            try:
+                if list == b"":
+                    break
+                line_len = int(list[5]) + 5
+                line = list[0:line_len]
+                src_rt = int(line[0])
+                src_mod = int(line[1])
+                if (src_rt == settings.module.rt_id) or (src_rt == 250):
+                    if src_mod == src_mod_id:
+                        external_automations.append(
+                            ExtAutomationDefinition(line, autmn_dict, settings)
+                        )
+            except Exception as err_msg:
+                self.logger.error(f"Error decoding automation {line}: {err_msg}")
+            list = list[line_len : len(list)]  # Strip processed line
+        external_automations, i = self.sort_automation_list(external_automations, 0)
+        return external_automations
 
     def save_changed_automation(self, app, form_data, step):
         """Save edited automation, add new or replace changed one."""
-        tmp_automtn = AutomationDefinition(None, self.autmn_dict, self.settings)
-        src_trigger = app["base_automation"].trigger
+        base_automtn = app["base_automation"]
+        tmp_automtn = AutomationDefinition(
+            None, base_automtn.autmn_dict, base_automtn.settings
+        )
+        src_trigger = base_automtn.trigger
         tmp_automtn.trigger.src_rt = src_trigger.src_rt
         tmp_automtn.trigger.src_mod = src_trigger.src_mod
         tmp_automtn.trigger.settings = src_trigger.settings
@@ -117,14 +159,23 @@ class AutomationsSet:
             )
         if step == 1:
             if app["atm_mode"] == "change":
-                self.external[self.selected] = tmp_automtn
+                self.external_trg[self.selected] = tmp_automtn
             else:
-                self.external.append(tmp_automtn)
-                self.selected = len(self.external) - 1
-            self.external, self.selected = self.sort_automation_list(
-                self.external, self.selected
+                self.external_trg.append(tmp_automtn)
+                self.selected = len(self.external_trg) - 1
+            self.external_trg, self.selected = self.sort_automation_list(
+                self.external_trg, self.selected
             )
-        if step == 2:
+        elif step == 2:
+            if app["atm_mode"] == "change":
+                self.external_act[self.selected] = tmp_automtn
+            else:
+                self.external_act.append(tmp_automtn)
+                self.selected = len(self.external_act) - 1
+            self.external_act, self.selected = self.sort_automation_list(
+                self.external_act, self.selected
+            )
+        if step == 3:
             if app["atm_mode"] == "change":
                 self.forward[self.selected] = tmp_automtn
             else:
@@ -140,6 +191,7 @@ class AutomationsSet:
         sort_strings = list()
         for atm in atm_list:
             sort_str = [
+                atm.mod_addr,
                 atm.src_rt,
                 atm.src_mod,
                 atm.event_code,
@@ -371,7 +423,7 @@ class AutomationDefinition:
 
 
 class ExtAutomationDefinition(AutomationDefinition):
-    """Object with automation data and methods, etras for ext. trigger."""
+    """Object with automation data and methods, extras for ext. trigger."""
 
     def __init__(self, atm_def, autmn_dict, settings):
         super().__init__(atm_def, autmn_dict, settings)
@@ -380,7 +432,7 @@ class ExtAutomationDefinition(AutomationDefinition):
             mod = rtr.get_module(self.src_mod)
             src_settings = mod.get_settings_def()
             self.trigger = AutomationTrigger(self, src_settings, atm_def)
-        else:
+        elif atm_def is not None:
             settings.logger.warning(
                 f"Automation reference in module {settings.module._id} to {self.src_mod}, module not found."
             )

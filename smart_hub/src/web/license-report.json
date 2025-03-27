@@ -5,8 +5,8 @@ idna:3.10                           BSD License                                 
 multidict:6.2.0                     Apache Software License                                 Permissive                                                   
 openpyxl:3.1.5                      MIT License                                             Permissive                                                   
 pip-licenses:5.0.0                  MIT License                                             Permissive                                                   
-prettytable:3.15.1                  Error                                                   Error                                                        
-propcache:0.3.0                     Apache Software License                                 Permissive                                                   
+prettytable:3.16.0                  Error                                                   Error                                                        
+propcache:0.3.1                     Apache Software License                                 Permissive                                                   
 psutil:7.0.0                        BSD License                                             Permissive                                                   
 py-cpuinfo:9.0.0                    MIT License                                             Permissive                                                   
 pyserial:3.5                        BSD License                                             Permissive                                                   

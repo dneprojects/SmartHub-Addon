@@ -3,6 +3,7 @@ import asyncio
 from math import ceil
 from const import MirrIdx, SMGIdx, RT_CMDS
 from hdlr_class import HdlrBase
+from messages import calc_crc
 
 
 class ModHdlr(HdlrBase):
@@ -154,6 +155,13 @@ class ModHdlr(HdlrBase):
     async def send_module_list(self, mod_addr: int):
         """Send SMC data from Smart Hub to router/module."""
 
+        list_crc = calc_crc(self.mod.list_upload)
+        if list_crc == self.mod.get_smc_crc():
+            self.logger.info(
+                f"List upload terminated, no change for module {self.mod_id}"
+            )
+            return
+
         await self.api_srv.set_server_mode(self.rt_id)
         flg_250 = False
         mod_list = self.mod.list_upload
@@ -207,13 +215,14 @@ class ModHdlr(HdlrBase):
             # await asyncio.sleep(0.1)
         if (resp_flg == 8) and (resp_cnt == 0):
             self.logger.info(
-                f"List upload terminated successfully, transferred {l_len} bytes of {no_lines} definitions to module"
+                f"List upload terminated successfully, transferred {l_len} bytes of {no_lines} definitions to module {self.mod_id}"
             )
         else:
             self.logger.info(
                 f"List upload (SMC) terminated: Count {resp_cnt} Flag {resp_flg}"
             )
-        return
+        self.mod.put_smc_crc(list_crc)
+        return list_crc
 
     async def set_module_language(self):
         """Send language settings to module."""
@@ -730,7 +739,7 @@ class ModHdlr(HdlrBase):
         await asyncio.sleep(0.5)
         ch_pair = self.mod._channel
         self.logger.info(
-            f"Switching channel power on channels {2*ch_pair - 1} and {2*ch_pair}"
+            f"Switching channel power on channels {2 * ch_pair - 1} and {2 * ch_pair}"
         )
         ch_low = 1 << (2 * ch_pair - 2)
         ch_high = 1 << (2 * ch_pair - 1)

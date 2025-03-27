@@ -477,7 +477,10 @@ class AutomationTrigger:
                         self.name.replace("Taste", "").replace("Schalter", "").strip()
                     )
                     trig_command = self.name.replace(event_desc, "").strip()
-                if event_arg < 9:
+                if len(self.autmn_dict["buttons"]) == 0:
+                    trig_command += f" {self.get_dict_entry('inputs', event_arg)}"
+                    self.unit = event_arg
+                elif event_arg < 9:
                     trig_command += f" {self.get_dict_entry('buttons', event_arg)}"
                     self.unit = event_arg
                 else:

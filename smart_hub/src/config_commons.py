@@ -1,4 +1,3 @@
-from datetime import datetime
 from aiohttp import web
 from const import (
     WEB_FILES_DIR,

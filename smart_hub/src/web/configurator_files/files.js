@@ -13,6 +13,7 @@ const bak_restore = document.getElementsByName("SysRestore");
 const sys_upload = document.getElementsByName("SysUpload");
 const file_button_l = document.getElementById("file_button_l");
 const sys_upload_l = document.getElementById("sys_upload");
+const wait_msg_popup = document.getElementById("msg_popup");
 
 if (document.getElementById("form_doc")) {
     form_doc.addEventListener("submit", function () {
@@ -41,8 +42,8 @@ if (sys_upload_l) {
 
 if (document.getElementById("config_button")) {
     document.getElementById("config_button").addEventListener("click", function () {
-        msg_popup.innerHTML = msg_popup.innerHTML.replace("ContentTitle", "Neue Initialisierung")
-        msg_popup.innerHTML = msg_popup.innerHTML.replace("Upload", "Bitte warten...")
+        wait_msg_popup.innerHTML = wait_msg_popup.innerHTML.replace("ContentTitle", "Neue Initialisierung")
+        wait_msg_popup.innerHTML = wait_msg_popup.innerHTML.replace("Upload", "Bitte warten...")
         openMsgPopup();
     });
 }
@@ -53,12 +54,16 @@ if (sys_download) {
 }
 if (bak_restore) {
     bak_restore[0].addEventListener("click", function () {
-        file_popup.classList.remove("show");
+        wait_msg_popup.innerHTML = wait_msg_popup.innerHTML.replace("ContentTitle", "System wird neu geladen")
+        wait_msg_popup.innerHTML = wait_msg_popup.innerHTML.replace("Upload", "Bitte warten...")
+        openMsgPopup();
     });
 }
 if (sys_upload) {
     sys_upload[0].addEventListener("click", function () {
-        file_popup.classList.remove("show");
+        wait_msg_popup.innerHTML = wait_msg_popup.innerHTML.replace("ContentTitle", "System wird neu geladen")
+        wait_msg_popup.innerHTML = wait_msg_popup.innerHTML.replace("Upload", "Bitte warten...")
+        openMsgPopup();
     });
 }
 if (sys_doc) {
@@ -101,7 +106,7 @@ window.addEventListener("click", function (event) {
 });
 function openMsgPopup() {
     file_popup.classList.remove("show");
-    msg_popup.classList.add("show");
+    wait_msg_popup.classList.add("show");
     if (updates_pop)
         updates_pop.classList.remove("show");
 };

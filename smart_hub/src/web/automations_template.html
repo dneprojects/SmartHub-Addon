@@ -152,7 +152,7 @@
       <h2>Neue externe Automatisierung</h2>
       <h3>Auslösendes Modul auswählen</h3>
       <form id="sel-src-module" action="automations/automtns" method="post">
-        <select name="src_module" style="position: absolute; width: 385px" id="src-module">
+        <select name="ext_module" style="position: absolute; width: 385px" id="src-module">
           <option value="">-- Modul wählen --</option>
         </select>
         <input id="sel-automtn" name="sel_automtn" style="position: absolute; visibility: hidden">
@@ -207,7 +207,7 @@
       var autom_rows = []
       var hr = 0
       var sel_position = 0
-      if (atm_tbl.rows[0].cells[0].innerText.search("Modul") > 0) {
+      if ((atm_tbl.rows[0].cells[0].innerText.search("Modul") > 0) | (atm_tbl.rows[0].cells[3].innerText.search("Modul") > 0)) {
         for (let r = 0; r < atm_tbl.rows.length; r++) {
           if (atm_tbl.rows[r].id == "atm-th") {
             header_rows.push(r);

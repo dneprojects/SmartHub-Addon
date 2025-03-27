@@ -143,8 +143,17 @@ class HbtnModule:
         """Return smc crc from status."""
         return int.from_bytes(self.status[MirrIdx.SMC_CRC : MirrIdx.SMC_CRC + 2], "big")
 
-    def set_smc_crc(self, crc: int):
+    def put_smc_crc(self, crc: int):
         """Store new smc crc into status."""
+        crc_str = (chr((crc - (crc & 0xFF)) >> 8) + chr(crc & 0xFF)).encode("iso8859-1")
+        self.status = (
+            self.status[: MirrIdx.SMC_CRC]
+            + crc_str
+            + self.status[MirrIdx.SMC_CRC + 2 :]
+        )
+
+    def set_smc_crc(self, crc: int):
+        """Store new smc crc into status with check."""
         crc_str = (chr((crc - (crc & 0xFF)) >> 8) + chr(crc & 0xFF)).encode("iso8859-1")
         if self.status[MirrIdx.SMC_CRC : MirrIdx.SMC_CRC + 2] != crc_str:
             self.logger.warning(
@@ -589,11 +598,30 @@ class HbtnModule:
         self.settings = settings
         self.list = await settings.set_automations()
         self.list_upload = self.list
+        self.settings.list = dpcopy(self.list)
         if not self.api_srv.is_offline:
             await self.hdlr.send_module_list(self._id)
         self.comp_status = self.get_status(False)
         # self.list = await self.hdlr.get_module_list(self._id)
         self.calc_SMC_crc(self.list)
+        # Extract external action modules from automations
+        mod_list = []
+        for ext_act_atmn in settings.automtns_def.external_act:
+            if ext_act_atmn.mod_addr not in mod_list:
+                mod_list.append(ext_act_atmn.mod_addr)
+        for ext_mod in mod_list:
+            module = self.get_rtr().get_module(ext_mod)
+            mod_settings = module.settings
+            module.list = await mod_settings.set_automations_ext_act(
+                settings.automtns_def.external_act, self._id
+            )
+            module.list_upload = module.list
+            module.settings.list = dpcopy(module.list)
+            if not self.api_srv.is_offline:
+                await module.hdlr.send_module_list(module._id)
+            module.comp_status = module.get_status(False)
+            # self.list = await self.hdlr.get_module_list(self._id)
+            module.calc_SMC_crc(module.list)
 
     def get_io_properties(self) -> tuple[dict[str, int], list[str]]:
         """Return number of inputs, outputs, etc."""

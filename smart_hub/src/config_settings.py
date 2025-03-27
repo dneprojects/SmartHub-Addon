@@ -313,8 +313,9 @@ def show_module_overview(main_app, mod_addr, popup_msg="") -> web.Response:
     )
     page = adjust_settings_button(page, "mod", f"{mod_addr}")
     if module.has_automations():
-        page = adjust_automations_button(page)
-    elif module._typ == b"\x1e\x01":
+        pass
+    page = adjust_automations_button(page)
+    if module._typ == b"\x1e\x01":
         page = adjust_ekeylog_button(page)
     if len(popup_msg):
         page = page.replace(
