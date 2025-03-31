@@ -561,12 +561,15 @@ body.produkte.sub #right h1 {
    padding-bottom: 8px;
 }
 
-#config_button, transfer_button, files_button, #chan_reset_button {
+#config_button, transfer_button, files_button, #chan_reset_button, #config_button_extra {
    height: 22px;
    width: 125px;
    margin-left: 0px;
    font-family: "Lucida Sans", Arial, Verdana, Helvetica, sans-serif;
    font: 11px arial, helvetica, clean, sans-serif;
+}
+#config_button_extra {
+   margin-top: 40px;
 }
 
 #add-mod-ok {

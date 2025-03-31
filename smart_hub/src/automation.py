@@ -14,6 +14,7 @@ class AutomationsSet:
         self.external_trg: list[AutomationDefinition] = []
         self.external_act: list[AutomationDefinition] = []
         self.forward: list[AutomationDefinition] = []
+        self.external_act_mods = []
         self.logger = logging.getLogger(__name__)
         self.settings = settings
         self.autmn_dict = self.get_autmn_dict(settings)
@@ -98,9 +99,10 @@ class AutomationsSet:
         rtr = settings.module.get_rtr()
         for mod in rtr.modules:
             if mod.has_automations():
-                self.external_act += self.get_ext_act_automations(
-                    mod.settings, self.settings.id
-                )
+                ext_atmns = self.get_ext_act_automations(mod.settings, self.settings.id)
+                if len(ext_atmns) > 0:
+                    self.external_act += ext_atmns
+                    self.external_act_mods.append(mod._id)
         return True
         return True
 

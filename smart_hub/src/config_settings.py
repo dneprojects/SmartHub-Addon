@@ -1704,7 +1704,7 @@ def log_download(main_app):
     """Download ekey logging protocol."""
     date = datetime.now().strftime("%Y-%m-%d")
     file_name = f"ekey_protocol_{date}.csv"
-    str_data = ""
+    str_data = "Nr.,Datum,Uhrzeit,Benutzer,Finger\n"
     ekey_protocol = main_app["ekey_log"]
     for entry in ekey_protocol:
         str_data += f"{entry['no']},{entry['date']},{entry['time']},{entry['user']},{entry['finger']}\n"

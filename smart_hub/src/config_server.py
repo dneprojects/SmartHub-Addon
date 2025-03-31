@@ -228,7 +228,10 @@ class ConfigServer:
         page = create_documentation(rtr, file_name)
         return web.Response(
             headers=MultiDict(
-                {"Content-Disposition": f"Attachment; filename = {file_name}"}
+                {
+                    "Content-Disposition": f"Attachment; filename = {file_name}",
+                    "Content-Type": "text/html; charset=utf-8",
+                }
             ),
             body=page,
         )

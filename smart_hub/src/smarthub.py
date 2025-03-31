@@ -236,6 +236,8 @@ class SmartHub:
         info_str = info_str + "  loglevel:\n"
         info_str = info_str + f"    console: {log_level_cons}\n"
         info_str = info_str + f"    file: {log_level_file}\n"
+        if os.getenv("SUPERVISOR_TOKEN") is not None:
+            info_str = info_str.replace("type: Smart Hub", "type:  Smart Hub Add-on")
         return info_str
 
     def get_info_obj(self):

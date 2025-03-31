@@ -609,7 +609,9 @@ class HbtnModule:
         for ext_act_atmn in settings.automtns_def.external_act:
             if ext_act_atmn.mod_addr not in mod_list:
                 mod_list.append(ext_act_atmn.mod_addr)
-        for ext_mod in mod_list:
+        for ext_mod in list(
+            set().union(mod_list, settings.automtns_def.external_act_mods)
+        ):
             module = self.get_rtr().get_module(ext_mod)
             mod_settings = module.settings
             module.list = await mod_settings.set_automations_ext_act(
@@ -622,6 +624,7 @@ class HbtnModule:
             module.comp_status = module.get_status(False)
             # self.list = await self.hdlr.get_module_list(self._id)
             module.calc_SMC_crc(module.list)
+        settings.automtns_def.external_act_mods = mod_list
 
     def get_io_properties(self) -> tuple[dict[str, int], list[str]]:
         """Return number of inputs, outputs, etc."""

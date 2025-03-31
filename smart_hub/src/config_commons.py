@@ -157,7 +157,6 @@ def show_hub_overview(app) -> web.Response:
         html_str = get_html(HUB_HOMEPAGE).replace(
             "HubTitle", f"Smart Center '{hub_name}'"
         )
-        smhub_info = smhub_info.replace("type: Smart Hub", "type:  Smart Hub Add-on")
     else:
         pic_file, subtitle = get_module_image(b"\xc9\x00")
         html_str = get_html(HUB_HOMEPAGE).replace("HubTitle", f"Smart Hub '{hub_name}'")
@@ -616,12 +615,12 @@ def adjust_ekeylog_button(page: str) -> str:
     """Enable edit automations button."""
     page = (
         page.replace(
-            '<!--<button name="EditAutomtns" id="automtns_button"',
-            '<button name="ShowLogs" id="showlogs_button"',
+            '<!--form action="settings/mod_extra"',
+            '<form action="settings/mod_extra"',
         )
-        .replace("Automatisierungen</button>-->", "Protokoll</button>")
-        .replace('action="automations/list"', 'action="settings/show_logs"')
-        .replace('"msg_popup_txt">Upload<', '"msg_popup_txt">Lade Protokoll<')
+        .replace("</form -->", "</form>")
+        .replace('action="settings/mod_extra"', 'action="settings/show_logs"')
+        .replace(">Extra<", ">Lade Protokoll<")
     )
     return page
 

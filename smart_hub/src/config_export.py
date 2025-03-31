@@ -1116,6 +1116,7 @@ def add_css_info() -> str:
     """Apply css style definition to page."""
     page = ""
     page += "<head>\n"
+    page += '  <meta charset="UTF-8">\n'
     page += "  <style>\n"
     page += '    body {margin-left: 60px; font: 10px/1.231 arial, helvetica, clean, sans-serif;line-height: 16px; font-family: "Lucida Sans", Arial, Verdana, Helvetica, sans-serif;}'
     page += "    h1 {padding-bottom: 5px; padding-top: 20px; font-size: 16px; color: #c0372d;}\n"
