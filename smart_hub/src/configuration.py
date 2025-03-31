@@ -445,8 +445,11 @@ class ModuleSettings:
             if event_code == 235:  # Beschriftung
                 text = line[8:]
                 text = text.decode("iso8859-1")
-                text = clean_name(text)
                 arg_code = int(line[3])
+                if arg_code in range(140, 173):
+                    text = text[:2] + clean_name(text[2:])
+                else:
+                    text = clean_name(text)
                 if int(line[0]) == 252:
                     # Finger users: user, bitmap of fingers as type
                     user_id = int(line[1])
