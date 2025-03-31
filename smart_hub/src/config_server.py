@@ -439,9 +439,8 @@ class ConfigServer:
             return show_not_authorized(request.app)
 
         if web_lock.locked():
-            return web.Response(
-                text="Webserver access is temporarily locked.", status=429
-            )
+            return web.Response(status=204)
+
         async with web_lock:
             app = request.app
             api_srv = app["api_srv"]
@@ -475,9 +474,8 @@ class ConfigServer:
             return show_not_authorized(request.app)
 
         if web_lock.locked():
-            return web.Response(
-                text="Webserver access is temporarily locked.", status=429
-            )
+            return web.Response(status=204)
+
         async with web_lock:
             app = request.app
             api_srv = app["api_srv"]

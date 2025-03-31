@@ -10,6 +10,7 @@ from config_commons import (
     adjust_settings_button,
     indent,
     hide_button,
+    web_lock,
 )
 from config_settings import activate_side_menu
 from const import (
@@ -191,25 +192,32 @@ class ConfigTestingServer:
         inspect_header(request)
         if client_not_authorized(request):
             return show_not_authorized(request.app)
-        main_app = request.app["parent"]
-        api_srv = main_app["api_srv"]
-        rtr = api_srv.routers[0]
-        await api_srv.block_network_if(rtr._id, True)
-        await api_srv.set_server_mode(rtr._id)
-        await api_srv.set_initial_server_mode(rtr._id)
-        main_app.logger.info(f"Router {rtr._id} will be rebooted, please wait...")
-        await rtr.hdlr.handle_router_cmd(rtr._id, RT_CMDS.RT_REBOOT)
-        main_app.logger.info(f"Router {rtr._id} will be initialized, please wait...")
-        rtr.__init__(api_srv, rtr._id)
-        main_app.logger.info("Reloading system status, please wait...")
-        try:
-            await rtr.get_full_system_status()
-        except Exception as err_msg:
-            main_app.logger.error(f"Error initializing system: {err_msg}")
-        api_srv._init_mode = False
-        await api_srv.block_network_if(rtr._id, False)
-        await api_srv.set_operate_mode(rtr._id)
-        return await show_router_syspage(main_app, "")
+
+        if web_lock.locked():
+            return web.Response(status=204)
+
+        async with web_lock:
+            main_app = request.app["parent"]
+            api_srv = main_app["api_srv"]
+            rtr = api_srv.routers[0]
+            await api_srv.block_network_if(rtr._id, True)
+            await api_srv.set_server_mode(rtr._id)
+            await api_srv.set_initial_server_mode(rtr._id)
+            main_app.logger.info(f"Router {rtr._id} will be rebooted, please wait...")
+            await rtr.hdlr.handle_router_cmd(rtr._id, RT_CMDS.RT_REBOOT)
+            main_app.logger.info(
+                f"Router {rtr._id} will be initialized, please wait..."
+            )
+            rtr.__init__(api_srv, rtr._id)
+            main_app.logger.info("Reloading system status, please wait...")
+            try:
+                await rtr.get_full_system_status()
+            except Exception as err_msg:
+                main_app.logger.error(f"Error initializing system: {err_msg}")
+            api_srv._init_mode = False
+            await api_srv.block_network_if(rtr._id, False)
+            await api_srv.set_operate_mode(rtr._id)
+            return await show_router_syspage(main_app, "")
 
     @routes.post("/chan_reset")
     async def chan_reset(request: web.Request) -> web.Response:  # type: ignore

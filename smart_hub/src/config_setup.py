@@ -362,7 +362,7 @@ async def re_init_hub(main_app) -> web.Response:
     """Revert all changes from setup table, re-init hub."""
 
     if web_lock.locked():
-        return web.Response(text="Webserver access is temporarily locked.", status=429)
+        return web.Response(status=204)
     async with web_lock:
         api_srv = main_app["api_srv"]
         rtr = api_srv.routers[0]
