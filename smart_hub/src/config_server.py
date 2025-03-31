@@ -31,6 +31,7 @@ from config_commons import (
     client_not_authorized,
     show_not_authorized,
     inspect_header,
+    web_lock,
 )
 from config_export import create_documentation
 from licenses import get_package_licenses, show_license_text
@@ -436,73 +437,85 @@ class ConfigServer:
         inspect_header(request)
         if client_not_authorized(request):
             return show_not_authorized(request.app)
-        app = request.app
-        api_srv = app["api_srv"]
-        rtr = api_srv.routers[0]
-        resp = await request.text()
-        form_data = parse_qs(resp)
-        if form_data["UpdButton"][0] == "cancel":
+
+        if web_lock.locked():
+            return web.Response(
+                text="Webserver access is temporarily locked.", status=429
+            )
+        async with web_lock:
+            app = request.app
+            api_srv = app["api_srv"]
+            rtr = api_srv.routers[0]
+            resp = await request.text()
+            form_data = parse_qs(resp)
+            if form_data["UpdButton"][0] == "cancel":
+                return show_hub_overview(app)
+            rtr.hdlr.upd_stat_dict = {"modules": [0], "upload": 100}
+            rtr.hdlr.upd_stat_dict["mod_0"] = {
+                "progress": 0,
+                "errors": 0,
+                "success": "OK",
+            }
+            if api_srv.sm_hub.flash_only:
+                await rtr.hdlr.upload_router_firmware(
+                    None, rtr.hdlr.stat_rtr_fw_update_protocol
+                )
+            else:
+                await api_srv.block_network_if(rtr._id, True)
+                await rtr.hdlr.upload_router_firmware(
+                    None, rtr.hdlr.stat_rtr_fw_update_protocol
+                )
+                await api_srv.block_network_if(rtr._id, False)
             return show_hub_overview(app)
-        rtr.hdlr.upd_stat_dict = {"modules": [0], "upload": 100}
-        rtr.hdlr.upd_stat_dict["mod_0"] = {
-            "progress": 0,
-            "errors": 0,
-            "success": "OK",
-        }
-        if api_srv.sm_hub.flash_only:
-            await rtr.hdlr.upload_router_firmware(
-                None, rtr.hdlr.stat_rtr_fw_update_protocol
-            )
-        else:
-            await api_srv.block_network_if(rtr._id, True)
-            await rtr.hdlr.upload_router_firmware(
-                None, rtr.hdlr.stat_rtr_fw_update_protocol
-            )
-            await api_srv.block_network_if(rtr._id, False)
-        return show_hub_overview(app)
 
     @routes.post("/update_modules")
     async def get_update_modules(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
         if client_not_authorized(request):
             return show_not_authorized(request.app)
-        app = request.app
-        api_srv = app["api_srv"]
-        rtr = api_srv.routers[0]
-        resp = await request.text()
-        form_data = parse_qs(resp)
-        if form_data["UpdButton"][0] == "cancel":
-            return show_hub_overview(app)
-        if len(form_data.keys()) == 1:
-            # nothing selected
-            return show_hub_overview(app)
 
-        mod_type = rtr.fw_upload[:2]
-        mod_list = []
-        for checked in list(form_data.keys())[:-1]:
-            mod_list.append(int(form_data[checked][0]))
-        rtr.hdlr.upd_stat_dict = {"modules": mod_list, "upload": 0}
-        for md in mod_list:
-            rtr.hdlr.upd_stat_dict[f"mod_{md}"] = {
-                "progress": 0,
-                "errors": 0,
-                "success": "OK",
-            }
-        app.logger.info(f"Update of Modules {mod_list}")
-        await api_srv.block_network_if(rtr._id, True)
-        if await rtr.hdlr.upload_module_firmware(
-            mod_type, rtr.hdlr.stat_mod_fw_upload_protocol
-        ):
-            app.logger.info("Firmware uploaded to router successfully")
-            await rtr.hdlr.flash_module_firmware(
-                mod_list, rtr.hdlr.stat_mod_fw_update_protocol
+        if web_lock.locked():
+            return web.Response(
+                text="Webserver access is temporarily locked.", status=429
             )
-            for mod in mod_list:
-                await rtr.get_module(mod).initialize()
-        else:
-            app.logger.info("Firmware upload to router failed, update terminated")
-        await api_srv.block_network_if(rtr._id, False)
-        return show_hub_overview(app)
+        async with web_lock:
+            app = request.app
+            api_srv = app["api_srv"]
+            rtr = api_srv.routers[0]
+            resp = await request.text()
+            form_data = parse_qs(resp)
+            if form_data["UpdButton"][0] == "cancel":
+                return show_hub_overview(app)
+            if len(form_data.keys()) == 1:
+                # nothing selected
+                return show_hub_overview(app)
+
+            mod_type = rtr.fw_upload[:2]
+            mod_list = []
+            for checked in list(form_data.keys())[:-1]:
+                mod_list.append(int(form_data[checked][0]))
+            rtr.hdlr.upd_stat_dict = {"modules": mod_list, "upload": 0}
+            for md in mod_list:
+                rtr.hdlr.upd_stat_dict[f"mod_{md}"] = {
+                    "progress": 0,
+                    "errors": 0,
+                    "success": "OK",
+                }
+            app.logger.info(f"Update of Modules {mod_list}")
+            await api_srv.block_network_if(rtr._id, True)
+            if await rtr.hdlr.upload_module_firmware(
+                mod_type, rtr.hdlr.stat_mod_fw_upload_protocol
+            ):
+                app.logger.info("Firmware uploaded to router successfully")
+                await rtr.hdlr.flash_module_firmware(
+                    mod_list, rtr.hdlr.stat_mod_fw_update_protocol
+                )
+                for mod in mod_list:
+                    await rtr.get_module(mod).initialize()
+            else:
+                app.logger.info("Firmware upload to router failed, update terminated")
+            await api_srv.block_network_if(rtr._id, False)
+            return show_hub_overview(app)
 
     @routes.get("/update_status")
     async def get_update_status(request: web.Request) -> web.Response:  # type: ignore

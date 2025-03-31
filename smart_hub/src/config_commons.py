@@ -1,3 +1,4 @@
+import asyncio
 from aiohttp import web
 from const import (
     WEB_FILES_DIR,
@@ -13,6 +14,8 @@ from const import (
     SMHUB_INFO,
     LOGGING_LEVELS,
 )
+
+web_lock = asyncio.Lock()
 
 
 def inspect_header(req: web.Request):
