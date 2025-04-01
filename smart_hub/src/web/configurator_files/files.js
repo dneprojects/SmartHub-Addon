@@ -165,7 +165,6 @@ function getWaitStatus(url) {
                 window.location.replace(url);
                 return;
             }
-            setStatus(text);
         })
         .catch(function (error) {
             pending = false;

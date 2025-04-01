@@ -598,7 +598,7 @@ class ConfigServer:
         return web.Response(text=page, content_type="text/html", charset="utf-8")
 
     @routes.get(path="/Smart Configurator Documentation")
-    async def show_doc(request: web.Request) -> web.Response:  # type: ignore
+    async def show_cdoc(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
 
         page = (

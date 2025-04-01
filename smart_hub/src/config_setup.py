@@ -374,4 +374,5 @@ async def re_init_hub(main_app) -> web.Response:
         api_srv._init_mode = False
         await api_srv.block_network_if(rtr._id, False)
         await api_srv.set_operate_mode(rtr._id)
-        return show_modules(main_app)
+        return web.Response(text="finished", status=200)
+        # return show_modules(main_app)
