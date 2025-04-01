@@ -13,6 +13,7 @@ const file_button_l = document.getElementById("file_button_l");
 const sys_upload_l = document.getElementById("sys_upload");
 const wait_msg_popup = document.getElementById("msg_popup");
 let intervalId;
+let pending;
 
 if (document.getElementById("form_doc")) {
     form_doc.addEventListener("submit", function () {
@@ -137,6 +138,7 @@ function handle_upload_button() {
 }
 async function watchWaitStatus(url) {
 
+    pending = false;
     intervalId = setInterval(function () {
         // alle 3 Sekunden ausführen 
         getWaitStatus(url);
@@ -145,7 +147,6 @@ async function watchWaitStatus(url) {
 
 function getWaitStatus(url) {
     const statusUrl = "wait_status"
-    var pending = false;
     if (url == "") {
         url = "modules";
     }
