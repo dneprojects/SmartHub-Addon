@@ -86,6 +86,7 @@ class ConfigServer:
 
         @web.middleware
         async def ingress_middleware(request: web.Request, handler) -> web.Response:
+            request.app.logger.debug(f"Request path: {request.path_qs}")
             response = await handler(request)
             if (
                 request.app["api_srv"].is_addon
@@ -94,9 +95,8 @@ class ConfigServer:
                 and response.status == 200
             ):
                 ingress_path = request.headers["X-Ingress-Path"]
-                request.app.logger.debug(f"Request path: {request.path_qs}")
                 request.app.logger.debug(
-                    f"Response status: {response.status} , Body type: {type(response.body)}"
+                    f"Request path: {request.path_qs}: Response status: {response.status} , Body type: {type(response.body)}"
                 )
                 if isinstance(response.body, bytes):
                     response.body = (
