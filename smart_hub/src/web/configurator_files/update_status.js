@@ -28,23 +28,27 @@ async function watchUpdateStatus() {
     document.getElementById("header_lg").hidden = true;
     setInterval(function () {
         // alle 3 Sekunden ausführen 
-        getStatus();
+        getUpdateStatus();
     }, 3000);
 }
 
-function getStatus() {
+function getUpdateStatus() {
     const statusUrl = "update_status"
     fetch(statusUrl)
         .then((resp) => resp.text())
         .then(function (text) {
-            setStatus(text);
+            if (text == "finished") {
+                window.location.replace("hub");
+                return;
+            }
+            setUpdateStatus(text);
         })
         .catch(function (error) {
             console.log(error);
         });
 }
 
-function setStatus(jsonString) {
+function setUpdateStatus(jsonString) {
     var updateStat = JSON.parse(jsonString);
     upldStat = updateStat.upload;
     modsList = updateStat.modules

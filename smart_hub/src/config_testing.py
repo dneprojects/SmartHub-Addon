@@ -194,7 +194,7 @@ class ConfigTestingServer:
             return show_not_authorized(request.app)
 
         if web_lock.locked():
-            return web.Response(status=204)
+            return web.Response(text="locked", status=200)
 
         async with web_lock:
             main_app = request.app["parent"]

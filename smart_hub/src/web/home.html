@@ -221,12 +221,6 @@
         close_updates_pop.addEventListener("click", function () {
             updates_pop.classList.remove("show");
         });
-    form_rtr_update.addEventListener("submit", function () {
-        openMsgPopup();
-    });
-    form_mod_update.addEventListener("submit", function () {
-        openMsgPopup();
-    });
     window.addEventListener("click", function (event) {
         if (event.target == file_popup) {
             openMsgPopup();

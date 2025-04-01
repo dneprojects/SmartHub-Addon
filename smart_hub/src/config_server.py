@@ -283,40 +283,20 @@ class ConfigServer:
         inspect_header(request)
         if client_not_authorized(request):
             return show_not_authorized(request.app)
-        app = request.app
-        data = await request.post()
-        backup_file = data["loc_backup_select"]  # type: ignore
-        with open(backup_file, "r") as file:
-            content_str = file.read()
-        content_parts = content_str.split("---\n")
-        if content_parts[-1] == "":
-            content_parts = content_parts[:-1]
-        app.logger.info("Local backup file uploaded")
-        await send_to_router(app, content_parts[0])
-        for mod_addr in app["api_srv"].routers[0].mod_addrs:
-            for cont_part in content_parts[1:]:
-                if mod_addr == int(cont_part.split(";")[0]):
-                    break
-            await send_to_module(app, cont_part, mod_addr)
-            app.logger.info(f"Module configuration file for module {mod_addr} uploaded")
-        init_side_menu(app)
-        return show_modules(app)
 
-    @routes.post("/upload")
-    async def get_upload(request: web.Request) -> web.Response:  # type: ignore
-        inspect_header(request)
-        if client_not_authorized(request):
-            return show_not_authorized(request.app)
-        app = request.app
-        data = await request.post()
-        config_file = data["file"].file  # type: ignore
-        content = config_file.read()
-        content_str = content.decode()
-        if "SysUpload" in data.keys():
+        if web_lock.locked():
+            return web.Response(text="locked", status=200)
+
+        async with web_lock:
+            app = request.app
+            data = await request.post()
+            backup_file = data["loc_backup_select"]  # type: ignore
+            with open(backup_file, "r") as file:
+                content_str = file.read()
             content_parts = content_str.split("---\n")
             if content_parts[-1] == "":
                 content_parts = content_parts[:-1]
-            app.logger.info("Router configuration file uploaded")
+            app.logger.info("Local backup file uploaded")
             await send_to_router(app, content_parts[0])
             for mod_addr in app["api_srv"].routers[0].mod_addrs:
                 for cont_part in content_parts[1:]:
@@ -328,109 +308,162 @@ class ConfigServer:
                 )
             init_side_menu(app)
             return show_modules(app)
-        elif data["ModUpload"] == "ModAddress":
-            # router upload
-            await send_to_router(app, content_str)
-            init_side_menu(app)
-            success_msg = "Router configuration file uploaded"
-            app.logger.info(success_msg)  # noqa: F541
-            return await show_router_overview(app, success_msg)  # type: ignore
-        else:
-            mod_addr = int(str(data["ModUpload"]))
-            if data["ModUpload"] == content_str.split(";")[0]:
-                await send_to_module(app, content_str, mod_addr)
-                success_msg = (
-                    f"Module configuration file for module {mod_addr} uploaded"
-                )
-                app.logger.info(success_msg)
+
+    @routes.post("/upload")
+    async def get_upload(request: web.Request) -> web.Response:  # type: ignore
+        inspect_header(request)
+        if client_not_authorized(request):
+            return show_not_authorized(request.app)
+
+        if web_lock.locked():
+            return web.Response(text="locked", status=200)
+
+        async with web_lock:
+            app = request.app
+            data = await request.post()
+            config_file = data["file"].file  # type: ignore
+            content = config_file.read()
+            content_str = content.decode()
+            if "SysUpload" in data.keys():
+                content_parts = content_str.split("---\n")
+                if content_parts[-1] == "":
+                    content_parts = content_parts[:-1]
+                app.logger.info("Router configuration file uploaded")
+                await send_to_router(app, content_parts[0])
+                for mod_addr in app["api_srv"].routers[0].mod_addrs:
+                    for cont_part in content_parts[1:]:
+                        if mod_addr == int(cont_part.split(";")[0]):
+                            break
+                    await send_to_module(app, cont_part, mod_addr)
+                    app.logger.info(
+                        f"Module configuration file for module {mod_addr} uploaded"
+                    )
+                init_side_menu(app)
+                return show_modules(app)
+            elif data["ModUpload"] == "ModAddress":
+                # router upload
+                await send_to_router(app, content_str)
+                init_side_menu(app)
+                success_msg = "Router configuration file uploaded"
+                app.logger.info(success_msg)  # noqa: F541
+                return await show_router_overview(app, success_msg)  # type: ignore
             else:
-                success_msg = f"Module configuration file does not fit to module number {mod_addr}, upload aborted"
-                app.logger.warning(success_msg)
-            init_side_menu(app)
-            return show_module_overview(
-                app, mod_addr, success_msg
-            )  # web.HTTPNoContent()
+                mod_addr = int(str(data["ModUpload"]))
+                if data["ModUpload"] == content_str.split(";")[0]:
+                    await send_to_module(app, content_str, mod_addr)
+                    success_msg = (
+                        f"Module configuration file for module {mod_addr} uploaded"
+                    )
+                    app.logger.info(success_msg)
+                else:
+                    success_msg = f"Module configuration file does not fit to module number {mod_addr}, upload aborted"
+                    app.logger.warning(success_msg)
+                init_side_menu(app)
+                return show_module_overview(
+                    app, mod_addr, success_msg
+                )  # web.HTTPNoContent()
 
     @routes.post("/loc_update")
     async def post_loc_update(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
         if client_not_authorized(request):
             return show_not_authorized(request.app)
-        app = request.app
-        api_srv = app["api_srv"]
-        rtr = api_srv.routers[0]
-        data = await request.post()
-        if "mod_type_select" in data.keys():
-            module = rtr.get_module(int(data["mod_type_select"]))
-            with open(module.update_fw_file, "rb") as fid:
-                rtr.fw_upload = fid.read()
-            mod_type = module._typ
-            mod_type_str = module._type
-            fw_vers = rtr.fw_upload[-27:-5].decode().strip()
-            app.logger.info(
-                f"Firmware file v. {fw_vers} for '{MODULE_CODES[mod_type.decode()]}' modules uploaded"
-            )
-            mod_list = rtr.get_module_list()
-            upd_list = []
-            for mod in mod_list:
-                if mod.typ == mod_type:
-                    upd_list.append(mod)
-            return show_update_modules(upd_list, fw_vers, mod_type_str, app.logger)
-        else:
-            with open(rtr.update_fw_file, "rb") as fid:
-                rtr.fw_upload = fid.read()
-            fw_vers = rtr.fw_upload[-27:-5]
-            app.logger.info(f"Firmware file for router {rtr._name} uploaded")
-            return show_update_router(rtr, fw_vers)
 
-    @routes.post("/upd_upload")
+        if web_lock.locked():
+            return web.Response(status=204)
+
+        async with web_lock:
+            app = request.app
+            api_srv = app["api_srv"]
+            rtr = api_srv.routers[0]
+            data = await request.post()
+            if "mod_type_select" in data.keys():
+                module = rtr.get_module(int(data["mod_type_select"]))
+                with open(module.update_fw_file, "rb") as fid:
+                    rtr.fw_upload = fid.read()
+                mod_type = module._typ
+                mod_type_str = module._type
+                fw_vers = rtr.fw_upload[-27:-5].decode().strip()
+                app.logger.info(
+                    f"Firmware file v. {fw_vers} for '{MODULE_CODES[mod_type.decode()]}' modules uploaded"
+                )
+                mod_list = rtr.get_module_list()
+                upd_list = []
+                for mod in mod_list:
+                    if mod.typ == mod_type:
+                        upd_list.append(mod)
+                return show_update_modules(upd_list, fw_vers, mod_type_str, app.logger)
+            else:
+                with open(rtr.update_fw_file, "rb") as fid:
+                    rtr.fw_upload = fid.read()
+                fw_vers = rtr.fw_upload[-27:-5]
+                app.logger.info(f"Firmware file for router {rtr._name} uploaded")
+                return show_update_router(rtr, fw_vers)
+
+    @routes.get("/upd_upload")
     async def get_upd_upload(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
         if client_not_authorized(request):
             return show_not_authorized(request.app)
-        app = request.app
-        api_srv = app["api_srv"]
-        rtr = api_srv.routers[0]
-        data = await request.post()
-        fw_filename = data["file"].filename  # type: ignore
-        rtr.fw_upload = data["file"].file.read()  # type: ignore
-        upd_type = str(data["SysUpload"])
-        if upd_type == "rtr":
-            fw_vers = rtr.fw_upload[-27:-5].decode()
-            app.logger.info(f"Firmware file for router {rtr._name} uploaded")
-            return show_update_router(rtr, fw_vers)
-        elif upd_type == "mod":
-            mod_type = rtr.fw_upload[:2]
-            if mod_type == b"\x01\x02" and fw_filename[:8] == "scrmgv46":
-                mod_type = b"\x01\x03"
-            mod_type_str = MODULE_CODES[mod_type.decode()]
-            fw_vers = rtr.fw_upload[-27:-5].decode().strip()
-            app.logger.info(
-                f"Firmware file v. {fw_vers} for '{MODULE_CODES[mod_type.decode()]}' modules uploaded"
-            )
-            mod_list = rtr.get_module_list()
-            upd_list = []
-            for mod in mod_list:
-                if mod.typ == mod_type:
-                    upd_list.append(mod)
-            return show_update_modules(upd_list, fw_vers, mod_type_str, app.logger)
-        else:
-            mod_type = rtr.fw_upload[:2]
-            mod_type_str = MODULE_CODES[mod_type.decode()]
-            fw_vers = rtr.fw_upload[-27:-5].decode().strip()
-            mod_addr = int(upd_type)
-            module = rtr.get_module(mod_addr)
-            if module is None:
-                app.logger.error(f"Could not find module {mod_addr}")
-                return show_hub_overview(app)
-            elif module._typ == mod_type:
-                app.logger.info(f"Firmware file for module {module._name} uploaded")
-                return show_update_modules([module], fw_vers, mod_type_str, app.logger)
-            else:
-                app.logger.error(
-                    f"Firmware file for {MODULE_CODES[mod_type.decode()]} uploaded, not compatible with module {module._name}"
+
+        if web_lock.locked():
+            return web.Response(status=204)
+
+    @routes.post("/upd_upload")
+    async def post_upd_upload(request: web.Request) -> web.Response:  # type: ignore
+        inspect_header(request)
+        if client_not_authorized(request):
+            return show_not_authorized(request.app)
+
+        if web_lock.locked():
+            return web.Response(status=204)
+
+        async with web_lock:
+            app = request.app
+            api_srv = app["api_srv"]
+            rtr = api_srv.routers[0]
+            data = await request.post()
+            fw_filename = data["file"].filename  # type: ignore
+            rtr.fw_upload = data["file"].file.read()  # type: ignore
+            upd_type = str(data["SysUpload"])
+            if upd_type == "rtr":
+                fw_vers = rtr.fw_upload[-27:-5].decode()
+                app.logger.info(f"Firmware file for router {rtr._name} uploaded")
+                return show_update_router(rtr, fw_vers)
+            elif upd_type == "mod":
+                mod_type = rtr.fw_upload[:2]
+                if mod_type == b"\x01\x02" and fw_filename[:8] == "scrmgv46":
+                    mod_type = b"\x01\x03"
+                mod_type_str = MODULE_CODES[mod_type.decode()]
+                fw_vers = rtr.fw_upload[-27:-5].decode().strip()
+                app.logger.info(
+                    f"Firmware file v. {fw_vers} for '{MODULE_CODES[mod_type.decode()]}' modules uploaded"
                 )
-                return show_hub_overview(app)
+                mod_list = rtr.get_module_list()
+                upd_list = []
+                for mod in mod_list:
+                    if mod.typ == mod_type:
+                        upd_list.append(mod)
+                return show_update_modules(upd_list, fw_vers, mod_type_str, app.logger)
+            else:
+                mod_type = rtr.fw_upload[:2]
+                mod_type_str = MODULE_CODES[mod_type.decode()]
+                fw_vers = rtr.fw_upload[-27:-5].decode().strip()
+                mod_addr = int(upd_type)
+                module = rtr.get_module(mod_addr)
+                if module is None:
+                    app.logger.error(f"Could not find module {mod_addr}")
+                    return show_hub_overview(app)
+                elif module._typ == mod_type:
+                    app.logger.info(f"Firmware file for module {module._name} uploaded")
+                    return show_update_modules(
+                        [module], fw_vers, mod_type_str, app.logger
+                    )
+                else:
+                    app.logger.error(
+                        f"Firmware file for {MODULE_CODES[mod_type.decode()]} uploaded, not compatible with module {module._name}"
+                    )
+                    return show_hub_overview(app)
 
     @routes.post("/update_router")
     async def get_update_router(request: web.Request) -> web.Response:  # type: ignore
@@ -521,11 +554,30 @@ class ConfigServer:
             inspect_header(request)
             app = request.app
             stat = app["api_srv"].routers[0].hdlr.upd_stat_dict
-            return web.Response(
-                text=json.dumps(stat), content_type="text/plain", charset="utf-8"
-            )
+            if web_lock.locked():
+                return web.Response(
+                    text=json.dumps(stat), content_type="text/plain", charset="utf-8"
+                )
+            else:
+                await asyncio.sleep(1)
+                return web.Response(text="finished", status=200)
         except Exception as err_msg:
             app.logger.warning("Error handling update status:" + err_msg)
+            return web.HTTPNoContent()
+
+    @routes.get("/wait_status")
+    async def get_wait_status(request: web.Request) -> web.Response:  # type: ignore
+        inspect_header(request)
+        app = request.app
+        try:
+            if web_lock.locked():
+                app.logger.debug("Wait locked")
+                return web.Response(text="locked", status=200)
+            else:
+                app.logger.debug("Wait lock released")
+                return web.Response(text="finished", status=200)
+        except Exception as err_msg:
+            app.logger.warning("Error handling wait status:" + err_msg)
             return web.HTTPNoContent()
 
     @routes.get(path="/Documentation")

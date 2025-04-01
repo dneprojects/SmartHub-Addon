@@ -362,7 +362,8 @@ async def re_init_hub(main_app) -> web.Response:
     """Revert all changes from setup table, re-init hub."""
 
     if web_lock.locked():
-        return web.Response(status=204)
+        return web.Response(text="locked", status=200)
+
     async with web_lock:
         api_srv = main_app["api_srv"]
         rtr = api_srv.routers[0]
@@ -373,4 +374,4 @@ async def re_init_hub(main_app) -> web.Response:
         api_srv._init_mode = False
         await api_srv.block_network_if(rtr._id, False)
         await api_srv.set_operate_mode(rtr._id)
-        return show_homepage(main_app)
+        return show_modules(main_app)
