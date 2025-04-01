@@ -145,12 +145,17 @@ async function watchWaitStatus(url) {
 
 function getWaitStatus(url) {
     const statusUrl = "wait_status"
+    var pending = false;
     if (url == "") {
         url = "modules";
     }
+    if (pending)
+        return;
+    pending = true;
     fetch(statusUrl)
         .then((resp) => resp.text())
         .then(function (text) {
+            pending = false;
             if (text == "locked") {
                 return;
             }
@@ -162,6 +167,7 @@ function getWaitStatus(url) {
             setStatus(text);
         })
         .catch(function (error) {
+            pending = false;
             console.log(error);
         });
 }
