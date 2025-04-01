@@ -12,6 +12,7 @@ const sys_upload = document.getElementsByName("SysUpload");
 const file_button_l = document.getElementById("file_button_l");
 const sys_upload_l = document.getElementById("sys_upload");
 const wait_msg_popup = document.getElementById("msg_popup");
+let intervalId;
 
 if (document.getElementById("form_doc")) {
     form_doc.addEventListener("submit", function () {
@@ -136,7 +137,7 @@ function handle_upload_button() {
 }
 async function watchWaitStatus(url) {
 
-    setInterval(function () {
+    intervalId = setInterval(function () {
         // alle 3 Sekunden ausführen 
         getWaitStatus(url);
     }, 3000);
@@ -154,6 +155,7 @@ function getWaitStatus(url) {
                 return;
             }
             if (text == "finished") {
+                clearInterval(intervalId);
                 window.location.replace(url);
                 return;
             }

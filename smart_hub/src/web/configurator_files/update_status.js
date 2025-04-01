@@ -1,6 +1,8 @@
 const flash_btn = document.getElementById("flash_button");
 const cancel_btn = document.getElementById("upd_cancel_button");
 const check_boxes = document.getElementsByClassName("mod_chk");
+let intervalId;
+
 flash_btn.addEventListener("click", function () {
     watchUpdateStatus();
 });
@@ -26,7 +28,7 @@ async function watchUpdateStatus() {
 
     cancel_btn.disabled = true;
     document.getElementById("header_lg").hidden = true;
-    setInterval(function () {
+    intervalId = setInterval(function () {
         // alle 3 Sekunden ausführen 
         getUpdateStatus();
     }, 3000);
@@ -38,6 +40,7 @@ function getUpdateStatus() {
         .then((resp) => resp.text())
         .then(function (text) {
             if (text == "finished") {
+                clearInterval(intervalId);
                 window.location.replace("hub");
                 return;
             }

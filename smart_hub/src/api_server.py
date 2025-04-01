@@ -469,7 +469,7 @@ class ApiServer:
             )
         if time_now.day == 1:
             # first day of a month: copy current day to monthly file
-            new_month_file = dayly_backup_file_list[-1].replace("_w.hcf", "_m.hcf")
+            new_month_file = dayly_backup_file_list[-1].replace("_d.hcf", "_m.hcf")
             with open(new_month_file, "w") as fid:
                 fid.write(str_data)
             self.logger.info(
