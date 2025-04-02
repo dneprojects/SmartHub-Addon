@@ -199,9 +199,9 @@ class HbtnModule:
             return
 
         file_found = False
-        fw_files = FW_FILES_DIR + MODULE_FIRMWARE[self._typ] + "*.bin"
+        fw_files = FW_FILES_DIR + MODULE_FIRMWARE[self._typ] + "_*.bin"
         fw_file_list = glob(fw_files)
-        fw_files = FW_FILES_DIR + MODULE_FIRMWARE_NEW[self._typ] + "*.bin"
+        fw_files = FW_FILES_DIR + MODULE_FIRMWARE_NEW[self._typ] + "_*.bin"
         fw_file_list += glob(fw_files)
         curr_fw = self.get_sw_version()
         for fw_file in fw_file_list:
