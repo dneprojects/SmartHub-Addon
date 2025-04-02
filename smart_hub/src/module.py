@@ -3,6 +3,7 @@ from glob import glob
 import logging
 from copy import deepcopy as dpcopy
 from const import (
+    MODULE_FIRMWARE,
     MODULE_FIRMWARE_NEW,
     MirrIdx,
     SMGIdx,
@@ -10,7 +11,6 @@ from const import (
     CStatBlkIdx,
     HA_EVENTS,
     FW_FILES_DIR,
-    MODULE_FIRMWARE,
     MOD_CHANGED,
 )
 from configuration import (
