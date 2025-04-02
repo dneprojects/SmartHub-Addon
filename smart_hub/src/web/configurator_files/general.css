@@ -49,7 +49,7 @@ body,
 }
 
 #header_bg {
-    width: auto;
+    width: 100%;
 }
 
 #logo_habitron {
@@ -203,6 +203,7 @@ img {
     }
     .ce_image.block {
         height: 70px;
+        width: 110%;
     }
     #pic.mod_article.block {
         position: fixed;
@@ -227,6 +228,7 @@ img {
         padding-bottom: 90px;
     }
     #left {
+        margin-top: -40px;
         margin-left: 0px;
         width: 0px;
         position: absolute;
@@ -285,6 +287,7 @@ img {
     .ce_text.block, 
     .mod_article.block {
         overflow:visible; 
+        width: 95%;
     }
     input.desc_input1, 
     input.desc_input2 {
@@ -311,5 +314,9 @@ img {
         top: 25px;
         font-size: 18px;
         color: #c8c8c8;
+    }
+    form table td {
+        padding-left: 0px; 
+        padding-right: 0px;
     }
 }

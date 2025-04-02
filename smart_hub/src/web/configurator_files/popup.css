@@ -14,7 +14,7 @@
 
 #count_popup .popup-content, #logic_popup .popup-content, #file_popup .popup-content, #updates_popup .popup-content, #newmod-popup .popup-content, #resp-popup .popup-content, #chan_popup .popup-content {
     background-color: white;
-    margin: 10% 20%;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     color: #6b6c6e;
@@ -27,7 +27,7 @@
 
 #msg_popup .popup-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     width: 200px;
@@ -38,7 +38,7 @@
 
 #sav_popup .popup-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     width: 200px;
@@ -49,7 +49,7 @@
 
 #wait_popup .popup-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     width: 200px;
@@ -60,7 +60,7 @@
 
 #teach_popup .popup-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     width: 200px;
@@ -72,7 +72,7 @@
 
 #automtn_new_popup .popup-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     width: 400px;
@@ -83,7 +83,7 @@
 
 #automtn_change_popup .popup-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     width: 400px;
@@ -94,7 +94,7 @@
 
 #automtn_del_popup .popup-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     width: 400px;
@@ -104,7 +104,7 @@
 }
 #automtn_err_popup .popup-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888888;
     width: 400px;
