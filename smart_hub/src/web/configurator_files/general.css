@@ -148,7 +148,7 @@ img {
     height: 24px;
     top: 20px;
     left: 20px;
-    z-index: 0;
+    z-index: 200;
 }
 
 #main {
