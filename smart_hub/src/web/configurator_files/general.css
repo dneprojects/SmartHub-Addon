@@ -67,6 +67,13 @@ body,
     margin-top: 150px;
     margin-bottom: 80px;
 }
+#inhalt_doc {
+    position: relative;
+    z-index: 10;
+    height: calc(100vh - 220px);
+    margin-top: 150px;
+    margin-bottom: 80px;
+}    
 
 #left {
     position: relative;
@@ -202,7 +209,7 @@ img {
 
 /* --------------------------------------------------------- Responsive Design ---------------------------- */
 
-@media (aspect-ratio < 0.7) or (max-width: 980px) {
+@media (aspect-ratio < 0.7) or (max-width: 1012px) {
     
     #header_lg {
         visibility: hidden;
@@ -222,8 +229,12 @@ img {
     #inhalt {
         z-index: 10;
         margin-top: 150px;
-        margin-bottom: 80px;
     }
+    #inhalt_doc {
+        z-index: 10;
+        height: calc(100vh - 180px);
+        margin-top: 80px;
+    }    
     #acc_img {
         position: absolute;
     }

@@ -587,47 +587,24 @@ class ConfigServer:
         return show_documentation_page(app)
 
     @routes.get(path="/Smart Center Introduction")
-    async def show_doc(request: web.Request) -> web.Response:  # type: ignore
+    async def show_intro(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
-
-        page = (
-            get_html("smartcenterintro_doc.html", "windows-1252")
-            .replace("smartcenterintro_doc-Dateien", "smartcenterintro_doc_files")
-            .replace('"text/html; charset=windows-1252"', '"text/html; charset=utf-8"')
-        )
-        return web.Response(text=page, content_type="text/html", charset="utf-8")
+        return await show_doc(WEB_FILES_DIR + "smartcenterintro_doc.html")
 
     @routes.get(path="/Smart Configurator Documentation")
     async def show_cdoc(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
-
-        page = (
-            get_html("configurator_doc.html", "windows-1252")
-            .replace("configurator_doc-Dateien", "configurator_doc_files")
-            .replace('"text/html; charset=windows-1252"', '"text/html; charset=utf-8"')
-        )
-        return web.Response(text=page, content_type="text/html", charset="utf-8")
+        return await show_doc(WEB_FILES_DIR + "configurator_doc.html")
 
     @routes.get(path="/Grundbegriffe Home Assistant")
     async def show_hadoc(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
-        page = (
-            get_html("habasics_doc.html", "windows-1252")
-            .replace("habasics_doc-Dateien", "habasics_doc_files")
-            .replace('"text/html; charset=windows-1252"', '"text/html; charset=utf-8"')
-        )
-        return web.Response(text=page, content_type="text/html", charset="utf-8")
+        return await show_doc(WEB_FILES_DIR + "habasics_doc.html")
 
     @routes.get(path="/Setup Guide")
     async def show_setup_doc(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
-
-        page = (
-            get_html("setup_doc.html", "windows-1252")
-            .replace("setup_doc-Dateien", "setup_doc_files")
-            .replace('"text/html; charset=windows-1252"', '"text/html; charset=utf-8"')
-        )
-        return web.Response(text=page, content_type="text/html", charset="utf-8")
+        return await show_doc(WEB_FILES_DIR + "setup_doc.html")
 
     @routes.get(path="/{key:.*}.txt")
     async def get_license_text(request: web.Request) -> web.Response:  # type: ignore
@@ -635,25 +612,36 @@ class ConfigServer:
         return show_license_text(request)
 
 
-@routes.get(path="/smartcenterintro_doc_files/{key:.*}")
+@routes.get(path="/web/smartcenterintro_doc_files/{key:.*}")
 async def load_doc_pic(request):
-    with open(WEB_FILES_DIR + request.path[1:], "rb") as img_file:
+    with open(request.path[1:], "rb") as img_file:
         img_content = img_file.read()
     return web.Response(body=img_content)
 
 
-@routes.get(path="/configurator_doc_files/{key:.*}")
+@routes.get(path="/web/configurator_doc_files/{key:.*}")
 async def load_sconfdoc_pic(request):
-    with open(WEB_FILES_DIR + request.path[1:], "rb") as img_file:
+    with open(request.path[1:], "rb") as img_file:
         img_content = img_file.read()
     return web.Response(body=img_content)
 
 
-@routes.get(path="/setup_doc_files/{key:.*}")
+@routes.get(path="/web/setup_doc_files/{key:.*}")
 async def load_setup_pic(request):
-    with open(WEB_FILES_DIR + request.path[1:], "rb") as img_file:
+    with open(request.path[1:], "rb") as img_file:
         img_content = img_file.read()
     return web.Response(body=img_content)
+
+
+@routes.get(path="/web/{key:.*}")
+async def load_html_file(request):
+    pname = request.path.replace("/web/", "").replace(".html", "")
+    page = (
+        get_html(pname + ".html", "windows-1252")
+        .replace(f"{pname}-Dateien", f"{pname}_files")
+        .replace('"text/html; charset=windows-1252"', '"text/html; charset=utf-8"')
+    )
+    return web.Response(text=page, content_type="text/html", charset="utf-8")
 
 
 @routes.get(path="/favicon.ico")
@@ -826,6 +814,12 @@ async def terminate_delayed(api_srv):
     await asyncio.sleep(2)
     # execute the other coroutine
     await api_srv.shutdown(1, False)
+
+
+async def show_doc(docfile_path: str):
+    """Show html documentation in iframe."""
+    page = get_html("doc.html").replace("CONTENT_URL", docfile_path)
+    return web.Response(text=page, content_type="text/html", charset="utf-8")
 
 
 def show_license_table(app):
