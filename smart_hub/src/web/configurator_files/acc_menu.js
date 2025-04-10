@@ -10,6 +10,11 @@ else {
             toggle_acc_btn();
         });
     }
+    if (el_left) {
+        el_left.addEventListener("click", function () {
+            toggle_acc_btn();
+        });
+    }
 }
 
 
