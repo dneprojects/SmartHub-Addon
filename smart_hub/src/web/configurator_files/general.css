@@ -245,6 +245,7 @@ img {
         padding-right: 20px;
         background-color: #f9f9f9;
         visibility: hidden;
+        box-shadow: grey 2px 2px 5px;
     }
     #right {
         width: 0px;

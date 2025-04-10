@@ -114,11 +114,13 @@
 
 /* ----------------------------------------------------------------------Subnavi--------------------------- */
 #subnavi {
-   width: 150px;
+   width: 240px;
    position: relative;
    top: 20px;
    padding-bottom: 60px;
    margin-left: 2px;
+   display: flex;
+   flex-direction: column;
 }
 
 #subnavi li.sign {
