@@ -70,11 +70,11 @@ body,
 
 #left {
     position: relative;
-    margin-left: 20px;
+    margin-left: 0px;
     background: #FFF;
     float: left;
     z-index: 1000;
-    width: 170px;
+    width: 220px;
     overflow: visible;
     margin-right: -1px;
     visibility: visible;
@@ -239,7 +239,6 @@ img {
     }
     #left {
         margin-top: -80px;
-        margin-left: 0px;
         width: 0px;
         position: absolute;
         padding-right: 20px;
