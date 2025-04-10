@@ -148,7 +148,7 @@ img {
     height: 24px;
     top: 20px;
     left: 20px;
-    z-index: 0;
+    z-index: 200;
 }
 
 #main {
@@ -195,6 +195,10 @@ img {
     clear: both;
     visibility: hidden;
 }
+  .radio-group {
+      display: flex;
+      flex-direction: column;
+  }
 
 /* --------------------------------------------------------- Responsive Design ---------------------------- */
 
@@ -327,5 +331,8 @@ img {
     }
     div#autmnbuttons {
     margin-left: 70px;
+    }
+    div#check_btn_line {
+
     }
 }

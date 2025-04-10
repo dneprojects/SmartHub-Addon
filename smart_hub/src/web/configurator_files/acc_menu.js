@@ -1,12 +1,12 @@
 const menu_btn = document.getElementById("acc_img")
 const el_left = document.getElementById("left")
 
-if (el_left.getBoundingClientRect().height < 220) {
+if (el_left.getBoundingClientRect().width > 50) {
     menu_btn.style.width = "0px"
 }
 else {
-    if (menu_btn)
-        {menu_btn.addEventListener("click", function () {
+    if (menu_btn) {
+        menu_btn.addEventListener("click", function () {
             toggle_acc_btn();
         });
     }
