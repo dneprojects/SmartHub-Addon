@@ -70,7 +70,7 @@ body,
 #inhalt_doc {
     position: relative;
     z-index: 10;
-    height: calc(100vh - 220px);
+    height: calc(100vh - 240px);
     margin-top: 150px;
     margin-bottom: 80px;
 }    
