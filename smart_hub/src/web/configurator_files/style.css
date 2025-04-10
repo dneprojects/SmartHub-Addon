@@ -240,9 +240,6 @@ div.tableform label {
    float: left;
 }
 
-form#automations_table {
-   min-height: 300px;
-}
 
 form input,
 form select {
@@ -482,7 +479,7 @@ tr#lic-tr:nth-child(odd) {
 /* ---------------------------------------------------------Elemente---------------------------- */
 
 #pic {
-   height: 150px;
+   height: 70px;
    position: relative;
    z-index: 90;
    top: 20px;
@@ -914,6 +911,9 @@ p.info {
    display:block;
    float:left;
 }*/
+#confbuttons {
+   margin-left: 10px;
+}
 body.kontakt table td {
    vertical-align: top;
    padding-top: 3px;
@@ -1202,7 +1202,8 @@ p#button-evnt {
 }
 
 div#autmnbuttons {
-   margin-top: 10px;
+   margin-top: 20px;
+   margin-left: 100px;
    display: inline-flex;
 }
 
