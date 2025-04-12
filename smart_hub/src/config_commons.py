@@ -538,7 +538,7 @@ def get_module_image(type_code: bytes) -> tuple[str, str]:
         case 30:
             match type_code[1]:
                 case 1:
-                    mod_image = "mod_smartkey.jpg"
+                    mod_image = "smart-key.jpg"
                     type_desc = "Smart Key - Zugangskontroller über Fingerprint"
                 case 3:
                     mod_image = "smart-gsm.jpg"

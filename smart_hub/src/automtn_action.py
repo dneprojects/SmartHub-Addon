@@ -486,6 +486,8 @@ class AutomationAction:
         sel_atm = self.automation
         opt_str = '<option value="">-- Aktion wählen --</option>\n'
         sel_actions = self.get_selector_actions()
+        # if sel_atm.action.action_code not in list(sel_actions.keys()):
+        #     sel_atm.action.action_code = 0
         self.action_id = self.action_code
         if self.action_code in [1, 2, 3]:
             if self.action_args[0] > 100:

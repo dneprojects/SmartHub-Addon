@@ -723,6 +723,8 @@ class AutomationTrigger:
     def prepare_trigger_lists(self, app, page: str, step: int) -> str:
         """Replace options part of select boxes for edit automation."""
         sel_triggers, sel_sensors = self.get_selector_triggers(step == 0)
+        if self.event_code not in sel_triggers:
+            self.event_code = 0
         opt_str = '<option value="">-- Auslösendes Ereignis wählen --</option>\n'
         for key in sel_triggers:
             opt_str += f'<option value="{key}">{sel_triggers[key]}</option>\n'

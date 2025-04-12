@@ -15,6 +15,7 @@ const climate_act = new Set([220, 221, 222]);
 const ambient_act = new Set([240]);
 
 function initActElements(act_code, act_args) {
+    setElement("action-select", "")
     if (switching_act.has(act_code)) {
         var out_no = 0
         if (act_code > 110) {
@@ -239,6 +240,10 @@ function initActElements(act_code, act_args) {
 }
 function setActionSels() {
     var idx = act_sel.selectedIndex
+    if (idx < 0) {
+        idx = 0;
+        setElement("action-select", "")
+    }
     var selectn = act_sel[idx].value
     setElementVisibility("output-act", "hidden");
     setElementVisibility("led-act", "hidden");
@@ -276,6 +281,8 @@ function setActionSels() {
     setElementVisibility("gsmmsg-act", "hidden");
     setElementVisibility("refreg-act", "hidden");
     setElementVisibility("perc-act", "hidden");
+    setElementVisibility("rgb-colorpicker", "hidden");
+
     if (selectn == "1") {
         setElementVisibility("output-act", "visible");
         setElementVisibility("outopt-act", "visible");

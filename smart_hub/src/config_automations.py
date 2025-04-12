@@ -501,15 +501,20 @@ def prepare_src_mod_trigger(automtn, rtr, src_mod):
     automtn.src_mod = src_mod
     mod = rtr.get_module(src_mod)
     src_settings = ModuleSettings(mod)
+    old_event_code = automtn.trigger.event_code
+    old_event_args = [automtn.trigger.event_arg1, automtn.trigger.event_arg2]
     automtn.trigger = AutomationTrigger(automtn, src_settings, None)
     automtn.event_code = 0
     automtn.trigger.src_mod = automtn.src_mod
     automtn.trigger.src_rt = automtn.src_rt
+    automtn.trigger.event_code = old_event_code
+    automtn.trigger.event_arg1 = old_event_args[0]
+    automtn.trigger.event_arg2 = old_event_args[1]
     return automtn
 
 
 def prepare_trg_mod_action(automtn, rtr, src_mod, targ_mod):
-    """Init empty trigger into given automation."""
+    """Init empty automation and include given trigger."""
     automtn.src_mod = src_mod
     mod = rtr.get_module(targ_mod)
     targ_settings = ModuleSettings(mod)
@@ -522,4 +527,6 @@ def prepare_trg_mod_action(automtn, rtr, src_mod, targ_mod):
     new_automtn.src_rt = automtn.src_rt
     new_automtn.trigger.src_mod = src_mod
     new_automtn.trigger.src_rt = automtn.src_rt
+    new_automtn.action.action_code = automtn.action.action_code
+    new_automtn.action.action_args = automtn.action.action_args
     return new_automtn

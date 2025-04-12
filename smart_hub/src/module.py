@@ -54,7 +54,6 @@ class HbtnModule:
         self.hdlr.initialize(self)
         await self.hdlr.get_module_status(self._id)
         self.comp_status = self.get_status(False)
-        self.calc_SMG_crc(self.build_smg())
 
         self._name = (
             self.status[MirrIdx.MOD_NAME : MirrIdx.MOD_NAME + 32]
@@ -70,9 +69,10 @@ class HbtnModule:
         if sw_vers.startswith("SC2 V4.6"):
             self._typ = b"\x01\x03"
         self._type = MODULE_CODES[self._typ.decode("iso8859-1")]
-        self.list = await self.hdlr.get_module_list(self._id)
-        self.calc_SMC_crc(self.list)
         self.io_properties, self.io_prop_keys = self.get_io_properties()
+        self.list = await self.hdlr.get_module_list(self._id)
+        self.calc_SMG_crc(self.build_smg())
+        self.calc_SMC_crc(self.list)
         self._serial = await self.get_serial()
         await self.cleanup_descriptions()
         self.check_firmware()

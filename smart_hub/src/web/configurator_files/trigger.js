@@ -245,6 +245,7 @@ function setTriggerSels() {
     setElementVisibility("cov-pos-val", "hidden");
     setElementVisibility("number-select", "hidden");
     setElementVisibility("prio-chng-vals", "hidden");
+    setElementVisibility("cov_pos_val", "hidden");
 
     if (selectn == "150") {
         setElementVisibility("button-select", "visible");
