@@ -614,6 +614,13 @@ def adjust_automations_button(page: str) -> str:
     return page
 
 
+def remove_menu_button(page: str) -> str:
+    """Remove acc-menu from page."""
+    return page.replace(
+        '<img id="acc_img" src="configurator_files/acc_white.png" alt="menu">', ""
+    )
+
+
 def adjust_ekeylog_button(page: str) -> str:
     """Enable edit automations button."""
     page = (

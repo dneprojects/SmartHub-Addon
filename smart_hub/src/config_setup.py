@@ -1,6 +1,7 @@
 from aiohttp import web
 from config_commons import (
     get_module_image,
+    remove_menu_button,
     show_modules,
     get_html,
     client_not_authorized,
@@ -231,6 +232,7 @@ def show_module_table(app) -> web.Response:
         side_menu, ">Module verwalten<", app["is_offline"] or app["api_srv"]._pc_mode
     )
     page = get_html("setup.html").replace("<!-- SideMenu -->", side_menu)
+    page = remove_menu_button(page)
     page = page.replace("<h1>HubTitle", "<h1>Module verwalten")
     page = page.replace("Overview", "Modulübersicht")
     page = page.replace(

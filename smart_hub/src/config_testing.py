@@ -4,6 +4,7 @@ from config_commons import (
     get_module_image,
     get_html,
     client_not_authorized,
+    remove_menu_button,
     show_not_authorized,
     fill_page_template,
     inspect_header,
@@ -443,6 +444,7 @@ async def show_module_testpage(main_app, mod_addr, update: bool) -> web.Response
         mod_image,
         def_filename,
     )
+    page = remove_menu_button(page)
     page = page.replace("<!-- SetupContentStart >", "<!-- SetupContentStart -->")
     # reconfigure existing buttons
     page = page.replace(
