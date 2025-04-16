@@ -30,7 +30,7 @@ var new_cntr_btn = document.getElementsByClassName("new_cntr_button")[0];
 if (new_cntr_btn == null) {
     new_lgc_btn = document.getElementsByClassName("new_lgc_button")[0];
     if (new_lgc_btn == null) {
-        new_btn = document.getElementsByClassName("new_button")[0];
+        new_btn = document.getElementsByClassName("new_button")[1];
     }
     else {
         new_btn = new_lgc_btn;
