@@ -275,10 +275,14 @@ class AutomationTrigger:
     def get_dict_entry(self, key, arg) -> str:
         """Lookup dict and return value, if found."""
         if key in self.autmn_dict.keys():
-            if arg in self.autmn_dict[key].keys():
-                return f"{arg}: '{self.autmn_dict[key][arg]}'"
+            if key == "inputs":
+                prefix = "I"
             else:
-                return f"'{arg}'"
+                prefix = ""
+            if arg in self.autmn_dict[key].keys():
+                return prefix + f"{arg}: '{self.autmn_dict[key][arg]}'"
+            else:
+                return prefix + f"'{arg}'"
         return f"{arg}"
 
     def get_selector_triggers(self, internal):

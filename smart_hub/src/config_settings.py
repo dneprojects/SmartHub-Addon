@@ -698,13 +698,13 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
             indent(7)
             + f'<td style="vertical-align: top;">{prompt}</td>'
             + '<td><div class="radio-group">'
-            + f'<div id="check_btn_line"><label for="{id_name}_cl1">Heizen</label><input type="radio" '
+            + f'<div id="check_btn_line"><label for="{id_name}_cl1" style="vertical-align: middle;">Heizen</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_cl1" value="1" {cl1_checked}></div>'
-            + f'<div id="check_btn_line"><label for="{id_name}_cl2">Kühlen</label><input type="radio" '
+            + f'<div id="check_btn_line"><label for="{id_name}_cl2" style="vertical-align: middle;">Kühlen</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_cl2" value="2" {cl2_checked}></div>'
-            + f'<div id="check_btn_line"><label for="{id_name}_cl3">Heizen / Kühlen</label><input type="radio" '
+            + f'<div id="check_btn_line"><label for="{id_name}_cl3" style="vertical-align: middle;">Heizen / Kühlen</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_cl3" value="3" {cl3_checked}></div>'
-            + f'<div id="check_btn_line"><label for="{id_name}_cl4">Aus</label><input type="radio" '
+            + f'<div id="check_btn_line"><label for="{id_name}_cl4" style="vertical-align: middle;">Aus</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_cl4" value="4" {cl4_checked}></div></div></td></tr>\n'
         )
     if settings.type in [
@@ -729,9 +729,9 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
             indent(7)
             + f'<td style="vertical-align: top;">{prompt}</td>'
             + '<td><div class="radio-group">'
-            + f'<div id="check_btn_line"><label for="{id_name}_s1">Sensor 1</label><input type="radio" '
+            + f'<div id="check_btn_line"><label for="{id_name}_s1" style="vertical-align: middle;">Sensor 1</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_s1" value="1" {s1_checked}></div>'
-            + f'<div id="check_btn_line"><label for="{id_name}_s2">Sensor 2</label><input type="radio" '
+            + f'<div id="check_btn_line"><label for="{id_name}_s2" style="vertical-align: middle;">Sensor 2</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_s2" value="2" {s2_checked}></div></div></td></tr>\n'
         )
     if settings.type in [
@@ -755,9 +755,9 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
             indent(7)
             + f'<td style="vertical-align: top;">{prompt}</td>'
             + '<td><div class="radio-group">'
-            + f'<div id="check_btn_line"><label for="{id_name}_230">230V</label><input type="radio" '
+            + f'<div id="check_btn_line"><label for="{id_name}_230" style="vertical-align: middle;">230V</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_230" value="230" {v230_checked}></div>'
-            + f'<div id="check_btn_line"><label for="{id_name}_24">24V</label><input type="radio" '
+            + f'<div id="check_btn_line"><label for="{id_name}_24" style="vertical-align: middle;">24V</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_24" value="24" {v24_checked}></div></div></td></tr>\n'
         )
     if settings.type in ["Smart GSM"]:
