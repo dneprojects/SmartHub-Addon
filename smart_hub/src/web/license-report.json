@@ -1,6 +1,6 @@
 attrs:25.3.0                        Error                                                   Error                                                        
 et_xmlfile:2.0.0                    MIT License                                             Permissive                                                   
-frozenlist:1.5.0                    Apache Software License                                 Permissive                                                   
+frozenlist:1.6.0                    Apache-2.0                                              Permissive                                                   
 idna:3.10                           BSD License                                             Permissive                                                   
 multidict:6.4.3                     Apache Software License                                 Permissive                                                   
 openpyxl:3.1.5                      MIT License                                             Permissive                                                   
@@ -15,4 +15,4 @@ PyYAML:6.0.2                        MIT License                                 
 tomli:2.2.1                         MIT License                                             Permissive                                                   
 wcwidth:0.2.13                      MIT License                                             Permissive                                                   
 websockets:15.0.1                   BSD License                                             Permissive                                                   
-yarl:1.19.0                         Apache Software License                                 Permissive
+yarl:1.20.0                         Apache Software License                                 Permissive

@@ -25,6 +25,8 @@ function initActElements(act_code, act_args) {
             out_no = act_args[0];
         }
         else {
+            act_code = 9;
+
             out_no = act_args[3]
             setElement("timeinterv-val", act_args[1]);
             if (new Set([2, 12, 22]).has(act_args[0]))
@@ -65,6 +67,7 @@ function initActElements(act_code, act_args) {
             setElement("flag-act", out_no);
         }
         if (act_code == 9) {
+            disable_8_high_flags()
             if (act_args[2] == 255)
                 setElement("outopt-act", 6);
             else if ((act_args[0] == 1) | (act_args[0] == 2))
@@ -238,6 +241,27 @@ function initActElements(act_code, act_args) {
     }
     act_sel.dispatchEvent(new Event("change"));
 }
+function disable_8_high_flags() {
+    var flg_sel = document.getElementById("flag-act");
+    if (out_actopt.selectedIndex > 3) {
+        const upperFlags = [8, 9, 10, 11, 112, 13, 14, 15, 16, 41, 42, 43, 44, 45, 46, 47, 48];
+        for (var i = 0; i < flg_sel.options.length; i++) {
+            if (upperFlags.includes(Number(flg_sel.options[i].value))) {
+                flg_sel.options[i].disabled = true;
+                if (flg_sel.options[i].selected) {
+                    flg_sel.options[i].selected = false;
+                    flg_sel.options[0].selected = true;
+                }
+            }
+
+        }
+    }
+    else {
+        for (var i = 0; i < flg_sel.options.length; i++) {
+            flg_sel.options[i].disabled = false;
+        }
+    }
+}
 function setActionSels() {
     var idx = act_sel.selectedIndex
     if (idx < 0) {
@@ -395,6 +419,7 @@ function setActDPercval() {
 }
 function setActTimeinterval() {
     var idx = out_actopt.selectedIndex
+    disable_8_high_flags();
     setElementVisibility("timeinterv-val", "hidden");
     setElementVisibility("timeunit-act", "hidden");
     if (idx > 3) {
