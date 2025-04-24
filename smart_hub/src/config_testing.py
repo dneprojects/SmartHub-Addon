@@ -186,7 +186,7 @@ class ConfigTestingServer:
         c_cnt = int(data["cov_autostop_cnt"])
         rtr.settings.cov_autostop_cnt = c_cnt
         rtr.cov_autostop_cnt = c_cnt
-        rtr.set_descriptions(rtr.settings)
+        await rtr.set_descriptions(rtr.settings)
         return await show_router_syspage(main_app, "")
 
     @routes.post("/rt_reboot")
