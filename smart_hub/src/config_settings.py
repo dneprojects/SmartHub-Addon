@@ -1439,10 +1439,10 @@ def parse_response_form(main_app, form_data):
                         if (indices[0] > 0) and (indices[1] == 1):
                             if indices[0] == 1:
                                 # Empty dependencies
-                                settings.mode_dependencies = b"P" + b"\0" * 80
-                            grp_nmbr = settings.__getattribute__(key)[
-                                int(indices[0])
-                            ].nmbr
+                                settings.mode_dependencies = b"\0" * 80
+                            grp_nmbr = (
+                                settings.__getattribute__(key)[int(indices[0])].nmbr - 1
+                            )
                             settings.mode_dependencies = (
                                 settings.mode_dependencies[:grp_nmbr]
                                 + int.to_bytes(int(form_data[form_key][0]))
