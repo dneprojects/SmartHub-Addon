@@ -185,6 +185,7 @@ class ConfigTestingServer:
         rtr = api_srv.routers[0]
         c_cnt = int(data["cov_autostop_cnt"])
         rtr.settings.cov_autostop_cnt = c_cnt
+        rtr.cov_autostop_cnt = c_cnt
         rtr.set_descriptions(rtr.settings)
         return await show_router_syspage(main_app, "")
 

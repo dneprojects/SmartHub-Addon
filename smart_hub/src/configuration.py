@@ -1100,7 +1100,9 @@ class RouterSettings:
                 self.coll_cmds.append(desc)
             elif desc.type == 5:  # FF 08: alarm commands
                 pass
-            self.cov_autostop_cnt = rtr.cov_autostop_cnt
+            elif desc.type == 6:  # FF 0B: cover autostop
+                self.cov_autostop_cnt = desc.nmbr
+                rtr.cov_autostop_cnt = desc.nmbr
         if len(self.groups) == 0:
             self.groups.append(IfDescriptor("general", 0, 0))
         if len(self.areas) == 0:
@@ -1117,6 +1119,7 @@ class RouterSettings:
             desc.append(IfDescriptor(flg.name, flg.nmbr, 3))
         for cmd in self.coll_cmds:
             desc.append(IfDescriptor(cmd.name, cmd.nmbr, 4))
+        desc.append(IfDescriptor("Cover autostop", self.cov_autostop_cnt, 6))
         return desc, self.cov_autostop_cnt
 
     def get_day_night(self) -> None:
