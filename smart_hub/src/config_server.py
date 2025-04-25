@@ -432,7 +432,9 @@ class ConfigServer:
                 return show_update_router(rtr, fw_vers)
             elif upd_type == "mod":
                 mod_type = rtr.fw_upload[:2]
-                if mod_type == b"\x01\x02" and fw_filename[:8] == "scrmgv46":
+                if mod_type == b"\x01\x02" and (
+                    fw_filename[:8] == "scrmgv46" or fw_filename[:8] == "scrmgv47"
+                ):
                     mod_type = b"\x01\x03"
                 mod_type_str = MODULE_CODES[mod_type.decode()]
                 fw_vers = rtr.fw_upload[-27:-5].decode().strip()
