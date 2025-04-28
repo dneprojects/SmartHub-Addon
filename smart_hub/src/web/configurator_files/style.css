@@ -975,6 +975,15 @@ input[type="number"].mod_ids, input[type="number"].mod_chans {
    height:15px;
    border: 0px solid #C0372D;
 }
+#airquality-val {
+   width: 70px;
+}
+#airquality-butt {
+   width: 70px;
+   margin-left: 20px;
+   margin-top: 1px;
+   height: 20px;
+}
 
 input.mod_chk {
    position:absolute;

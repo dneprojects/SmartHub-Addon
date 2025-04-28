@@ -198,7 +198,7 @@ class ApiServer:
         self.ip_writer.write(self.api_msg._rbuffer)
         await self.ip_writer.drain()
 
-    async def block_network_if(self, rt_no, set_block):
+    async def block_network_if(self, rt_no=1, set_block=True):
         """Set or reset operate mode pause."""
         if self.is_offline:
             return

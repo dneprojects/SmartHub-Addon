@@ -164,6 +164,7 @@ class ModuleSettings:
         if self.displ_time == 0:
             if self.type == "Smart Controller Mini":
                 self.displ_time = 100
+        self.air_quality = conf[MirrIdx.AQI]
         self.temp_ctl = conf[MirrIdx.CLIM_SETTINGS]
         self.temp_1_2 = conf[MirrIdx.TMP_CTL_MD]
         self.t_short = conf[MirrIdx.T_SHORT] * 10

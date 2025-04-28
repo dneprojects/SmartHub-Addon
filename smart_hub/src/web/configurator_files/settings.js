@@ -2,6 +2,7 @@ const save_btn = document.getElementById("config_button_sv");
 const check_boxes = document.getElementsByClassName("sel_element");
 const settngs_buttons = document.getElementsByName("ModSettings");
 const teach_buttons = document.getElementsByName("TeachNewFinger");
+const aircal_button = document.getElementById("airquality-butt");
 var del_btn = null;
 for (let i = 0; i < settngs_buttons.length; i++) {
     if (settngs_buttons[i].innerHTML == "entfernen") {
@@ -69,6 +70,11 @@ if (new_lgc_btn != null) {
         getLogicOptions()
     })
 }
+if (aircal_button != null) {
+    aircal_button.addEventListener("click", function () {
+        calAirQuality()
+    })
+}
 if (chk_sens_type != null) {
     chk_sens_type.addEventListener("change", function () {
         setHeatingVis(chk_sens_type)
@@ -131,10 +137,12 @@ if (rt_reboot != null) {
         openMsgPopup();
     });
 }
-if (teach_btn != null) {
-    teach_btn.addEventListener("click", function () {
-        openTeachPopup();
-    });
+if (teach_buttons.length) {
+    if (teach_btn != null) {
+        teach_btn.addEventListener("click", function () {
+            openTeachPopup();
+        });
+    }
 }
 close_popup.addEventListener("click", function () {
     teach_popup.classList.remove("show");
@@ -163,6 +171,11 @@ function getCounterOptions() {
 function getLogicOptions() {
     if (new_addr.value != "")
         logic_popup.classList.add("show");
+};
+function calAirQuality() {
+    var air_quality = document.getElementById("airquality-val").value;
+    const calUrl = "settings/air_cal?value=" + air_quality;
+    fetch(calUrl)
 };
 function getMaxCount() {
     max_btn.value += document.getElementById("max_count_input").value

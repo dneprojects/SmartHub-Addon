@@ -2,7 +2,7 @@
 
 from typing import Final
 
-SMHUB_VERSION = "2.4.6"
+SMHUB_VERSION = "2.4.8"
 
 OWN_IP = "192.168.178.110"
 ANY_IP = "0.0.0.0"
@@ -387,7 +387,7 @@ class RT_CMDS:
     CHG_MD_ADDR = "\x2a<rtr>\x0c\x44<mod>\x08\x01<rtr><mdnew>\x42\x53\xff"
 
     GET_AIR_QUAL = "\x2a<rtr>\x0a\x44<mod>\x06\xd2\x03\x14\xff"
-    CAL_AIR_QUAL = "\x2a<rtr>\x0f\x44<mod>\x0b\xd2\x03\x14\x01<prc_good><good_long><prc_bad><bad_long>\xff"
+    CAL_AIR_QUAL = "\x2a<rtr>\x0f\x44<mod>\x0d\xd2\x03\x15\x01<prc_good><good_long><prc_bad><bad_long>\xff"
 
     RT_REBOOT = "\x2a<rtr>\x0a\xf0\x52\x45\x53\x45\x54\xff"
     MD_REBOOT = "\x2a<rtr>\x0d\x44<mod>\x09\xf0RESET\xff"
@@ -832,7 +832,7 @@ MODULE_FIRMWARE: Final[dict[bytes, str]] = {
     b"\x0a\x15": "sdmpab",
     b"\x0a\x16": "sdmpab",
     b"\x0a\x1e": "scsmartio2",
-    b"\x0a\x32": "scout230relais",
+    b"\x0a\x32": "screlaisspv1",
     b"\x0a\x33": "screlaisspv2",
     b"\x0b\x01": "scem230",
     b"\x0b\x1e": "scem24",

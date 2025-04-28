@@ -12,6 +12,7 @@ button_help_dict["Download"] = "Einstellungen unter dem angegebenen Namen als Do
 button_help_dict["Einstellungen"] = "Einstellungen für aktuelles Modul ansehen oder anpassen";
 button_help_dict["Automatisierungen"] = "Automatisierungen im Habitron-System ansehen oder anpassen";
 button_help_dict["Konfigurationsdatei"] = "Router- oder Moduleinstellungen sichern oder wiederherstellen";
+button_help_dict["Kalibrieren"] = "Setzt den für die aktuelle Luftqualität eingestellten Prozentwert als unteren (< 50%) oder oben Punkt (> 50%)";
 button_help_dict["zurück"] = "Zur vorherigen Einstellungsseite wechseln";
 button_help_dict["weiter"] = "Zur nächsten Einstellungsseite wechseln";
 button_help_dict["Weiter"] = "Externe Automatisierung anlegen";

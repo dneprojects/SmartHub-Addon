@@ -138,6 +138,46 @@ class ConfigSettingsServer:
         args = parse_response_form(request.app["parent"], form_data)
         return await show_next_prev(request.app["parent"], args)
 
+    @routes.get("/air_cal")
+    async def get_aircal(request: web.Request) -> web.Response:  # type: ignore
+        inspect_header(request)
+        if client_not_authorized(request):
+            return show_not_authorized(request.app)
+        args = request.query_string.split("=")
+        settings = request.app["parent"]["settings"]
+        module = settings.module
+        mod_addr = module._id
+        perc_set = int(args[1])
+        lower_point = perc_set < 50
+        await module.api_srv.block_network_if(module.rt_id, True)
+        resp = await module.hdlr.get_air_quality()
+        curr_aq = resp[0]
+        curr_val = resp[1] + 256 * resp[2]
+        perc_good = resp[3]
+        val_good = resp[4] + 256 * resp[5]
+        perc_bad = resp[6]
+        val_bad = resp[7] + 256 * resp[8]
+        # plausibility checks and corrections
+        if perc_good not in range(50, 101):
+            perc_good = 90
+        if perc_bad not in range(0, 50):
+            perc_bad = 30
+        # val_good: around 110 .. 140
+        # val_bad: around 220 .. 250
+        if lower_point:
+            perc_bad = perc_set
+            val_bad = curr_val
+            if val_good >= val_bad:
+                val_good = val_bad / 2
+        else:
+            perc_good = perc_set
+            val_good = curr_val
+            if val_good >= val_bad:
+                val_bad = val_good * 2
+        await module.hdlr.calibrate_air_quality(perc_good, val_good, perc_bad, val_bad)
+        await module.api_srv.block_network_if(module.rt_id, False)
+        return show_setting_step(request.app["parent"], mod_addr, 0)
+
     @routes.get("/teach")
     async def get_teach(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
@@ -760,6 +800,27 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
             + f'<div id="check_btn_line"><label for="{id_name}_24" style="vertical-align: middle;">24V</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_24" value="24" {v24_checked}></div></div></td></tr>\n'
         )
+    if settings.type in [
+        "Smart Controller XL-1",
+        "Smart Controller XL-2",
+        "Smart Controller XL-2 (LE2)",
+        "Smart Controller Mini",
+    ]:
+        id_name = "airquality-val"
+        prompt = "Luftqualität [%]"
+        tbl += (
+            indent(7)
+            + "<tr><td>&nbsp;</td></tr>\n"
+            + indent(7)
+            + "<tr><td>&nbsp;</td></tr>\n"
+            + indent(7)
+            + '<tr><td style="vertical-align: top;">Luftqualität [%]</td>\n'
+            + indent(7)
+            + "<td>2-Punkt-Kalibrierung:<br>Prozentwert für die aktuelle Luftqualität<br>einstellen und als unteren (< 50%)<br>oder oberen (> 50%) Punkt setzen</td></tr>\n"
+            + indent(7)
+            + f'<tr><td><label for="{id_name}"></label></td><td><input name="{id_name}" '
+            + f'type="number" min="0" max="100" id="{id_name}" value="{settings.air_quality}"/><button id="airquality-butt" type="button">Kalibrieren</button></td></tr>\n'
+        )
     if settings.type in ["Smart GSM"]:
         tbl += (
             indent(7)
@@ -1017,7 +1078,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                     + f'title="Verfahrzeit in s" value={cov_t[ci]} style="width: 40px;"></td>'
                 )
                 tbl += (
-                    f'<td></td><td><input name="data[{ci},2]" type="number" id="{id_name}_tb" min="0" step="0.5" max="25.5" '
+                    f'<td></td><td><input name="data[{ci},2]" type="number" id="{id_name}_tb" min="0" step="0.1" max="25.5" '
                     + f'title="Jalousiezeit in s (0 falls Rollladen)" value={bld_t[ci]} style="width: 40px;"></td>'
                 )
                 tbl += (

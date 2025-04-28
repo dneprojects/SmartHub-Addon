@@ -512,9 +512,15 @@ def get_module_image(type_code: bytes) -> tuple[str, str]:
             type_desc = "Smart Controller - Raumzentrale mit Sensorik und Aktorik"
         case 10:
             match type_code[1]:
-                case 1 | 50 | 51:
+                case 1:
                     mod_image = "smart-out-8-R.jpg"
                     type_desc = "Smart-Out 8/R - 8fach Binärausgang (potentialfrei)"
+                case 50:
+                    mod_image = "smart-out-8-R.jpg"
+                    type_desc = "Smart-Out 8/R-1 - 8fach Binärausgang (potentialfrei)"
+                case 51:
+                    mod_image = "smart-out-8-R.jpg"
+                    type_desc = "Smart-Out 8/R-2 - 8fach Binärausgang (potentialfrei)"
                 case 2:
                     mod_image = "smart-out-8-T.jpg"
                     type_desc = "Smart-Out 8/T - 8fach Binärausgang (potentialgebunden)"
