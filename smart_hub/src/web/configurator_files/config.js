@@ -1,6 +1,7 @@
 const form_upload = document.getElementById("file_upload");
 const form_download = document.getElementById("file_download");
 const resp_popup = document.getElementById("resp-popup");
+const file_popup = document.getElementById("file_popup");
 const save_butt = document.getElementById("config_button_sv")
 const protoc_butt = document.getElementById("showlogs_button")
 const close_resp_popup_h = document.getElementById("close_resp_popup");
@@ -56,6 +57,13 @@ if (close_chan_popup_h) {
 if (form_upload) {
     form_upload.addEventListener("submit", function () {
         openMsgPopup();
+    });
+}
+if (file_popup) {
+    file_popup.addEventListener("click", function (event) {
+        if (event.target == file_popup) {
+            openMsgPopup();
+        };
     });
 }
 window.addEventListener("click", function (event) {

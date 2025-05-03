@@ -121,6 +121,9 @@
    margin-left: 2px;
    display: flex;
    flex-direction: column;
+   overflow-y: auto;
+   scroll-behavior: smooth;
+   max-height: calc(100vh - 280px);
 }
 
 #subnavi li.sign {

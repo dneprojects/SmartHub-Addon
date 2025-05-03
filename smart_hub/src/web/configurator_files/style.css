@@ -158,6 +158,8 @@ body {
    /* opera */
    background: linear-gradient(top, #e6e6e6 0%, #8d8e90 30%);
    behavior: url("ie-css3.htc");
+   height: 100%;
+   overflow: hidden
 }
 
 pre,
@@ -792,7 +794,6 @@ body.start #right {
    top: 0px;
    z-index: 450;
    width: 343px;
-   overflow: visible;
    min-height: 160px;
    background-color: #b90315 !important;
    background: -moz-linear-gradient(left, #fe6633 0%, #b90315 100%);

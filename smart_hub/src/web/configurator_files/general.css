@@ -82,7 +82,6 @@ body,
     float: left;
     z-index: 1000;
     width: 220px;
-    overflow: visible;
     margin-right: -1px;
     visibility: visible;
 }
@@ -90,11 +89,10 @@ body,
 #right {
    float: right;
    position: relative;
-   left: -40px;
+   left: 0px;
    top: 0px;
    z-index: 450;
    width: 170px;
-   overflow: visible;
    min-height: 300px;
    padding-top: 59px;
    background: #FFF;
@@ -110,6 +108,9 @@ body,
     float: left;
     min-height: 400px;
     background: #FFF;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    height: calc(100vh - 280px);
 }
 
 #mitte {
@@ -247,7 +248,7 @@ img {
         width: 100%;
         margin-left: 0px;
         margin-top: -80px;
-
+        height: calc(100vh - 200px);
     }
     #left {
         margin-top: -80px;
@@ -266,6 +267,9 @@ img {
     .left-show {
         transform: translateX(0);
         -webkit-transform: translateX(0);
+    }
+   #subnavi { 
+        max-height: calc(100vh - 200px);
     }
     #right {
         width: 0px;
@@ -317,7 +321,6 @@ img {
     }
     .ce_text.block, 
     .mod_article.block {
-        overflow:visible; 
         width: 97%;
     }
     input.desc_input1, 
