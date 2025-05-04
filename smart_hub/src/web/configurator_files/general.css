@@ -38,6 +38,7 @@ body,
     top: 0px;
     z-index: 100;
     max-width: 1000px;
+    width: 98%;
     background-color: white;
 }
 
@@ -53,7 +54,6 @@ body,
 
 #header_bg {
     width: 100%;
-    clip-path: rect(0px 1000px 70px 0px);
 }
 
 #logo_habitron {
@@ -133,7 +133,9 @@ body,
 }
 
 .image_container {
+    height: 70px;
     overflow: hidden;
+    clip-path: rect(0px 1000px 70px 0px);
 }
 
 select,
@@ -205,7 +207,12 @@ img {
       display: flex;
       flex-direction: column;
   }
-
+#SCtitle2 {  
+        position: absolute;
+        left: 70px;
+        top: 25px;
+        visibility: hidden;
+}
 /* --------------------------------------------------------- Responsive Design ---------------------------- */
 
 @media (aspect-ratio < 0.7) or (max-width: 1012px) {
