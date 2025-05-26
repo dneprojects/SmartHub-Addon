@@ -148,6 +148,7 @@ class ModuleSettings:
             self.t_short = 100
             self.t_long = 1000
             self.t_dimm = 1
+            self.dimm_mode = 255
             self.supply_prio = 230
             self.temp_ctl = 4
             self.temp_1_2 = 1
@@ -170,6 +171,7 @@ class ModuleSettings:
         self.t_short = conf[MirrIdx.T_SHORT] * 10
         self.t_long = conf[MirrIdx.T_LONG] * 10
         self.t_dimm = conf[MirrIdx.T_DIM]
+        self.dimm_mode = conf[MirrIdx.DIMM_MODE]
         self.is_outdoor = conf[MirrIdx.OUTDOOR_MODE] == 65
         inp_state = int.from_bytes(
             conf[MirrIdx.SWMOD_1_8 : MirrIdx.SWMOD_1_8 + 3], "little"
@@ -309,6 +311,11 @@ class ModuleSettings:
             status,
             int.to_bytes(int(self.t_dimm)),
             MirrIdx.T_DIM,
+        )
+        status = replace_bytes(
+            status,
+            int.to_bytes(int(self.dimm_mode)),
+            MirrIdx.DIMM_MODE,
         )
         if self.typ[0] == 80:
             status = replace_bytes(

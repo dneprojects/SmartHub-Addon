@@ -11,6 +11,10 @@ for (let i = 0; i < check_boxes.length; i++) {
         control_flashbutton();
     })
 }
+document.getElementById("update-0").addEventListener("change", function () {
+    control_flashbutton();
+}
+);
 control_flashbutton();
 
 function control_flashbutton() {
@@ -21,6 +25,9 @@ function control_flashbutton() {
             flash_btn.disabled = false;
             break;
         }
+    }
+    if (document.getElementById("update-0").checked) {
+        flash_btn.disabled = false;  // router sends to all modules
     }
 }
 

@@ -68,6 +68,8 @@ class HbtnModule:
         self._typ = self.status[MirrIdx.MOD_DESC : MirrIdx.MOD_DESC + 2]
         if sw_vers.startswith("SC2 V4.6") or sw_vers.startswith("SC2 V4.7"):
             self._typ = b"\x01\x03"
+        if sw_vers.startswith("SC2 V5.6") or sw_vers.startswith("SC2 V5.7"):
+            self._typ = b"\x01\x04"
         self._type = MODULE_CODES[self._typ.decode("iso8859-1")]
         self.io_properties, self.io_prop_keys = self.get_io_properties()
         self.list = await self.hdlr.get_module_list(self._id)

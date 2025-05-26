@@ -1049,6 +1049,8 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
             tbl += area_menu.replace(f">{area_name_e}<", f" selected>{area_name_e}<")
             title_out = "Ausgänge einzeln verwenden"
             title_cov = "Ausgangspaar für Rollladen gebündelt"
+            title_rise = "Phasenanschnittsteuerung"
+            title_fall = "Phasenabschnittsteuerung"
             if (ci < 2 * len(covers)) and ((ci % 2) == 0):
                 if tbl_data[ci].type == -10:
                     out_chkd = ""
@@ -1063,6 +1065,29 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                 tbl += (
                     f'<td><label title="{title_cov}" for="{id_name}_cvr">Rollladen</label><input type="radio" '
                     + f'name="data[{ci},1]" id="{id_name}_cvr" title="{title_cov}" value="cvr" {cvr_chkd}></td>'
+                )
+            if (
+                module._typ in [b"\x01\x03", b"\x01\x04"] and ci in [10, 11]
+            ) or module._typ == b"\x0a\x16":
+                # smart controller with new LE or Dimm-Modul 2
+                if ci in [10, 11]:
+                    di = ci - 10
+                else:
+                    di = ci
+                dimm_mode = module.settings.dimm_mode & (1 << di)
+                if dimm_mode == 0:
+                    out_chkd = "checked"
+                    cvr_chkd = ""
+                else:
+                    out_chkd = ""
+                    cvr_chkd = "checked"
+                tbl += (
+                    f'<td><label title="{title_fall}" for="{id_name}_out">Abschnitt</label><input type="radio" '
+                    + f'name="data[{ci},1]" id="{id_name}_out" title="{title_fall}" value="fall" {out_chkd}></td>'
+                )
+                tbl += (
+                    f'<td><label title="{title_rise}" for="{id_name}_cvr">Anschnitt</label><input type="radio" '
+                    + f'name="data[{ci},1]" id="{id_name}_cvr" title="{title_rise}" value="rise" {cvr_chkd}></td>'
                 )
         elif key == "covers":
             if covers[ci].type != 0:
@@ -1428,6 +1453,18 @@ def parse_response_form(main_app, form_data):
                             settings.outputs[o_idx + 1].type = 1
                             settings.covers[c_idx].type = 0
                             settings.covers[c_idx].name = ""
+                        elif form_data[form_key][0] == "rise":
+                            if o_idx > 8:
+                                di = o_idx - 10
+                            else:
+                                di = o_idx
+                            settings.dimm_mode |= 1 << di
+                        elif form_data[form_key][0] == "fall":
+                            if o_idx > 8:
+                                di = o_idx - 10
+                            else:
+                                di = o_idx
+                            settings.dimm_mode &= ~(1 << di)
                         settings.outputs[indices[0]].area = int(
                             form_data["area_sel"][indices[0]]
                         )

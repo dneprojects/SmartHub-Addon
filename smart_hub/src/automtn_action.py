@@ -705,7 +705,9 @@ class AutomationAction:
                 if outp_opt == 7:
                     self.action_args[-1] += 20
                 self.action_args.append(int(form_data["timeinterv_val"][0]))
-                if outp_opt == 6:
+                if outp_opt in [4, 5]:
+                    self.action_args.append(int(form_data["timefunc_rep"][0]))
+                elif outp_opt == 6:
                     self.action_args.append(255)
                 else:
                     self.action_args.append(1)

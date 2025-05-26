@@ -324,7 +324,9 @@ def is_outdated(cur_fw: str, new_fw: str, logger) -> bool:
         return False
 
 
-def show_update_modules(mod_list, new_fw: str, mod_type: str, logger) -> web.Response:
+def show_update_modules(
+    mod_list, new_fw: str, mod_type: str, logger, is_install: bool
+) -> web.Response:
     """Prepare modules page with update candidates."""
     page = get_html("modules.html")
     page = page.replace(
@@ -353,6 +355,8 @@ def show_update_modules(mod_list, new_fw: str, mod_type: str, logger) -> web.Res
         images += "</label>\n"
         images += "</div>\n"
     images += "</div>\n"
+    images += "<br>\n"
+    images += '<div>Automatische Auswahl durch Router<input type="checkbox" title="Router sendet die geladene Firmware an alle Module mit passender Kennung" name="update_0" id="update-0"></div>'
     images += "<br><br>\n"
     images += '<button name="UpdButton" id="upd_cancel_button" type="submit" value="cancel">Abbruch</button>\n'
     images += '<button name="UpdButton" id="flash_button" type="submit" value="flash">Flashen</button>\n'
@@ -361,9 +365,8 @@ def show_update_modules(mod_list, new_fw: str, mod_type: str, logger) -> web.Res
     page = page.replace("<h1>Module</h1>", "<h1>Firmware Update</h1>")
     if len(mod_list) == 0:
         page = page.replace(
-            "Wählen Sie ein Modul aus", "Kein kompatibles Modul vorhanden"
+            "Wählen Sie ein Modul aus", "Kein kompatibles Modul vorhanden."
         )
-        page = page.replace(">Flashen</button>", " disabled>Flashen</button>")
     else:
         page = page.replace(
             "Wählen Sie ein Modul aus", "Wählen Sie Module für das Update aus"

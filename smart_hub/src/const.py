@@ -2,7 +2,7 @@
 
 from typing import Final
 
-SMHUB_VERSION = "2.5.0"
+SMHUB_VERSION = "2.5.8"
 
 OWN_IP = "192.168.178.110"
 ANY_IP = "0.0.0.0"
@@ -778,7 +778,7 @@ MODULE_CODES: Final[dict[str, str]] = {
     "\x01\x01": "Smart Controller XL-1",
     "\x01\x02": "Smart Controller XL-2",
     "\x01\x03": "Smart Controller XL-2 (LE2)",
-    # "\x01\x0a": "Smart Controller X",
+    "\x01\x04": "Smart Controller Touch",
     "\x0a\x01": "Smart Out 8/R",
     "\x0a\x02": "Smart Out 8/T",
     "\x0a\x14": "Smart Dimm",
@@ -804,7 +804,7 @@ MODULE_CODES: Final[dict[str, str]] = {
 MODULE_TYPES: Final[dict[str, str]] = {
     "\x01\x02": "Smart Controller XL-2",
     "\x01\x03": "Smart Controller XL-2 (LE2)",
-    # "\x01\x0a": "Smart Controller X",
+    "\x01\x04": "Smart Controller Touch",
     "\x32\x01": "Smart Controller Mini",
     "\x0a\x02": "Smart Out 8/T",
     "\x0a\x16": "Smart Dimm-2",
@@ -824,7 +824,7 @@ MODULE_FIRMWARE: Final[dict[bytes, str]] = {
     b"\x00\x01": "scvmv30",
     b"\x01\x02": "scrmgv45",
     b"\x01\x03": "scrmgv46",
-    # b"\x01\x0a": "Smart Controller X",
+    b"\x01\x04": "scrmgv56",
     b"\x32\x01": "scrmkv45",
     b"\x0a\x01": "scout230relais",
     b"\x0a\x02": "scout230tronic",

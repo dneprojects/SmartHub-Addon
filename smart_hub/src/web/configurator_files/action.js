@@ -33,6 +33,7 @@ function initActElements(act_code, act_args) {
                 setElement("timeunit-act", "2");
             else
                 setElement("timeunit-act", "1");
+            setElement("timefunc-rep", act_args[2]);
         }
         if (out_no < 16) {
             setElement("action-select", 1)
@@ -306,6 +307,8 @@ function setActionSels() {
     setElementVisibility("refreg-act", "hidden");
     setElementVisibility("perc-act", "hidden");
     setElementVisibility("rgb-colorpicker", "hidden");
+    setElementVisibility("timefunc-rep", "hidden");
+    setElementVisibility("timefunc-rep-lbl", "hidden");
 
     if (selectn == "1") {
         setElementVisibility("output-act", "visible");
@@ -422,6 +425,8 @@ function setActTimeinterval() {
     disable_8_high_flags();
     setElementVisibility("timeinterv-val", "hidden");
     setElementVisibility("timeunit-act", "hidden");
+    setElementVisibility("timefunc-rep", "hidden");
+    setElementVisibility("timefunc-rep-lbl", "hidden");
     if (idx > 3) {
         setElementVisibility("timeinterv-val", "visible");
         setElementVisibility("timeunit-act", "visible");
@@ -439,6 +444,10 @@ function setActTimeinterval() {
                 flg_sel.selectedIndex = 0
             else if (flg_idx > 40)
                 flg_sel.selectedIndex = 0
+        }
+        if (idx == 4 | idx == 5) {
+            setElementVisibility("timefunc-rep", "visible");
+            setElementVisibility("timefunc-rep-lbl", "visible");
         }
     }
     else {

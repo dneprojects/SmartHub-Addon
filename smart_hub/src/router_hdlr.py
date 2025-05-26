@@ -602,6 +602,8 @@ class RtHdlr(HdlrBase):
     ) -> str:
         """Upload router firmware to router, returns True for success."""
 
+        # for old router fw versions new client/server mode command is not available
+        await self.set_mode(0, 75)  # set router into config mode, works always
         fw_buf = self.rtr.fw_upload
         self._last_progress = 0
         new_fw = fw_buf[-27:-5]

@@ -68,7 +68,7 @@ class AdminHdlr(HdlrBase):
                 await self.handle_router_cmd_resp(rt, RT_CMDS.SYSTEM_RESTART)
                 self.response = self.rt_msg._resp_buffer
             case spec.RT_START_FWD:
-                self.check_router_module_no(rt, mod)
+                self.check_router_no(rt)
                 if self.args_err:
                     return
                 mod_list = self.api_srv.routers[rt - 1].mod_addrs
