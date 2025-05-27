@@ -243,6 +243,7 @@ function setTriggerSels() {
     setElementVisibility("cover-select", "hidden");
     setElementVisibility("covpos-select", "hidden");
     setElementVisibility("cov-pos-val", "hidden");
+    setElementVisibility("cov_pos_val", "hidden");
     setElementVisibility("number-select", "hidden");
     setElementVisibility("prio-chng-vals", "hidden");
     setElementVisibility("cov_pos_val", "hidden");
@@ -410,10 +411,13 @@ document.getElementById("cover-select").addEventListener("change", function () {
     setBladeModes();
 });
 function setCoverValues() {
-    if (document.getElementById("covpos-select").value >= 20)
+    if (document.getElementById("covpos-select").value >= 20) {
         setElementVisibility("cov-pos-val", "visible");
-    else
+        setElementVisibility("cov_pos_val", "visible");
+    } else {
         setElementVisibility("cov-pos-val", "hidden");
+        setElementVisibility("cov_pos_val", "hidden");
+    }
 }
 function setDimmvalModes() {
     const cov_md = document.getElementById("covpos-select")
@@ -440,6 +444,7 @@ function setBladeModes() {
         if ((cov_md.value > 40) || (cov_md.value == 10)) {
             cov_md.options[0].selected = true;
             setElementVisibility("cov-pos-val", "hidden");
+            setElementVisibility("cov_pos_val", "hidden");
         }
     }
 }

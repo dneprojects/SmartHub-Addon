@@ -1426,11 +1426,5 @@ div.sens_lbl {
    margin-left: 4px; 
    padding-top: 4px; 
    height: 22px;
-   width: 138px;
-}
-div#buzz-freq-lbl, div#buzz-rep-lbl, div#buzz-dur-lbl {
-   margin-left: 4px; 
-   padding-top: 4px; 
-   height: 22px;
    width: 122px;
 }
