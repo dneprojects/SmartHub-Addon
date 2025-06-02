@@ -36,6 +36,7 @@ if (protoc_butt) {
 
 if (resp_popup) {
     resp_popup.classList.add("show");
+    close_resp_popup.focus();
 }
 
 if (close_resp_popup_h) {

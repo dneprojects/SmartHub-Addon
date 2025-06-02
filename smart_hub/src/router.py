@@ -535,6 +535,14 @@ class HbtnRouter:
             await self.get_full_status()
             await self.api_srv.block_network_if(self._id, False)
 
+    async def reinit_forward_table(self):
+        """Reinit forward table."""
+        mod_list = self.mod_addrs
+        for md in mod_list:
+            rt_command = RT_CMDS.START_RT_FORW_MOD.replace("<mod>", chr(md))
+            await self.hdlr.handle_router_cmd_resp(self._id, rt_command)
+        return self.hdlr.rt_msg._resp_buffer
+
     async def get_module_comm_status(self, mod_addrs: list[int] = []):
         """Ask communication status for all modules."""
         self.mod_comm_status = {}

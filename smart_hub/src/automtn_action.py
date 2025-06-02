@@ -609,7 +609,7 @@ class AutomationAction:
                 if msg.type == 1:
                     opt_str += f'<option value="{msg.nmbr}">{msg.name}</option>\n'
             page = page.replace(
-                '<option value="">-- SMS-Meldung wählen --</option>', opt_str
+                '<option value="">-- ActSMS-Meldung wählen --</option>', opt_str
             )
         elif SelActCodes["send"] in self.actions_dict.keys():
             page = page.replace(
@@ -624,7 +624,7 @@ class AutomationAction:
                 if nmbr.type == 1:
                     opt_str += f'<option value="{nmbr.nmbr}">{nmbr.name}</option>\n'
             page = page.replace(
-                '<option value="">-- Telefonnummer wählen --</option>', opt_str
+                '<option value="">-- ActTelefonnummer wählen --</option>', opt_str
             )
         elif self.automation.settings.typ == b"\x1e\x03":
             page = page.replace(
@@ -844,6 +844,7 @@ class AutomationAction:
                 self.unit = self.automation.get_sel(form_data, "act_climoutput")
                 self.action_args.append(0)
                 self.action_args.append(self.unit)
+                self.action_args.append(0)
             else:
                 self.action_args.append(cl_opt)
                 self.action_args.append(0)

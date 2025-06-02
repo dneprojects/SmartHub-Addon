@@ -248,6 +248,16 @@
                                         <select name="trigger_ekey" style="visibility: hidden; position: absolute" id="ekey-select">
                                             <option value="">-- Benutzer wählen --</option>
                                         </select>
+                                        <select name="fb_shortlong" style="visibility: hidden; position: absolute"
+                                            id="fbshortlong-select">
+                                            <option value="">-- Zustand wählen --</option>
+                                            <option value="1">kurzer Tastendruck</option>
+                                            <option value="2">langer Tastendruck</option>
+                                        </select>
+                                        <select name="trg_gsm" style="visibility: hidden; position: absolute" id="gsm-trg">
+                                            <option value="">-- Telefonnummer wählen --</option>
+                                        </select>
+                                        <br><br>
                                         <div name="remote_codes" class="sens_lims" style="visibility: hidden; position: absolute" id="remote-codes">
                                             <div id="rem_high_lbl" class="sens_lbl"><label for="ir-high">IR-Code high:</label></div>
                                             <input type="number" id="ir-high" class="sens_no" name="ir_high" min="0" max="255" step="1" value="0" />
@@ -255,7 +265,6 @@
                                             <div id="rem_low_lbl" class="sens_lbl"><label for="ir-low">IR-Code low:</label></div>
                                             <input type="number" id="ir-low" class="sens_no" name="ir_low" min="0" max="255" step="1" value="0" />
                                         </div>
-                                        <br><br>
                                         <select name="trigger_onoff" style="visibility: hidden; position: absolute"
                                             id="onoff-select">
                                             <option value="">-- Zustand wählen --</option>
@@ -334,6 +343,9 @@
                                             <option value="11">November</option>
                                             <option value="12">Dezember</option>
                                         </select>
+                                        <select name="trg_gsmmsg" style="visibility: hidden; position: absolute" id="gsmmsg-trg">
+                                            <option value="">-- SMS-Meldung wählen --</option>
+                                        </select>
                                         <select name="trigger_finger" style="visibility: hidden; position: absolute" id="finger-select">
                                             <option value="">-- Finger wählen --</option>\n
                                             <option value="1">Kleiner Finger links</option>
@@ -377,10 +389,10 @@
                                         </div>
                                         <div name="sens_lims_lux" class="sens_lims" style="visibility: hidden; position: absolute" id="sens-lims-lux">
                                             <div id="sens-lbl_low" class="sens_lbl"><label for="sens-low">Bereich unten [Lux]:</label></div>
-                                            <input type="number" id="sens-low-lux" class="sens_no" name="sens_low_lux" min="0" max="2550" step="10" value="0"/>
+                                            <input type="number" id="sens-low-lux" class="sens_no" name="sens_low_lux" min="0" max="64770" step="10" value="0"/>
                                             <br><br>
                                             <div id="sens-lbl_high" class="sens_lbl"><label for="sens-high">Bereich oben [Lux]:</label></div>
-                                            <input type="number" id="sens-high-lux" class="sens_no" name="sens_high_lux" min="0" max="2550" step="10" value="2550"/>
+                                            <input type="number" id="sens-high-lux" class="sens_no" name="sens_high_lux" min="0" max="65025" step="10" value="2550"/>
                                         </div>
                                         <div name="sens_lims_wind" class="sens_lims" style="visibility: hidden; position: absolute" id="sens-lims-wind">
                                             <div id="sens-lbl_low" class="sens_lbl"><label for="sens-low">Bereich unten [m/s]:</label></div>
@@ -532,11 +544,11 @@
                                             <option value="">-- Meldung wählen --</option>
                                         </select>
                                         <select name="act_gsm" style="visibility: hidden; position: absolute" id="gsm-act">
-                                            <option value="">-- Telefonnummer wählen --</option>
+                                            <option value="">-- ActTelefonnummer wählen --</option>
                                         </select>
                                         <br><br>
                                         <select name="act_gsmmsg" style="visibility: hidden; position: absolute" id="gsmmsg-act">
-                                            <option value="">-- SMS-Meldung wählen --</option>
+                                            <option value="">-- ActSMS-Meldung wählen --</option>
                                         </select>
                                         <div name="buzz_pars2" class="sens_lims" style="visibility: hidden; position: absolute" id="buzz-pars2">
                                             <div id="buzz-rep-lbl" class="sens_lbl"><label for="buzz-rep">Wiederholungen:</label></div>

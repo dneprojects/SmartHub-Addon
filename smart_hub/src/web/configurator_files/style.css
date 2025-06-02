@@ -184,9 +184,13 @@ a:hover,
 img a:hover,
 img:hover,
 fieldset {
-   outline: 0;
+   outline: none;
    text-decoration: none;
    border: none;
+}
+
+#close_resp_popup:focus {
+   outline: 1.5px solid;
 }
 
 span.mandatory {
@@ -1082,7 +1086,8 @@ input#send:hover {
 input#rtr_timeout, input#new_mod_id, input#new_mod_ch, input#chan_reset, input#reset_ch, input#cov_autostop_cnt {
    width: 50px;
 }
-#btn_rtr_timeout, #btn_new_mod_id, #btn_chan_reset, #btn_rt_reboot, #btn_cov_autostop_cnt {
+#btn_rtr_timeout, #btn_new_mod_id, #btn_chan_reset, #btn_rt_reboot,  
+#btn_rt_fwdtable, #btn_cov_autostop_cnt {
    width: 80px;
    height: 22px;
 }

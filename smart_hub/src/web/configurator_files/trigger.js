@@ -5,7 +5,7 @@ const count_trg = new Set([9])
 const output_trg = new Set([10])
 const dimmval_trg = new Set([15])
 const cover_trg = new Set([17])
-const remote_trg = new Set([23])
+const remote_trg = new Set([23, 24])
 const perc_trg = new Set([30])
 const viscmd_trg = new Set([31])
 const move_trg = new Set([40, 41])
@@ -14,13 +14,14 @@ const mode_trg = new Set([137])
 const dimm_trg = new Set([149])
 const button_trg = new Set([150, 151, 154])
 const switch_trg = new Set([152, 153])
+const gsm_trg = new Set([167, 168])
 const ekey_trg = new Set([169])
 const time_trg = new Set([170])
-const sensor_trg = new Set([201, 202, 203, 204, 205, 206, 213, 214, 215, 216, 217])
+const sensor_trg = new Set([201, 202, 203, 204, 205, 206, 207, 213, 214, 215, 216, 217])
 const ad_trg = new Set([218, 219, 224, 225, 226, 227])
 const temp_sens = new Set([201, 213])
 const perc_sens = new Set([202, 215, 217])
-const light_sens = new Set([203, 216])
+const light_sens = new Set([203, 207, 216])
 const wind_sens = new Set([204])
 const rain_sens = new Set([205])
 const windpk_sens = new Set([206])
@@ -28,6 +29,25 @@ const ad_sens = new Set([218, 219])
 const climate_trg = new Set([220, 221, 222])
 const sys_trg = new Set([12, 101, 249])
 const dircmd_trg = new Set([253])
+const low_lux = document.getElementById("sens-low-lux")
+const high_lux = document.getElementById("sens-high-lux")
+
+high_lux.addEventListener("change", function () { adapt_LuxSteps() });
+low_lux.addEventListener("change", function () { adapt_LuxSteps() });
+
+function adapt_LuxSteps() {
+    if (high_lux.value >= 2550 || low_lux.value >= 2550) {
+        high_lux.step = 255;
+        high_lux.value = Math.round(high_lux.value / 255) * 255;
+        low_lux.step = 255;
+        low_lux.value = Math.round(low_lux.value / 255) * 255;
+    } else {
+        high_lux.step = 10;
+        high_lux.value = Math.round(high_lux.value / 10) * 10;
+        low_lux.step = 10;
+        low_lux.value = Math.round(low_lux.value / 10) * 10;
+    }
+}
 
 function initTrigElements(trg_code, trg_arg1, trg_arg2, trg_time) {
     if (button_trg.has(trg_code)) {
@@ -67,6 +87,11 @@ function initTrigElements(trg_code, trg_arg1, trg_arg2, trg_time) {
     }
     else if (remote_trg.has(trg_code)) {
         setElement("trigger-select", 23);
+        if (trg_code == 23) {
+            setElement("fbshortlong-select", 1);
+        } else if (trg_code == 24) {
+            setElement("fbshortlong-select", 2);
+        }
         setElement("ir-high", trg_arg1);
         setElement("ir-low", trg_arg2);
     }
@@ -120,6 +145,16 @@ function initTrigElements(trg_code, trg_arg1, trg_arg2, trg_time) {
         setElement("mode-select", trg_arg2 & 0xF8);
         setElement("mode2-select", trg_arg2 & 0x07);
     }
+    else if (gsm_trg.has(trg_code)) {
+        setElement("trigger-select", trg_code);
+        setElement("gsm-trg", trg_arg1);
+        if (trg_code == 168) {
+            setElement("gsmmsg-trg", trg_arg2);
+        }
+        else if (trg_code == 168) {
+            setElement("gsmmsg-trg", trg_arg2);
+        }
+    }
     else if (ekey_trg.has(trg_code)) {
         setElement("trigger-select", 169);
         setEkeyUser(trg_arg1);
@@ -140,7 +175,12 @@ function initTrigElements(trg_code, trg_arg1, trg_arg2, trg_time) {
     }
     else if (sensor_trg.has(trg_code)) {
         setElement("trigger-select", 203);
-        setElement("sensor-select", trg_code);
+        if (trg_code == 207) {
+            setElement("sensor-select", 203);
+        }
+        else {
+            setElement("sensor-select", trg_code);
+        }
         if (temp_sens.has(trg_code)) {
             setElement("sens-low-temp", u2sign7(trg_arg1));
             setElement("sens-high-temp", u2sign7(trg_arg2));
@@ -150,8 +190,16 @@ function initTrigElements(trg_code, trg_arg1, trg_arg2, trg_time) {
             setElement("sens-high-perc", trg_arg2);
         }
         if (light_sens.has(trg_code)) {
-            setElement("sens-low-lux", trg_arg1 * 10);
-            setElement("sens-high-lux", trg_arg2 * 10);
+            if (trg_code == 207) {
+                low_lux.step = 255;
+                high_lux.step = 255;
+                setElement("sens-low-lux", trg_arg1 * 255);
+                setElement("sens-high-lux", trg_arg2 * 255);
+            }
+            else {
+                setElement("sens-low-lux", trg_arg1 * 10);
+                setElement("sens-high-lux", trg_arg2 * 10);
+            }
         }
         if (wind_sens.has(trg_code)) {
             setElement("sens-low-wind", trg_arg1);
@@ -220,6 +268,7 @@ function setTriggerSels() {
     setElementVisibility("mov-light", "hidden");
     setElementVisibility("mov-light-lbl", "hidden");
     setElementVisibility("shortlong-select", "hidden");
+    setElementVisibility("fbshortlong-select", "hidden");
     setElementVisibility("onoff-select", "hidden");
     setElementVisibility("count-vals", "hidden");
     setElementVisibility("sens-lims-wind", "hidden");
@@ -247,6 +296,8 @@ function setTriggerSels() {
     setElementVisibility("number-select", "hidden");
     setElementVisibility("prio-chng-vals", "hidden");
     setElementVisibility("cov_pos_val", "hidden");
+    setElementVisibility("gsm-trg", "hidden");
+    setElementVisibility("gsmmsg-trg", "hidden");
 
     if (selectn == "150") {
         setElementVisibility("button-select", "visible");
@@ -261,6 +312,7 @@ function setTriggerSels() {
     }
     if (selectn == "23") {
         setElementVisibility("remote-codes", "visible");
+        setElementVisibility("fbshortlong-select", "visible");
     }
     if (selectn == "10") {
         setElementVisibility("output-select", "visible");
@@ -323,6 +375,13 @@ function setTriggerSels() {
         setElementVisibility("mov-select", "visible");
         setElementVisibility("mov-params", "visible");
         setMovLight();
+    }
+    if (selectn == "167") {
+        setElementVisibility("gsm-trg", "visible");
+    }
+    if (selectn == "168") {
+        setElementVisibility("gsm-trg", "visible");
+        setElementVisibility("gsmmsg-trg", "visible");
     }
     if (selectn == "169") {
         setElementVisibility("ekey-select", "visible");

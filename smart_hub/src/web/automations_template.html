@@ -238,12 +238,22 @@
   };
   function openNewPopup() {
       var sel = 0
+      var extMod = 0
+      var selector = document.getElementById("src-module")
       for (let l = 0; l < frm.length; l++) {
         if (frm[l].checked) {
           sel = l;
+          extMod = frm[sel].parentElement.id
         }
       }
       ext_automtn.value = "new_automtn-" + sel;
+      selectStr = "modad-" + extMod;
+      for (let mda = 0; mda < selector.options.length; mda++) {
+        if (selector.options[mda].value == selectStr) {
+          selector.options[mda].selected = true;
+          break;
+        }
+      }
       automtn_new_popup.classList.add("show");
     };
     function continueWithModule() {

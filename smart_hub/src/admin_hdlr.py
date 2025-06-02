@@ -71,11 +71,8 @@ class AdminHdlr(HdlrBase):
                 self.check_router_no(rt)
                 if self.args_err:
                     return
-                mod_list = self.api_srv.routers[rt - 1].mod_addrs
-                for md in mod_list:
-                    rt_command = RT_CMDS.START_RT_FORW_MOD.replace("<mod>", md)
-                    await self.handle_router_cmd_resp(rt, rt_command)
-                self.response = self.rt_msg._resp_buffer
+                rtr = self.api_srv.routers[rt - 1]
+                self.response = await rtr.reinit_forward_table()
                 return
             case spec.RT_FWD_SET:
                 mod = self._args[1]

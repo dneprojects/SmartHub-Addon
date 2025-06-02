@@ -512,8 +512,12 @@ function setSensorNums() {
     if ((selectn == "204") || (selectn == "206")) {
         setElementVisibility("sens-lims-wind", "visible");
     }
-    if ((selectn == "203") || (selectn == "216")) {
+    if ((selectn == "203") || (selectn == "207") || (selectn == "216")) {
         setElementVisibility("sens-lims-lux", "visible");
+        if (selectn == "207") {
+            low_lux.step = 255;
+            high_lux.step = 255;
+        }
     }
     if ((selectn == "201") || (selectn == "213")) {
         setElementVisibility("sens-lims-temp", "visible");

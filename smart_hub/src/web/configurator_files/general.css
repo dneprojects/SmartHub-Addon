@@ -297,6 +297,7 @@ img {
     #btn_new_mod_id, 
     #btn_chan_reset, 
     #btn_rt_reboot, 
+    #btn_rt_fwdtable,
     #btn_cov_autostop_cnt {
         width: 60px;
         font-size: 90%;

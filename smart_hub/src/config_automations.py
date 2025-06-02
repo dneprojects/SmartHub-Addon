@@ -480,6 +480,12 @@ def prepare_automations_list(main_app, step):
         cond_desc = automations[at_i].condition.name
         actn_desc = automations[at_i].action.description
         id_name = "atmn_tbl"
+        if step == 1:
+            ext_mod = src_mod
+        elif step == 2:
+            ext_mod = trgt_mod
+        else:
+            ext_mod = 0
         sel_chkd = ""
         if at_i == main_app["automations_def"].selected:
             sel_chkd = "checked"
@@ -488,7 +494,7 @@ def prepare_automations_list(main_app, step):
             + f"<td>{evnt_desc}</td><td>{cond_desc}</td><td align=center>&nbsp;&nbsp;&rArr;&nbsp;&nbsp;</td>\n"
         )
         tbl += indent(7) + f"<td>{actn_desc}</td>\n"
-        tbl += f'<td><input title="Auswahl zum Ändern oder Löschen oder als Voreinstellung für neue Automatisierungsregel" type="radio" name="{id_name}" id="{id_name}" value="{at_i}" {sel_chkd}></td>'
+        tbl += f'<td id="{ext_mod}"><input title="Auswahl zum Ändern oder Löschen oder als Voreinstellung für neue Automatisierungsregel" type="radio" name="{id_name}" id="{id_name}" value="{at_i}" {sel_chkd}></td>'
         tbl += indent(6) + "</tr>\n"
     tbl += indent(6) + "</tbody>\n"
     tbl += indent(5) + "</table>\n"

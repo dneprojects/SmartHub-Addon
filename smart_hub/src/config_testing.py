@@ -221,6 +221,27 @@ class ConfigTestingServer:
             await api_srv.set_operate_mode(rtr._id)
             return await show_router_syspage(main_app, "")
 
+    @routes.post("/rt_fwdtable")
+    async def rt_reinit_fwdtbl(request: web.Request) -> web.Response:  # type: ignore
+        inspect_header(request)
+        if client_not_authorized(request):
+            return show_not_authorized(request.app)
+
+        if web_lock.locked():
+            return web.Response(status=204)
+
+        async with web_lock:
+            main_app = request.app["parent"]
+            api_srv = main_app["api_srv"]
+            rtr = api_srv.routers[0]
+            await api_srv.block_network_if(rtr._id, True)
+            await api_srv.set_server_mode(rtr._id)
+            main_app.logger.info("Forward table will be re-initialized")
+            await rtr.reinit_forward_table()
+            await api_srv.block_network_if(rtr._id, False)
+            await api_srv.set_operate_mode(rtr._id)
+            return await show_router_syspage(main_app, "")
+
     @routes.post("/chan_reset")
     async def chan_reset(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
@@ -567,6 +588,15 @@ async def show_router_syspage(main_app, popup_msg="") -> web.Response:
         indent(7)
         + f'<tr><td><label for="{id_name}">{prompt}</label></td><td></td><td></td>'
         + f'<td><input name="btn_{id_name}" type="submit" id="btn_{id_name}" value="Neustart"/></td></tr>\n'
+    )
+    tbl += indent(6) + "</form>"
+    id_name = "rt_fwdtable"
+    prompt = "Weiterleitungstabelle neu initialisieren"
+    tbl += indent(6) + '<form action="test/rt_fwdtable" method="post">\n'
+    tbl += (
+        indent(7)
+        + f'<tr><td><label for="{id_name}">{prompt}</label></td><td></td><td></td>'
+        + f'<td><input name="btn_{id_name}" type="submit" id="btn_{id_name}" value="Initialisieren"/></td></tr>\n'
     )
     tbl += indent(6) + "</form>"
     id_name = "chan_reset"

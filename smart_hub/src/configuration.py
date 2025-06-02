@@ -484,7 +484,7 @@ class ModuleSettings:
                         self.messages.append(IfDescriptor(text, arg_code, line[4]))
                 elif int(line[0]) == 255:
                     try:
-                        if self.type == "Smart GSM":
+                        if self.type == "Smart GSM" and arg_code in range(0, 128):
                             self.gsm_messages.append(
                                 IfDescriptor(text, arg_code, line[4])
                             )

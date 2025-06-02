@@ -26,6 +26,8 @@ EventCodes = {
     152: "Schalter ein",
     153: "Schalter aus",
     154: "Taste lang Ende",
+    167: "GSM-Anruf",
+    168: "GSM-Nachricht",
     169: "Ekey",
     170: "Timer",
     201: "Außentemperatur",
@@ -34,6 +36,7 @@ EventCodes = {
     204: "Wind",
     205: "Regen",
     206: "Wind Peak",
+    207: "Außenhelligkeit",
     213: "Innentemperatur",
     215: "Luftfeuchtigkeit innen",
     216: "Helligkeit innen",
@@ -66,6 +69,8 @@ EventCodesSel = {
     8: "Logikfunktion",
     17: "Rollladenposition",
     137: "Modusänderung",
+    167: "GSM-Anruf",
+    168: "GSM-Nachricht",
     4: "Prioritätsänderung",
     40: "Bewegung",
     41: "Bewegung",
@@ -75,6 +80,7 @@ EventCodesSel = {
     204: "Sensor",
     205: "Sensor",
     206: "Sensor",
+    207: "Sensor",
     213: "Sensor",
     215: "Sensor",
     216: "Sensor",
@@ -118,6 +124,8 @@ SelTrgCodes = {
     "switch": 152,
     "ekey": 169,
     "time": 170,
+    "call": 167,
+    "msg": 168,
     "sensor": 203,
     "ad": 218,
     "climate": 220,
@@ -133,7 +141,7 @@ EventsSets = {
     10: [10],
     15: [15],
     17: [17],
-    23: [23],
+    23: [23, 24, 25],
     30: [30],
     31: [31],
     40: [40, 41],
@@ -142,9 +150,11 @@ EventsSets = {
     149: [149],
     150: [150, 151, 154],
     152: [152, 153],
+    167: [167],
+    168: [168],
     169: [169],
     170: [170],
-    203: [201, 202, 203, 204, 205, 206, 213, 214, 215, 216, 217],
+    203: [201, 202, 203, 204, 205, 206, 207, 213, 214, 215, 216, 217],
     218: [218, 219, 224, 225, 226, 227],
     220: [220, 221, 222],
     249: [12, 101, 249],
@@ -157,6 +167,7 @@ SelSensCodes = {
     "wind": 204,
     "rain": 205,
     "wind_peak": 206,
+    "light_ext_full": 207,
     "temp_int": 213,
     "humid_int": 215,
     "light_int": 216,
@@ -166,6 +177,7 @@ SensorUnit = {
     201: "°C",
     202: "%",
     203: "Lux",
+    207: "Lux",
     204: "m/s",
     205: "",
     206: "m/s",
@@ -380,6 +392,8 @@ class AutomationTrigger:
                 }
                 self.sensors_dict = {
                     SelSensCodes["temp_int"]: "Temperatur innen",
+                    SelSensCodes["humid_int"]: "Feuchte innen",
+                    SelSensCodes["airqual"]: "Luftqualität",
                 }
         if mod_typ[0] == 10:
             self.triggers_dict = {
@@ -439,6 +453,8 @@ class AutomationTrigger:
             }
         if mod_typ == b"\x1e\x03":  # Smart GSM
             self.triggers_dict = {
+                SelTrgCodes["call"]: "Anruf",
+                SelTrgCodes["msg"]: "SMS",
                 SelTrgCodes["collcmd"]: "Sammelbefehl",
                 SelTrgCodes["viscmd"]: "Visualisierungsbefehl",
                 SelTrgCodes["mode"]: "Modusänderung",
@@ -462,12 +478,20 @@ class AutomationTrigger:
 
         return self.triggers_dict, self.sensors_dict
 
+    def get_allowed_triggers(self, sel_triggers: dict[int, str]) -> list[int]:
+        """Return list of allowed triggers for given module."""
+        allowed_triggers = []
+        for trg in sel_triggers.keys():
+            allowed_triggers += EventsSets[trg]
+        return allowed_triggers
+
     def parse(self) -> None:
         """Parse event arguments and return readable string."""
         try:
             self.unit = None
             self.value = None
             self.event_id = None
+            trig_command = ""
             event_arg = self.event_arg1
             self.event_arg_name = f"{event_arg}"
             event_desc = self.event_arg_name
@@ -678,12 +702,26 @@ class AutomationTrigger:
                     SelSensCodes["light_int"],
                 ]:
                     trig_command = f"{EventCodes[self.event_code]} zwischen {self.event_arg1 * 10} und {self.event_arg2 * 10} {unit}"
+                elif self.event_code in [
+                    SelSensCodes["light_ext_full"],
+                ]:
+                    trig_command = f"{EventCodes[self.event_code]} zwischen {self.event_arg1 * 255} und {self.event_arg2 * 255} {unit}"
                 else:
                     trig_command = f"{EventCodes[self.event_code]} zwischen {self.event_arg1} und {self.event_arg2} {unit}"
                 event_desc = ""
             elif self.event_code in EventsSets[SelTrgCodes["ad"]]:
                 trig_command = f"{EventCodes[self.event_code]} "
                 event_desc = f"zwischen {round(self.event_arg1 / 25, 2)} und {round(self.event_arg2 / 25, 2)} V"
+            elif self.event_code in EventsSets[SelTrgCodes["call"]]:
+                trig_command = (
+                    f"Anruf von '{self.settings.gsm_numbers[self.event_arg1 - 1].name}'"
+                )
+                event_desc = ""
+            elif self.event_code in EventsSets[SelTrgCodes["msg"]]:
+                trig_command = (
+                    f"SMS von '{self.settings.gsm_numbers[self.event_arg1 - 1].name}':"
+                )
+                event_desc = f"'{self.settings.gsm_messages[self.event_arg2 - 1].name}'"
             elif self.event_code in EventsSets[SelTrgCodes["ekey"]]:
                 id = self.event_arg1
                 if id == 255:
@@ -718,7 +756,7 @@ class AutomationTrigger:
                 self.event_id = self.event_code
             return
         except Exception as err_msg:
-            self.settings.logger.error(
+            self.settings.logger.warning(
                 f"Could not handle event code:  {self.event_code} / {self.event_arg1} / {self.event_arg2}, Error: {err_msg}"
             )
             self.description = f"{self.name}: {self.event_code} / {self.event_arg1} / {self.event_arg2}"
@@ -727,7 +765,7 @@ class AutomationTrigger:
     def prepare_trigger_lists(self, app, page: str, step: int) -> str:
         """Replace options part of select boxes for edit automation."""
         sel_triggers, sel_sensors = self.get_selector_triggers(step == 0)
-        if self.event_code not in sel_triggers:
+        if self.event_code not in self.get_allowed_triggers(sel_triggers):
             self.event_code = 0
         opt_str = '<option value="">-- Auslösendes Ereignis wählen --</option>\n'
         for key in sel_triggers:
@@ -898,7 +936,38 @@ class AutomationTrigger:
                 f'<option value="{SelTrgCodes["dircmd"]}">{self.triggers_dict[SelTrgCodes["dircmd"]]}',
                 f'<option value="{SelTrgCodes["dircmd"]}" disabled>{self.triggers_dict[SelTrgCodes["dircmd"]]}',
             )
-
+        if len(self.settings.gsm_numbers) > 0:
+            opt_str = '<option value="">-- Telefonnummer wählen --</option>'
+            for nmbr in self.settings.gsm_numbers:
+                # only entries in language 1 (german) supported
+                if nmbr.type == 1:
+                    opt_str += f'<option value="{nmbr.nmbr}">{nmbr.name}</option>\n'
+            page = page.replace(
+                '<option value="">-- Telefonnummer wählen --</option>', opt_str
+            )
+        elif self.settings.typ == b"\x1e\x03":
+            page = page.replace(
+                f'<option value="{SelTrgCodes["call"]}">{self.triggers_dict[SelTrgCodes["call"]]}',
+                f'<option value="{SelTrgCodes["call"]}" disabled>{self.triggers_dict[SelTrgCodes["call"]]}',
+            )
+            page = page.replace(
+                f'<option value="{SelTrgCodes["msg"]}">{self.triggers_dict[SelTrgCodes["msg"]]}',
+                f'<option value="{SelTrgCodes["msg"]}" disabled>{self.triggers_dict[SelTrgCodes["msg"]]}',
+            )
+        if len(self.settings.gsm_messages) > 0:
+            opt_str = '<option value="">-- SMS-Meldung wählen --</option>'
+            for msg in self.settings.gsm_messages:
+                # only entries in language 1 (german) supported
+                if msg.type == 1:
+                    opt_str += f'<option value="{msg.nmbr}">{msg.name}</option>\n'
+            page = page.replace(
+                '<option value="">-- SMS-Meldung wählen --</option>', opt_str
+            )
+        elif self.settings.typ == b"\x1e\x03":
+            page = page.replace(
+                f'<option value="{SelTrgCodes["msg"]}">{self.triggers_dict[SelTrgCodes["msg"]]}',
+                f'<option value="{SelTrgCodes["msg"]}" disabled>{self.triggers_dict[SelTrgCodes["msg"]]}',
+            )
         opt_str = '<option value="">-- Benutzer wählen --</option>'
         if len(self.settings.users) > 0:
             for usr in self.settings.users:
@@ -1033,6 +1102,8 @@ class AutomationTrigger:
             self.event_arg1 = self.automation.get_sel(form_data, "trigger_dircmd")
             self.event_arg2 = 0
         elif self.event_code in EventsSets[SelTrgCodes["remote"]]:
+            if form_data["fb_shortlong"][0] == "2":
+                self.event_code = 24
             self.event_arg1 = self.automation.get_sel(form_data, "ir_high")
             self.event_arg2 = self.automation.get_sel(form_data, "ir_low")
         elif self.event_code in EventsSets[SelTrgCodes["collcmd"]]:
@@ -1103,20 +1174,32 @@ class AutomationTrigger:
             ]:
                 self.event_arg1 = self.automation.get_sel(form_data, "sens_low_wind")
                 self.event_arg2 = self.automation.get_sel(form_data, "sens_high_wind")
-            if self.event_code in [
-                SelSensCodes["light_ext"],
-                SelSensCodes["light_int"],
-            ]:
+            if self.event_code in [SelSensCodes["light_int"]]:
                 self.event_arg1 = (
                     self.automation.get_sel(form_data, "sens_low_lux") / 10
                 )
                 self.event_arg2 = (
                     self.automation.get_sel(form_data, "sens_high_lux") / 10
                 )
+            if self.event_code in [SelSensCodes["light_ext"]]:
+                low_lux = self.automation.get_sel(form_data, "sens_low_lux")
+                high_lux = self.automation.get_sel(form_data, "sens_high_lux")
+                if low_lux > 2550 or high_lux > 2550:
+                    self.event_code = SelSensCodes["light_ext_full"]
+                    self.event_arg1 = int(low_lux / 255)
+                    self.event_arg2 = int(high_lux / 255)
+                else:
+                    self.event_arg1 = int(low_lux / 10)
+                    self.event_arg2 = int(high_lux / 10)
             if self.event_code in [SelSensCodes["rain"]]:
                 self.event_arg1 = self.automation.get_sel(form_data, "trigger_rain")
                 self.event_arg2 = 0
-
+        elif self.event_code in EventsSets[SelTrgCodes["call"]]:
+            self.event_arg1 = self.automation.get_sel(form_data, "trg_gsm")
+            self.event_arg2 = 0
+        elif self.event_code in EventsSets[SelTrgCodes["msg"]]:
+            self.event_arg1 = self.automation.get_sel(form_data, "trg_gsm")
+            self.event_arg2 = self.automation.get_sel(form_data, "trg_gsmmsg")
         elif self.event_code in EventsSets[SelTrgCodes["ekey"]]:
             self.event_arg1 = int(form_data["trigger_ekey"][0].split("-")[0])
             if self.event_arg1 == 255:

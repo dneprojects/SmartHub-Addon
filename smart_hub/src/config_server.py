@@ -534,23 +534,26 @@ class ConfigServer:
             if len(form_data.keys()) == 1:
                 # nothing selected
                 return show_hub_overview(app)
-            if form_data["update_0"][0] == "on":
-                app.logger.info("Update of Modules: router controls module selection")
-                mod_type = rtr.fw_upload[:2]
-                await api_srv.block_network_if(rtr._id, True)
-                if await rtr.hdlr.upload_module_firmware(
-                    mod_type, rtr.hdlr.stat_mod_fw_upload_protocol
-                ):
-                    app.logger.info("Firmware uploaded to router successfully")
-                    await rtr.hdlr.flash_module_firmware(
-                        [0], rtr.hdlr.log_mod_fw_update_protocol
-                    )
-                else:
+            if "update_0" in list(form_data.keys()):
+                if form_data["update_0"][0] == "on":
                     app.logger.info(
-                        "Firmware upload to router failed, update terminated"
+                        "Update of Modules: router controls module selection"
                     )
-                await api_srv.block_network_if(rtr._id, False)
-                return show_hub_overview(app)
+                    mod_type = rtr.fw_upload[:2]
+                    await api_srv.block_network_if(rtr._id, True)
+                    if await rtr.hdlr.upload_module_firmware(
+                        mod_type, rtr.hdlr.stat_mod_fw_upload_protocol
+                    ):
+                        app.logger.info("Firmware uploaded to router successfully")
+                        await rtr.hdlr.flash_module_firmware(
+                            [0], rtr.hdlr.log_mod_fw_update_protocol
+                        )
+                    else:
+                        app.logger.info(
+                            "Firmware upload to router failed, update terminated"
+                        )
+                    await api_srv.block_network_if(rtr._id, False)
+                    return show_hub_overview(app)
             mod_type = rtr.fw_upload[:2]
             mod_list = []
             for checked in list(form_data.keys())[:-1]:
