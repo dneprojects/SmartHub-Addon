@@ -66,6 +66,7 @@ class ApiServer:
         self.is_addon: bool = self.sm_hub.is_addon
         self.release_block_next = False  # Set if middleware should release block next
         self._last_check_day = self.get_last_backupday()
+        self.extatmn_error_list = []  # List of errors from external modules
 
     async def get_initial_status(self):
         """Starts router object and reads complete system status"""

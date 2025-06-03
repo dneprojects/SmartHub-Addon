@@ -435,7 +435,14 @@ class ExtAutomationDefinition(AutomationDefinition):
             src_settings = mod.get_settings_def()
             self.trigger = AutomationTrigger(self, src_settings, atm_def)
         elif atm_def is not None:
-            settings.logger.warning(
-                f"Automation reference in module {settings.module._id} to {self.src_mod}, module not found."
-            )
+            if [
+                settings.module._id,
+                self.src_mod,
+            ] not in rtr.api_srv.extatmn_error_list:
+                rtr.api_srv.extatmn_error_list.append(
+                    [settings.module._id, self.src_mod]
+                )
+                settings.logger.warning(
+                    f"Automation reference in module {settings.module._id} to {self.src_mod}, module not found."
+                )
             self.trigger = AutomationTrigger(self, settings, atm_def)

@@ -1,6 +1,11 @@
-v2.6.2
+#v2.6.3
 
-New features:
+##Fix:
+- Warning of external automation if ext. module is missing: now only once
+
+#v2.6.2
+
+##New features:
 - GSM triggers
 - IR remote long press trigger
 - Weather station luminance with full range trigger
@@ -8,6 +13,6 @@ New features:
 - Improved usability with popup default button, external module preselection
 - Sensor module support of sensor air qualitiy, humidity
 
-Fixes:
+##Fixes:
 - Climate action additional last argument 0
 - Automation prefill for external modules fails sometimes
