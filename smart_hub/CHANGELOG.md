@@ -1,3 +1,8 @@
+## v2.6.4
+
+### New:
+- Firmware support for Smart Touch
+
 ## v2.6.3
 
 ### Fix:
