@@ -269,6 +269,16 @@ class ConfigTestingServer:
         await rtr.hdlr.set_module_address(1, chan, id)
         return await show_router_syspage(main_app, "")
 
+    @routes.post("/updcheck_toggle")
+    async def toggle_updcheck(request: web.Request) -> web.Response:  # type: ignore
+        inspect_header(request)
+        if client_not_authorized(request):
+            return show_not_authorized(request.app)
+        main_app = request.app["parent"]
+        api_srv = main_app["api_srv"]
+        api_srv._upd_check = not api_srv._upd_check
+        return await show_router_syspage(main_app, "")
+
 
 def show_diag_page(app, popup_msg="") -> web.Response:
     """Prepare modules page."""
@@ -638,6 +648,19 @@ async def show_router_syspage(main_app, popup_msg="") -> web.Response:
         + f'<tr><td><label for="{id_name}">{prompt}</label></td><td></td>'
         + f'<td><input name="{id_name}" type="number" min="0" max="10" id="{id_name}" value="{settings.cov_autostop_cnt}"/></td>\n'
         + f'<td><input name="btn_{id_name}" type="submit" id="btn_{id_name}" value="Speichern"/></td></tr>\n'
+    )
+    tbl += indent(6) + "</form>"
+    id_name = "updcheck_toggle"
+    prompt = "Modultyp beim Update prüfen"
+    tbl += indent(6) + '<form action="test/updcheck_toggle" method="post">\n'
+    if main_app["api_srv"]._upd_check:
+        btn_str = "Deaktivieren"
+    else:
+        btn_str = "Aktivieren"
+    tbl += (
+        indent(7)
+        + f'<tr><td><label for="{id_name}">{prompt}</label></td><td></td><td></td>'
+        + f'<td><input name="btn_{id_name}" type="submit" id="btn_{id_name}" value="{btn_str}"/></td></tr>\n'
     )
     tbl += indent(6) + "</form>"
     tbl += indent(5) + "</tbody></table>\n"

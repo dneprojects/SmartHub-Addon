@@ -298,7 +298,8 @@ img {
     #btn_chan_reset, 
     #btn_rt_reboot, 
     #btn_rt_fwdtable,
-    #btn_cov_autostop_cnt {
+    #btn_cov_autostop_cnt,
+    #btn_updcheck_toggle {
         width: 60px;
         font-size: 90%;
     }

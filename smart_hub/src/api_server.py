@@ -45,6 +45,9 @@ class ApiServer:
         self.api_msg = ApiMessage(self, const.def_cmd, const.def_len)
         self._running = True
         self._client_ip: str = ""
+        self._upd_check: bool = (
+            True  # Check for module compatibility for fw update file
+        )
         self.hass_ip: str = ""
         self.mirror_mode_enabled: bool = True
         self.event_mode_enabled: bool = True

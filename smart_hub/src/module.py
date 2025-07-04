@@ -219,6 +219,11 @@ class HbtnModule:
                 f"     Found new firmware file for {self._type}: version {new_fw}"
             )
             self.init_msg += f"New firmware '{new_fw}', "
+        elif file_found and not self.api_srv._upd_check:
+            # If update check is disabled, set update_available always
+            self.update_available = True
+            self.update_fw_file = fw_file
+            self.update_version = new_fw
         else:
             self.update_available = False
             self.update_fw_file = ""

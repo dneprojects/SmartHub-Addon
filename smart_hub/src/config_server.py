@@ -390,10 +390,15 @@ class ConfigServer:
                 mod_list = rtr.get_module_list()
                 upd_list = []
                 for mod in mod_list:
-                    if mod.typ == mod_type:
+                    if mod.typ == mod_type or not api_srv._upd_check:
                         upd_list.append(mod)
                 return show_update_modules(
-                    upd_list, fw_vers, mod_type_str, app.logger, app["is_install"]
+                    api_srv,
+                    upd_list,
+                    fw_vers,
+                    mod_type_str,
+                    app.logger,
+                    app["is_install"],
                 )
             else:
                 with open(rtr.update_fw_file, "rb") as fid:
@@ -450,10 +455,15 @@ class ConfigServer:
                 mod_list = rtr.get_module_list()
                 upd_list = []
                 for mod in mod_list:
-                    if mod.typ == mod_type:
+                    if mod.typ == mod_type or not api_srv._upd_check:
                         upd_list.append(mod)
                 return show_update_modules(
-                    upd_list, fw_vers, mod_type_str, app.logger, app["is_install"]
+                    api_srv,
+                    upd_list,
+                    fw_vers,
+                    mod_type_str,
+                    app.logger,
+                    app["is_install"],
                 )
             else:
                 mod_type = rtr.fw_upload[:2]
@@ -467,6 +477,7 @@ class ConfigServer:
                 elif module._typ == mod_type:
                     app.logger.info(f"Firmware file for module {module._name} uploaded")
                     return show_update_modules(
+                        api_srv,
                         [module],
                         fw_vers,
                         mod_type_str,

@@ -325,7 +325,7 @@ def is_outdated(cur_fw: str, new_fw: str, logger) -> bool:
 
 
 def show_update_modules(
-    mod_list, new_fw: str, mod_type: str, logger, is_install: bool
+    api_srv, mod_list, new_fw: str, mod_type: str, logger, is_install: bool
 ) -> web.Response:
     """Prepare modules page with update candidates."""
     page = get_html("modules.html")
@@ -342,7 +342,7 @@ def show_update_modules(
         images += f'<img src="configurator_files/{pic_file}" alt="{module.name}">'
         images += "</div>\n"
         images += '<div class="lbl_grid">'
-        if is_outdated(module.fw, new_fw, logger):
+        if is_outdated(module.fw, new_fw, logger) and api_srv._upd_check:
             images += f'<input type="checkbox" class="mod_chk" id="chk_{module.id}" name="chk_{module.id}" value="{module.id}" checked>\n'
         else:
             images += f'<input type="checkbox" class="mod_chk" id="chk_{module.id}" name="chk_{module.id}" value="{module.id}">\n'
