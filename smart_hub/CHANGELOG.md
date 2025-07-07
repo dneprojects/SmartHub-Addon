@@ -1,3 +1,13 @@
+## v2.6.6
+
+### New:
+- Menu Einstellungen für Installateure mit Auslesen der Weiterleitungstabelle
+
+## v2.6.5
+
+### New:
+- Option zum Flashen ohne Kompatibilitätsprüfung
+
 ## v2.6.4
 
 ### New:

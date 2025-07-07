@@ -1,5 +1,7 @@
 from aiohttp import web
 from asyncio import sleep
+
+from multidict import MultiDict
 from config_commons import (
     get_module_image,
     get_html,
@@ -157,7 +159,7 @@ class ConfigTestingServer:
         if client_not_authorized(request):
             return show_not_authorized(request.app)
         main_app = request.app["parent"]
-        return await show_router_syspage(main_app, "")
+        return await show_syssettings_page(main_app, "")
 
     @routes.post("/master_timeout")
     async def set_sys_settings(request: web.Request) -> web.Response:  # type: ignore
@@ -168,11 +170,11 @@ class ConfigTestingServer:
         main_app = request.app["parent"]
         api_srv = main_app["api_srv"]
         rtr = api_srv.routers[0]
-        t_out = int(int(data["rtr_timeout"]) / 10)
+        t_out = int(int(data["rtr_timeout"]) / 10)  # type: ignore
         rtr.settings.timeout = t_out * 10
         rtr.timeout = chr(t_out).encode("iso8859-1")
         await rtr.hdlr.send_rt_timeout(t_out)
-        return await show_router_syspage(main_app, "")
+        return await show_syssettings_page(main_app, "")
 
     @routes.post("/cov_autostop")
     async def set_cov_autostop(request: web.Request) -> web.Response:  # type: ignore
@@ -183,11 +185,11 @@ class ConfigTestingServer:
         main_app = request.app["parent"]
         api_srv = main_app["api_srv"]
         rtr = api_srv.routers[0]
-        c_cnt = int(data["cov_autostop_cnt"])
+        c_cnt = int(data["cov_autostop_cnt"])  # type: ignore
         rtr.settings.cov_autostop_cnt = c_cnt
         rtr.cov_autostop_cnt = c_cnt
         await rtr.set_descriptions(rtr.settings)
-        return await show_router_syspage(main_app, "")
+        return await show_syssettings_page(main_app, "")
 
     @routes.post("/rt_reboot")
     async def rt_reboot(request: web.Request) -> web.Response:  # type: ignore
@@ -219,7 +221,7 @@ class ConfigTestingServer:
             api_srv._init_mode = False
             await api_srv.block_network_if(rtr._id, False)
             await api_srv.set_operate_mode(rtr._id)
-            return await show_router_syspage(main_app, "")
+            return await show_syssettings_page(main_app, "")
 
     @routes.post("/rt_fwdtable")
     async def rt_reinit_fwdtbl(request: web.Request) -> web.Response:  # type: ignore
@@ -240,7 +242,7 @@ class ConfigTestingServer:
             await rtr.reinit_forward_table()
             await api_srv.block_network_if(rtr._id, False)
             await api_srv.set_operate_mode(rtr._id)
-            return await show_router_syspage(main_app, "")
+            return await show_syssettings_page(main_app, "")
 
     @routes.post("/chan_reset")
     async def chan_reset(request: web.Request) -> web.Response:  # type: ignore
@@ -248,12 +250,12 @@ class ConfigTestingServer:
         if client_not_authorized(request):
             return show_not_authorized(request.app)
         data = await request.post()
-        chan_mask = 1 << (int(data["reset_ch"]) - 1)
+        chan_mask = 1 << (int(data["reset_ch"]) - 1)  # type: ignore
         main_app = request.app["parent"]
         api_srv = main_app["api_srv"]
         rtr = api_srv.routers[0]
         await rtr.reset_chan_power(chan_mask)
-        return await show_router_syspage(main_app, "")
+        return await show_syssettings_page(main_app, "")
 
     @routes.post("/new_chan_id")
     async def new_chan_id(request: web.Request) -> web.Response:  # type: ignore
@@ -261,13 +263,13 @@ class ConfigTestingServer:
         if client_not_authorized(request):
             return show_not_authorized(request.app)
         data = await request.post()
-        id = int(data["new_mod_id"])
-        chan = int(data["new_mod_ch"])
+        id = int(data["new_mod_id"])  # type: ignore
+        chan = int(data["new_mod_ch"])  # type: ignore
         main_app = request.app["parent"]
         api_srv = main_app["api_srv"]
         rtr = api_srv.routers[0]
         await rtr.hdlr.set_module_address(1, chan, id)
-        return await show_router_syspage(main_app, "")
+        return await show_syssettings_page(main_app, "")
 
     @routes.post("/updcheck_toggle")
     async def toggle_updcheck(request: web.Request) -> web.Response:  # type: ignore
@@ -277,7 +279,36 @@ class ConfigTestingServer:
         main_app = request.app["parent"]
         api_srv = main_app["api_srv"]
         api_srv._upd_check = not api_srv._upd_check
-        return await show_router_syspage(main_app, "")
+        return await show_syssettings_page(main_app, "")
+
+    @routes.post("/rd_fwdtable")
+    async def readout_fwdtable(request: web.Request) -> web.Response:  # type: ignore
+        inspect_header(request)
+        if client_not_authorized(request):
+            return show_not_authorized(request.app)
+        async with web_lock:
+            main_app = request.app["parent"]
+            api_srv = main_app["api_srv"]
+            rtr = api_srv.routers[0]
+            await api_srv.block_network_if(rtr._id, True)
+            await api_srv.set_server_mode(rtr._id)
+            main_app.logger.info("Forward table will be downloaded")
+            fwd_table = await rtr.get_forward_table()
+            # upload result...
+            file_name = "forward_table.txt"
+            str_data = ""
+            for byt in fwd_table:
+                str_data += f"{byt};"
+                if str_data.count(";") % 4 == 0:
+                    str_data += "\n"
+            await api_srv.block_network_if(rtr._id, False)
+            await api_srv.set_operate_mode(rtr._id)
+            return web.Response(
+                headers=MultiDict(
+                    {"Content-Disposition": f"Attachment; filename = {file_name}"}
+                ),
+                body=str_data,
+            )
 
 
 def show_diag_page(app, popup_msg="") -> web.Response:
@@ -450,7 +481,7 @@ async def show_router_testpage(main_app, popup_msg="") -> web.Response:
         "router.jpg",
         def_filename,
     )
-    page = adjust_settings_button(page, "rtr_tst", f"{0}")
+    page = adjust_settings_button(page, "", f"{0}")
     if len(popup_msg):
         page = page.replace(
             '<h3 id="resp_popup_txt">response_message</h3>',
@@ -562,31 +593,34 @@ async def show_comm_testpage(main_app, mod_addrs: list[int] = []) -> web.Respons
     return web.Response(text=page, content_type="text/html")
 
 
-async def show_router_syspage(main_app, popup_msg="") -> web.Response:
+async def show_syssettings_page(main_app, popup_msg="") -> web.Response:
     """Prepare page for router system settings."""
     api_srv = main_app["api_srv"]
     rtr = api_srv.routers[0]
     main_app["settings"] = rtr.settings
     settings = main_app["settings"]
 
-    with open(
-        WEB_FILES_DIR + SETTINGS_TEMPLATE_FILE, mode="r", encoding="utf-8"
-    ) as tplf_id:
-        page = tplf_id.read()
-    mod_image, subtitle = get_module_image(settings.typ)
-    page = (
-        page.replace("ContentTitle", f"Router '{rtr._name}'")
-        .replace("ContentSubtitle", "Systemeinstellungen")
-        .replace("controller.jpg", mod_image)
-        .replace("ModAddress", "0-0")
-        .replace("Einstellungen speichern", "Router bootet")
+    side_menu = main_app["side_menu"]
+    side_menu = activate_side_menu(
+        side_menu, ">Einstellungen<", api_srv.is_offline or api_srv._pc_mode
     )
+    page = get_html("setup.html").replace("<!-- SideMenu -->", side_menu)
+    page = page.replace("<h1>HubTitle", "<h1>Systemeinstellungen")
+    page = page.replace("Overview", "")
 
-    page = hide_button("zurück", page)
-    page = hide_button("weiter", page)
-    page = hide_button("Speichern", page)
-    page = page.replace(">Abbruch<", ">Beenden<")
-    page = page.replace('action="settings/step"', 'action="test/router"')
+    page = page.replace(">Abbruch<", ' style="visibility: hidden;">Abbruch<')
+    page = page.replace(">Übernehmen<", ' style="visibility: hidden;">Übernehmen<')
+    if len(popup_msg):
+        page = page.replace(
+            '<h3 id="resp_popup_txt">response_message</h3>',
+            f'<h3 id="resp_popup_txt">{popup_msg}</h3>',
+        ).replace('id="resp-popup-disabled"', 'id="resp-popup"')
+    page = hide_button("Übertragen", page)
+    page = hide_button("Abbruch", page)
+    page = page.replace(
+        'left: 560px;">Systemkonfiguration<',
+        'left: 560px; visibility: hidden;">Systemkonfiguration<',
+    )
     page = page.replace(
         "reserved_numbers = [];", f"reserved_numbers = {rtr.mod_addrs};"
     )
@@ -598,6 +632,15 @@ async def show_router_syspage(main_app, popup_msg="") -> web.Response:
         indent(7)
         + f'<tr><td><label for="{id_name}">{prompt}</label></td><td></td><td></td>'
         + f'<td><input name="btn_{id_name}" type="submit" id="btn_{id_name}" value="Neustart"/></td></tr>\n'
+    )
+    tbl += indent(6) + "</form>"
+    id_name = "rt_fwdtable"
+    prompt = "Weiterleitungstabelle auslesen"
+    tbl += indent(6) + '<form action="test/rd_fwdtable" method="post">\n'
+    tbl += (
+        indent(7)
+        + f'<tr><td><label for="{id_name}">{prompt}</label></td><td></td><td></td>'
+        + f'<td><input name="btn_{id_name}" type="submit" id="btn_{id_name}" value="Auslesen"/></td></tr>\n'
     )
     tbl += indent(6) + "</form>"
     id_name = "rt_fwdtable"
@@ -655,8 +698,10 @@ async def show_router_syspage(main_app, popup_msg="") -> web.Response:
     tbl += indent(6) + '<form action="test/updcheck_toggle" method="post">\n'
     if main_app["api_srv"]._upd_check:
         btn_str = "Deaktivieren"
+        prompt += " (Aktiv)"
     else:
         btn_str = "Aktivieren"
+        prompt += " (Inaktiv)"
     tbl += (
         indent(7)
         + f'<tr><td><label for="{id_name}">{prompt}</label></td><td></td><td></td>'

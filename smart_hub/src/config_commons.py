@@ -441,7 +441,12 @@ def adjust_side_menu(modules, is_offline: bool, is_install: bool) -> str:
             if not is_offline:
                 side_menu.append('<ul class="level_1">')
                 side_menu.append(
-                    '<li class="submenu modules last"><a href="test/" title="Diagnose und spezielle Einstellungen" class="submenu modules last">Diagnose</a>'
+                    '<li class="submenu modules last"><a href="test/sys_settings" title="Spezielle Systemeinstellungen" class="submenu modules last">Einstellungen</a>'
+                )
+                side_menu.append("</ul></li>\n")
+                side_menu.append('<ul class="level_1">')
+                side_menu.append(
+                    '<li class="submenu modules last"><a href="test/" title="Router- und Modul-Diagnose" class="submenu modules last">Diagnose</a>'
                 )
                 side_menu.append(
                     '\n  <ul class="level_2">\n'
@@ -594,15 +599,6 @@ def adjust_settings_button(page, type, addr: str) -> str:
         page = page.replace("ModSettings", "GtwSettings")
     elif type.lower() == "rtr":
         page = page.replace("ModSettings", "RtrSettings")
-    elif type.lower() == "rtr_tst":
-        page = page.replace("ConfigFile", "RtrTesting")
-        page = page.replace('action="settings/settings"', "action=test/sys_settings")
-        page = page.replace('id="files_button"', 'id="chan_reset_button" type="button"')
-        page = page.replace(">Einstellungen", ">System-Einstellungen")
-        page = page.replace(
-            '">Konfigurationsdatei<',
-            ' visibility: hidden;">Konfigurationsdatei<',
-        )
     elif type == "":
         page = page.replace(">Einstellungen", " disabled >Einstellungen")
         page = page.replace(">Konfigurationsdatei", " disabled >Konfigurationsdatei")

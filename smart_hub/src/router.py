@@ -124,6 +124,7 @@ class HbtnRouter:
     async def get_full_status(self):
         """Load full router status."""
         await self.set_config_mode(True)
+        await self.hdlr.read_forward_table()
         self.status = await self.hdlr.get_rt_full_status()
         self.chan_status = await self.hdlr.get_rt_status()
         self.comm_errors = await self.hdlr.get_mod_errors()
@@ -132,6 +133,13 @@ class HbtnRouter:
         self.logger.debug("Router status initialized")
         modules = await self.hdlr.get_rt_modules()
         return modules
+
+    async def get_forward_table(self):
+        """Get forward table from router."""
+        await self.set_config_mode(True)
+        fwd_tbl = await self.hdlr.read_forward_table()
+        await self.set_config_mode(False)
+        return fwd_tbl
 
     async def get_full_system_status(self):
         """Startup procedure: wait for router #1, get router info, start modules."""

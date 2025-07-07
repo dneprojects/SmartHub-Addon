@@ -471,7 +471,7 @@ class RtHdlr(HdlrBase):
         smr_ptr += item_len + 1
         return item, smr_ptr
 
-    async def get_rtr_descriptions(self) -> bytes:
+    async def get_rtr_descriptions(self) -> None:
         """Get the router descriptions."""
 
         desc = []
@@ -603,6 +603,7 @@ class RtHdlr(HdlrBase):
         """Upload router firmware to router, returns True for success."""
 
         # for old router fw versions new client/server mode command is not available
+        old_mode: int = self.rtr.mode0
         await self.set_mode(0, 75)  # set router into config mode, works always
         fw_buf = self.rtr.fw_upload
         self._last_progress = 0
@@ -695,7 +696,7 @@ class RtHdlr(HdlrBase):
                 self.logger.info("Router restarted")
                 return "ERROR"
             await asyncio.sleep(0.01)
-        self.logger.info("Successfully uploaded and flashed router firmware")
+        await self.set_mode(0, old_mode)  # set router into config mode, works always
         self.rtr.version = b"\x16" + new_fw
         await self.handle_router_cmd_resp(self.rt_id, RT_CMDS.SYSTEM_RESTART)
         self.logger.info("Router restarted")
@@ -717,7 +718,7 @@ class RtHdlr(HdlrBase):
                 RT_STAT_CODES.PKG_OK,
             )
         except Exception as err_msg:
-            self.logger.error("Router update status failed: " + err_msg)
+            self.logger.error(f"Router update status failed:  {err_msg}")
 
     async def log_rtr_fw_update_protocol(
         self, pkg_low: int, pkg_high: int, max_count: int
@@ -805,7 +806,7 @@ class RtHdlr(HdlrBase):
             )
             await self.api_srv.hdlr.send_api_response(stat_msg, code)
         except Exception as err_msg:
-            self.logger.error("Router update status failed: " + err_msg)
+            self.logger.error("Router update status failed: " + str(err_msg))
 
     async def stat_mod_fw_upload_protocol(
         self, pckg: int, no_pkgs: int, code: int
@@ -910,6 +911,39 @@ class RtHdlr(HdlrBase):
                 md_stat = "skipped"
             log_info += f"  Mod {ord(protocol[3 + 3 * mod_rdy_i])}: {md_stat}"
         self.logger.info(log_info)
+
+    async def read_forward_table(self) -> bytes:
+        """Read complete forward table from router"""
+        fwd_table = b""
+        rd_cnt = 0  # read count, starts with 0
+        read_more = True
+        while read_more:
+            await self.handle_router_cmd_resp(
+                self.rt_id, RT_CMDS.RT_FORW_RD_ALL.replace("<cnt>", chr(rd_cnt))
+            )
+            resp_code = self.rt_msg._resp_buffer[4]
+            rd_cnt = self.rt_msg._resp_buffer[5]
+            if resp_code == 2:
+                # No forward table entries, return empty
+                return b""
+            elif resp_code == 4 and rd_cnt == 1:
+                # First and last response, table complete
+                fwd_table += self.rt_msg._resp_msg[3:]
+                read_more = False
+            elif resp_code == 4 and rd_cnt > 1:
+                # Last response, table complete
+                fwd_table += self.rt_msg._resp_msg[1:]
+                read_more = False
+            elif rd_cnt == 1:
+                # First response, read more
+                tbl_len = int.from_bytes(self.rt_msg._resp_msg[1:3], "little")
+                fwd_table = self.rt_msg._resp_msg[3:]
+                read_more = len(fwd_table) < tbl_len * 4
+            else:
+                # Read more
+                fwd_table += self.rt_msg._resp_msg[1:]
+                read_more = len(fwd_table) < tbl_len * 4
+        return fwd_table
 
     async def forward_message(self, src_rt: int, fwd_cmd: bytes) -> bytes:
         """Forward message from other router."""
