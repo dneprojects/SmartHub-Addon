@@ -13,7 +13,7 @@ pyserial:3.5                        BSD License                                 
 pyserial-asyncio:0.6                BSD License                                             Permissive                                                   
 PyYAML:6.0.2                        MIT License                                             Permissive                                                   
 tomli:2.2.1                         MIT License                                             Permissive                                                   
-typing_extensions:4.14.0            Error                                                   Error                                                        
+typing_extensions:4.14.1            Error                                                   Error                                                        
 wcwidth:0.2.13                      MIT License                                             Permissive                                                   
 websockets:15.0.1                   BSD License                                             Permissive                                                   
 yarl:1.20.1                         Apache Software License                                 Permissive

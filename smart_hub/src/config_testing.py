@@ -481,6 +481,13 @@ async def show_router_testpage(main_app, popup_msg="") -> web.Response:
         "router.jpg",
         def_filename,
     )
+    page = page.replace(
+        ">Einstellungen</button>", 'style="visibility: hidden;">Einstellungen</button>'
+    )
+    page = page.replace(
+        '">Konfigurationsdatei<',
+        ' visibility: hidden;">Konfigurationsdatei<',
+    )
     page = adjust_settings_button(page, "", f"{0}")
     if len(popup_msg):
         page = page.replace(
