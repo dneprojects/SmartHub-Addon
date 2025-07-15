@@ -990,10 +990,11 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                         )
                 tbl += indent(8) + "</td>\n"
         else:
+            field_content = tbl_data[ci].name[:maxl].strip().replace('"', "&quot;")
             tbl += (
                 indent(7)
                 + f'<tr><td><label for="{id_name}">{prompt}</label></td><td><input name="data[{ci},0]" '
-                + f'type="text" id="{id_name}" class="desc_input1" maxlength="{maxl}" title="Beschriftung (max. {maxl} Zeichen)"value="{tbl_data[ci].name[:maxl].strip().replace('"', "&quot;")}"></td>'
+                + f'type="text" id="{id_name}" class="desc_input1" maxlength="{maxl}" title="Beschriftung (max. {maxl} Zeichen)" value="{field_content}"></td>'
             )
         if key in ["leds", "buttons", "dir_cmds", "messages"]:
             tbl += (
