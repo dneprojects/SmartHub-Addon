@@ -104,11 +104,6 @@ if (mod_type_sel) {
         });
     }
 }
-window.addEventListener("click", function (event) {
-    if (event.target == file_popup) {
-        openMsgPopup("");
-    };
-});
 function openMsgPopup(url) {
     if (file_popup)
         file_popup.classList.remove("show");

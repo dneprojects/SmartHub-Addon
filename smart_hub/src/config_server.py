@@ -290,7 +290,7 @@ class ConfigServer:
         async with web_lock:
             app = request.app
             data = await request.post()
-            backup_file = data["loc_backup_select"]  # type: ignore
+            backup_file = str(data["loc_backup_select"])  # type: ignore
             with open(backup_file, "r") as file:
                 content_str = file.read()
             content_parts = content_str.split("---\n")
@@ -378,7 +378,7 @@ class ConfigServer:
             rtr = api_srv.routers[0]
             data = await request.post()
             if "mod_type_select" in data.keys():
-                module = rtr.get_module(int(data["mod_type_select"]))
+                module = rtr.get_module(int(data["mod_type_select"]))  # type: ignore
                 with open(module.update_fw_file, "rb") as fid:
                     rtr.fw_upload = fid.read()
                 mod_type = module._typ
@@ -403,7 +403,7 @@ class ConfigServer:
             else:
                 with open(rtr.update_fw_file, "rb") as fid:
                     rtr.fw_upload = fid.read()
-                fw_vers = rtr.fw_upload[-27:-5]
+                fw_vers = rtr.fw_upload[-27:-5].decode("iso8859-1").strip()
                 app.logger.info(f"Firmware file for router {rtr._name} uploaded")
                 return show_update_router(rtr, fw_vers)
 
@@ -606,7 +606,7 @@ class ConfigServer:
                 await asyncio.sleep(1)
                 return web.Response(text="finished", status=200)
         except Exception as err_msg:
-            app.logger.warning("Error handling update status:" + err_msg)
+            app.logger.warning("Error handling update status:" + str(err_msg))
             return web.HTTPNoContent()
 
     @routes.get("/wait_status")
@@ -621,7 +621,7 @@ class ConfigServer:
                 app.logger.debug("Wait lock released")
                 return web.Response(text="finished", status=200)
         except Exception as err_msg:
-            app.logger.warning("Error handling wait status:" + err_msg)
+            app.logger.warning("Error handling wait status:" + str(err_msg))
             return web.HTTPNoContent()
 
     @routes.get(path="/Documentation")

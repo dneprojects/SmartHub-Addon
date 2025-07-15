@@ -57,21 +57,15 @@ if (close_chan_popup_h) {
 }
 if (form_upload) {
     form_upload.addEventListener("submit", function () {
+        file_popup.classList.remove("show");
         openMsgPopup();
     });
 }
-if (file_popup) {
-    file_popup.addEventListener("click", function (event) {
-        if (event.target == file_popup) {
-            openMsgPopup();
-        };
+if (form_download) {
+    form_download.addEventListener("submit", function () {
+        file_popup.classList.remove("show");
     });
 }
-window.addEventListener("click", function (event) {
-    if (event.target == file_popup) {
-        openMsgPopup();
-    };
-});
 function openMsgPopup() {
     file_popup.classList.remove("show");
     chan_popup.classList.remove("show");

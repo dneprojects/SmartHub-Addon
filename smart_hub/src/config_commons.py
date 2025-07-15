@@ -224,8 +224,9 @@ def show_hub_overview(app) -> web.Response:
     local_backup_files = api_srv.get_unique_backup_list()
     opt_str = ""
     for file_date in local_backup_files.keys():
-        opt_str += (
+        opt_str = (
             f'\n<option value="{local_backup_files[file_date]}">{file_date}</option>'
+            + opt_str
         )
     html_str = html_str.replace(
         ">-- Lokales Backup --</option>", ">-- Lokales Backup --</option>" + opt_str

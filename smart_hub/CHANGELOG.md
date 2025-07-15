@@ -1,3 +1,13 @@
+## v2.6.7
+
+### New:
+- Tag-/Nachtumschaltung neu mit Option für identische Einstellungen für alle Tage
+- Neue Firmware für Smart Detect 180-1
+- Kleinere Verbesserungen
+
+### Fix:
+- Tag-/Nachtumschaltung nur Uhrzeit: Umschaltung war disabled
+
 ## v2.6.6
 
 ### New:

@@ -3,6 +3,7 @@ const check_boxes = document.getElementsByClassName("sel_element");
 const settngs_buttons = document.getElementsByName("ModSettings");
 const teach_buttons = document.getElementsByName("TeachNewFinger");
 const aircal_button = document.getElementById("airquality-butt");
+const week_global = document.getElementById("global");
 var del_btn = null;
 for (let i = 0; i < settngs_buttons.length; i++) {
     if (settngs_buttons[i].innerHTML == "entfernen") {
@@ -49,6 +50,11 @@ const new_modid = document.getElementById("new_mod_id");
 const rt_reboot = document.getElementById("btn_rt_reboot");
 const chk_sens_type = document.getElementById("sens_type");
 
+if (week_global != null) {
+    week_global.addEventListener("change", function () {
+        parseDayNightMode()
+    })
+}
 if (new_addr != null) {
     new_addr.addEventListener("change", function () {
         parseNewAddr()
@@ -189,6 +195,28 @@ function parseDayNightMode() {
     document.getElementsByName("data[6,3]")[0].disabled = true;
     document.getElementsByName("data[6,3]")[0].classList.add("disabled");
     for (let day = 0; day < 7; day++) {
+        if (week_global != null && week_global.checked) {
+            if (day < 6) {
+                document.getElementsByName("data[" + String(day) + ",0]")[0].value = document.getElementsByName("data[6,0]")[0].value;
+                document.getElementsByName("data[" + String(day) + ",1]")[0].value = document.getElementsByName("data[6,1]")[0].value;
+                document.getElementsByName("data[" + String(day) + ",2]")[0].value = document.getElementsByName("data[6,2]")[0].value;
+                document.getElementsByName("data[" + String(day) + ",0]")[0].setAttribute("style", "visibility: hidden");
+                document.getElementsByName("data[" + String(day) + ",1]")[0].setAttribute("style", "visibility: hidden");
+                document.getElementsByName("data[" + String(day) + ",2]")[0].setAttribute("style", "visibility: hidden");
+                document.getElementById("row_" + String(day)).setAttribute("style", "visibility: hidden");
+                document.getElementById("label_6").innerHTML = "So.-Sa.";
+            } else {
+                document.getElementById("lx_" + String(day)).setAttribute("style", "margin-top: 4px; color: black;");
+            }
+        }
+        else {
+            document.getElementsByName("data[" + String(day) + ",0]")[0].setAttribute("style", "visibility: visible");
+            document.getElementsByName("data[" + String(day) + ",1]")[0].setAttribute("style", "visibility: visible");
+            document.getElementsByName("data[" + String(day) + ",2]")[0].setAttribute("style", "visibility: visible");
+            document.getElementById("row_" + String(day)).setAttribute("style", "visibility: visible");
+            document.getElementById("label_6").innerHTML = "Sonntag";
+            document.getElementById("lx_" + String(day)).setAttribute("style", "margin-top: 4px; color: black;");
+        }
         sel = document.getElementsByName("data[" + String(day) + ",2]")[0];
         document.getElementsByName("data[" + String(day) + ",0]")[0].disabled = false;
         document.getElementsByName("data[" + String(day) + ",0]")[0].classList.remove("disabled");
@@ -203,6 +231,7 @@ function parseDayNightMode() {
         else if (sel.options[sel.selectedIndex].innerHTML == "nur Zeit") {
             document.getElementsByName("data[" + String(day) + ",1]")[0].disabled = true;
             document.getElementsByName("data[" + String(day) + ",1]")[0].classList.add("disabled");
+            document.getElementById("lx_" + String(day)).setAttribute("style", "margin-top: 4px; color: #D3D3D3;");
         }
         else if (sel.options[sel.selectedIndex].innerHTML == "nur Helligkeit") {
             document.getElementsByName("data[" + String(day) + ",0]")[0].disabled = true;

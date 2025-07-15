@@ -1140,12 +1140,16 @@ class RouterSettings:
             setting["hour"] = self.day_night[ptr]
             setting["minute"] = self.day_night[ptr + 1]
             setting["light"] = self.day_night[ptr + 2]
-            if setting["hour"] == 24:
-                setting["mode"] = -1
-            elif setting["light"] == 0:
-                setting["mode"] = 0
+            setting["mode"] = self.day_night[ptr + 3]
+            if setting["mode"] == 0:
+                setting["mode"] = -1  # disabled
             else:
-                setting["mode"] = self.day_night[ptr + 3]
+                if setting["hour"] == 24:
+                    setting["mode"] = 3  # no time, only light
+                elif setting["light"] == 0:
+                    setting["mode"] = 0  # no light, only time
+                else:
+                    setting["mode"] = self.day_night[ptr + 3]
             setting["module"] = self.day_night[ptr + 4]
             self.day_sched.append(setting)
             ptr += 5
@@ -1162,7 +1166,7 @@ class RouterSettings:
             else:
                 sched = self.night_sched
                 di = day - 7
-            if sched[di]["mode"] != -1:
+            if sched[di]["mode"] != 3:
                 day_night_str += chr(sched[di]["hour"])
             else:
                 day_night_str += chr(24)
@@ -1173,7 +1177,9 @@ class RouterSettings:
                 day_night_str += chr(0)
             if sched[di]["mode"] > 0:
                 day_night_str += chr(sched[di]["mode"])
-            else:
+            elif sched[di]["mode"] == 0:
+                day_night_str += chr(2)  # Uhrzeit hat Prio, Helligkeit inaktiv
+            elif sched[di]["mode"] == -1:
                 day_night_str += chr(0)
             day_night_str += chr(sched[di]["module"])
         self.day_night = day_night_str.encode("iso8859-1")

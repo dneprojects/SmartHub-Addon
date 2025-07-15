@@ -151,7 +151,7 @@ class ConfigSettingsServer:
         lower_point = perc_set < 50
         await module.api_srv.block_network_if(module.rt_id, True)
         resp = await module.hdlr.get_air_quality()
-        curr_aq = resp[0]
+        # curr_aq = resp[0]
         curr_val = resp[1] + 256 * resp[2]
         perc_good = resp[3]
         val_good = resp[4] + 256 * resp[5]
@@ -924,11 +924,25 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                     + f'type="text" id="{id_name}" maxlength="{maxl}" value="{tbl_data[ci].name[:maxl].strip()}"></td>'
                 )
         elif key in ["day_sched", "night_sched"]:
+            all_equal = all(tbl_data[0] == tbl_data[i] for i in range(1, 6))
+            if wd == 50:
+                if all_equal:
+                    sw_checked = "checked"
+                else:
+                    sw_checked = ""
+                tbl += (
+                    indent(7)
+                    + "<tr>"
+                    + indent(8)
+                    + '<td><label for="global">Alle Tage</label></td>'
+                    + indent(8)
+                    + f'<td><input type="checkbox" title="Einheitliche Einstellung für alle Wochentage" name="global" class="daytime" id="global" style="margin-left: 5px; margin-bottom: 2px;" {sw_checked}>\n'
+                )
             tbl += (
                 indent(7)
-                + "<tr>"
+                + f'<tr id="row_{ci}">'
                 + indent(8)
-                + f'<td><label for="{id_name}">{Weekdays[wd]}</label></td>'
+                + f'<td><label  id="label_{ci}" for="{id_name}">{Weekdays[wd]}</label></td>'
                 + indent(8)
                 + f'<td><select title="Auswahl des Umschaltmodus" name="data[{ci},2]" class="daytime" id="{id_name}">\n'
             )
@@ -951,7 +965,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                 + f'<td><input name="data[{ci},0]" '
                 + f'type="time" title="Uhrzeit" class="daytime" id="{id_name}" maxlength="{maxl}" value="{tbl_data[ci]["hour"]:02}:{tbl_data[ci]["minute"]:02}"></td>'
                 + indent(8)
-                + f'<td><input title="Helligkeitswert" name="data[{ci},1]" type="number" min="0" max="2550" step="10" class="daytime" id="{id_name}" value="{tbl_data[ci]["light"] * 10}">&nbsp;lx</td>'
+                + f'<td style="width: 60px;"><input title="Helligkeitswert" name="data[{ci},1]" type="number" min="10" max="2550" step="10" class="daytime" id="{id_name}" value="{max(tbl_data[ci]["light"] * 10, 10)}"><p id="lx_{ci}" style="margin-top: 4px;">&nbsp;lx</p></td>'
             )
             if entry[0]:
                 tbl += indent(8) + "<td></td>\n"
@@ -979,7 +993,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
             tbl += (
                 indent(7)
                 + f'<tr><td><label for="{id_name}">{prompt}</label></td><td><input name="data[{ci},0]" '
-                + f'type="text" id="{id_name}" class="desc_input1" maxlength="{maxl}" title="Beschriftung (max. {maxl} Zeichen)"value="{tbl_data[ci].name[:maxl].strip()}"></td>'
+                + f'type="text" id="{id_name}" class="desc_input1" maxlength="{maxl}" title="Beschriftung (max. {maxl} Zeichen)"value="{tbl_data[ci].name[:maxl].strip().replace('"', "&quot;")}"></td>'
             )
         if key in ["leds", "buttons", "dir_cmds", "messages"]:
             tbl += (
@@ -1314,7 +1328,7 @@ def parse_response_form(main_app, form_data):
             elem.name = ""  # clear names to get empty entries
 
     for form_key in list(form_data.keys())[:-1]:
-        if form_key[:4] in ["area", "sel_"]:
+        if form_key[:4] in ["area", "sel_", "glob"]:
             pass  # checked, but no delete command; area_sel handled later
         elif form_key == "new_entry":
             # add element
@@ -1551,6 +1565,21 @@ def parse_response_form(main_app, form_data):
                             form_key
                         ][0]
                     case "day_sched" | "night_sched":
+                        if (
+                            "global" in form_data.keys()
+                            and form_data["data[6,2]"][0] == "0"
+                        ):
+                            for day in settings.__getattribute__(key):
+                                # set global light value
+                                day["light"] = 1
+                        if (
+                            "global" in form_data.keys()
+                            and form_data["data[6,2]"][0] == "3"
+                        ):
+                            for day in settings.__getattribute__(key):
+                                # set global time value
+                                day["hour"] = 0
+                                day["minute"] = 0
                         if indices[1] == 3:
                             for day in settings.__getattribute__(key):
                                 day["module"] = int(form_data[form_key][0])
