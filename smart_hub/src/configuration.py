@@ -83,6 +83,9 @@ class ModuleSettings:
         self.buttons = [
             IfDescriptor("", i + 1, 1) for i in range(self.properties["buttons"])
         ]
+        self.buttonslong = [
+            IfDescriptor("", i + 1, 1) for i in range(self.properties["buttonslong"])
+        ]
         self.inputs = [
             IoDescriptor("", i + 1, 1, 0) for i in range(self.properties["inputs"])
         ]
@@ -506,6 +509,11 @@ class ModuleSettings:
                                 self.inputs[arg_code - 10].nmbr = arg_code - 9
                                 if int(line[1]) > 0:
                                     self.inputs[arg_code - 10].area = int(line[1])
+                        elif arg_code in range(101, 109):
+                            # Description of module buttons long
+                            self.buttonslong[arg_code - 101] = IfDescriptor(
+                                text, arg_code - 100, 1
+                            )
                         elif arg_code in range(18, 26):
                             # Description of module LEDs
                             self.leds[arg_code - 17] = IfDescriptor(
@@ -832,6 +840,12 @@ class ModuleSettings:
                 desc += " " * (32 - len(desc))
                 desc = desc[:32]
                 new_list.append(f"\xff\0\xeb{chr(9 + btn.nmbr)}\1\x23\0\xeb" + desc)
+        for btn in self.buttonslong:
+            desc = btn.name
+            if len(desc.strip()) > 0:
+                desc += " " * (32 - len(desc))
+                desc = desc[:32]
+                new_list.append(f"\xff\0\xeb{chr(100 + btn.nmbr)}\1\x23\0\xeb" + desc)
         for led in self.leds:
             if led.nmbr > 0:
                 desc = led.name

@@ -185,6 +185,10 @@ def show_setup_page(app, popup_msg="") -> web.Response:
             'value="cancel" style="visibility: hidden;"',
             'value="cancel" style="width: 140px;"',
         )
+        page = page.replace(
+            'id="config_button" type="submit"',
+            'id="reload_button" type="submit"',
+        )
         page = page.replace("Abbruch", "Neustart")
 
     return web.Response(text=page, content_type="text/html", charset="utf-8")

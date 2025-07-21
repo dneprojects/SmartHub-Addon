@@ -131,7 +131,7 @@ class HbtnModule:
     def get_area_name(self) -> str:
         """Return own area from router."""
         rtr = self.get_rtr()
-        return rtr.get_area_name(self.settings.area_member)
+        return rtr.get_area_name(self.settings.area_member)  # type: ignore
 
     def get_area_member(self, area_name: str) -> int:
         """Return index of area given by name."""
@@ -638,6 +638,7 @@ class HbtnModule:
         type_code = self._typ
         props: dict = {}
         props["buttons"] = 0
+        props["buttonslong"] = 0
         props["inputs"] = 0
         props["inputs_230V"] = 0
         props["inputs_24V"] = 0
@@ -678,10 +679,12 @@ class HbtnModule:
                 props["dir_cmds"] = 25
                 props["vis_cmds"] = 65280
                 props["messages"] = 100
-                if type_code[1] == 3:
+                if type_code[1] >= 3:
                     props["inputs"] = 12  # add 2 dedicated analog inputs
                     props["inputs_24V"] = 8
                     props["inputs_analog"] = 2
+                if type_code[1] == 4:
+                    props["buttonslong"] = 8
             case 10:
                 match type_code[1]:
                     case 1 | 50 | 51:  # relais module
@@ -753,6 +756,7 @@ class HbtnModule:
 
         keys = [
             "buttons",
+            "buttonslong",
             "leds",
             "inputs",
             "outputs",
@@ -785,7 +789,7 @@ class HbtnModule:
         # Instantiate settings and parse descriptions
         self.settings = self.get_settings_def()
         if self.settings.save_desc_file_needed:
-            self.get_rtr().descriptions = dpcopy(self.settings.desc)
+            self.get_rtr().descriptions = dpcopy(self.settings.desc)  # type: ignore
             self.get_rtr().save_descriptions()
         if self.settings.upload_desc_info_needed:
             self.list = await self.settings.set_list()

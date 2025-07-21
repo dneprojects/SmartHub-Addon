@@ -1396,7 +1396,8 @@ input[type="time"].daytime {
    color: #333;
    border: 1px solid #C0372D;
    width: 55px;
-   margin-left: 2px
+   margin-left: 2px;
+   height: 18px;
 }
 
 .disabled {

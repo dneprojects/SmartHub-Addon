@@ -7,10 +7,26 @@ const protoc_butt = document.getElementById("showlogs_button")
 const close_resp_popup_h = document.getElementById("close_resp_popup");
 const close_file_popup_h = document.getElementById("close_file_popup");
 const close_chan_popup_h = document.getElementById("close_chan_popup");
+const upld_button = document.getElementsByName("ModUpload")[0];
+const allInputs = document.querySelectorAll('input');
+var upld_filename = document.getElementById("upld_filename");
+if (allInputs.length == 2 && allInputs[1].type === 'file' && upld_button) {
+    allInputs.forEach(input => {
+        if (input.type === 'file') {
+            upld_filename = input;
+            upld_filename.addEventListener('change', function () {
+                handleUploadButton();
+            });
+        }
+    });
+}
 
 if (document.getElementById("files_button")) {
     files_button.addEventListener("click", function () {
         file_popup.classList.add("show");
+        if (upld_filename) {
+            handleUploadButton();
+        }
     });
 }
 
@@ -71,3 +87,10 @@ function openMsgPopup() {
     chan_popup.classList.remove("show");
     msg_popup.classList.add("show");
 };
+function handleUploadButton() {
+    if (upld_filename.value) {
+        upld_button.disabled = false;
+    } else {
+        upld_button.disabled = true;
+    }
+}

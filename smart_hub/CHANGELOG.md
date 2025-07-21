@@ -1,3 +1,9 @@
+## v2.6.8
+
+### New:
+- Beschriftung langer Tastendruck (nur für SC Touch)
+- Disable von upload-Buttons, wenn keine Datei ausgewählt ist
+
 ## v2.6.7
 
 ### New:

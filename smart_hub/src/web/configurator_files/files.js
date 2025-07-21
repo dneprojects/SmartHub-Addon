@@ -12,6 +12,26 @@ const sys_upload = document.getElementsByName("SysUpload");
 const file_button_l = document.getElementById("file_button_l");
 const sys_upload_l = document.getElementById("sys_upload");
 const wait_msg_popup = document.getElementById("msg_popup");
+const allInputs = document.querySelectorAll('input');
+var rtrfw_filename = document.getElementById("upld_filename");
+var modfw_filename = document.getElementById("upld_filename");
+
+allInputs.forEach(input => {
+    if (input.type === 'file' && input.id === "upd_updwnload") {
+        if (input.accept === ".rbin") {
+            rtrfw_filename = input;
+            rtrfw_filename.addEventListener('change', function () {
+                handleRtrUpdateButton();
+            });
+        } else if (input.accept === ".bin") {
+            modfw_filename = input;
+            modfw_filename.addEventListener('change', function () {
+                handleModUpdateButton();
+            });
+        }
+    }
+});
+
 let intervalId;
 let pending;
 
@@ -28,15 +48,15 @@ if (document.getElementById("form_upload")) {
 
 if (file_button_l) {
     file_button_l.addEventListener("change", function () {
-        handle_local_button();
+        handleLocalButton();
     });
-    handle_local_button();
+    handleLocalButton();
 }
 if (sys_upload_l) {
     sys_upload_l.addEventListener("change", function () {
-        handle_upload_button();
+        handleUploadButton();
     });
-    handle_upload_button();
+    handleUploadButton();
 }
 
 
@@ -92,6 +112,8 @@ form_upload.addEventListener("submit", function () {
 if (updates_butt)
     updates_butt.addEventListener("click", function () {
         updates_pop.classList.add("show");
+        handleRtrUpdateButton();
+        handleModUpdateButton();
     });
 if (close_updates_pop)
     close_updates_pop.addEventListener("click", function () {
@@ -115,7 +137,7 @@ function openMsgPopup(url) {
     }
 
 };
-function handle_local_button() {
+function handleLocalButton() {
     if (file_button_l.selectedIndex)
         bak_restore[0].disabled = false;
     else {
@@ -123,11 +145,27 @@ function handle_local_button() {
     }
 }
 
-function handle_upload_button() {
+function handleUploadButton() {
     if (sys_upload_l.value == "")
         sys_upload[0].disabled = true;
     else {
         sys_upload[0].disabled = false;
+    }
+
+}
+function handleRtrUpdateButton() {
+    if (rtrfw_filename.value == "")
+        sys_upload[1].disabled = true;
+    else {
+        sys_upload[1].disabled = false;
+    }
+
+}
+function handleModUpdateButton() {
+    if (modfw_filename.value == "")
+        sys_upload[2].disabled = true;
+    else {
+        sys_upload[2].disabled = false;
     }
 
 }

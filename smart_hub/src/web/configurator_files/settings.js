@@ -1,9 +1,19 @@
 const save_btn = document.getElementById("config_button_sv");
+const rld_btn = document.getElementById("reload_button");
 const check_boxes = document.getElementsByClassName("sel_element");
 const settngs_buttons = document.getElementsByName("ModSettings");
 const teach_buttons = document.getElementsByName("TeachNewFinger");
 const aircal_button = document.getElementById("airquality-butt");
 const week_global = document.getElementById("global");
+const close_popup = document.getElementById("close_popup");
+var sav_popup = document.getElementById("sav_popup");
+if (sav_popup == null) {
+    sav_popup = document.getElementById("msg_popup");
+}
+var msg_popup = document.getElementById("msg_popup");
+if (msg_popup == null) {
+    msg_popup = document.getElementById("sav_popup");
+}
 var del_btn = null;
 for (let i = 0; i < settngs_buttons.length; i++) {
     if (settngs_buttons[i].innerHTML == "entfernen") {
@@ -133,9 +143,17 @@ function controlDelButton() {
     }
 }
 
+if (rld_btn != null) {
+    rld_btn.addEventListener("click", function () {
+
+        sav_popup.innerHTML = sav_popup.innerHTML.replace("Upload", "Router wird initialisiert,<br>Module werden neu eingelesen...");
+        sav_popup.innerHTML = sav_popup.innerHTML.replace("ContentTitle", "Neustart Router");
+        openMsgPopup();
+    });
+}
 if (save_btn != null) {
     save_btn.addEventListener("click", function () {
-        openMsgPopup();
+        openSavPopup();
     });
 }
 if (rt_reboot != null) {
@@ -150,11 +168,16 @@ if (teach_buttons.length) {
         });
     }
 }
-close_popup.addEventListener("click", function () {
-    teach_popup.classList.remove("show");
-});
+if (close_popup != null) {
+    close_popup.addEventListener("click", function () {
+        teach_popup.classList.remove("show");
+    });
+}
 
 function openMsgPopup() {
+    msg_popup.classList.add("show");
+};
+function openSavPopup() {
     sav_popup.classList.add("show");
 };
 function openTeachPopup() {
@@ -200,22 +223,22 @@ function parseDayNightMode() {
                 document.getElementsByName("data[" + String(day) + ",0]")[0].value = document.getElementsByName("data[6,0]")[0].value;
                 document.getElementsByName("data[" + String(day) + ",1]")[0].value = document.getElementsByName("data[6,1]")[0].value;
                 document.getElementsByName("data[" + String(day) + ",2]")[0].value = document.getElementsByName("data[6,2]")[0].value;
-                document.getElementsByName("data[" + String(day) + ",0]")[0].setAttribute("style", "visibility: hidden");
-                document.getElementsByName("data[" + String(day) + ",1]")[0].setAttribute("style", "visibility: hidden");
-                document.getElementsByName("data[" + String(day) + ",2]")[0].setAttribute("style", "visibility: hidden");
-                document.getElementById("row_" + String(day)).setAttribute("style", "visibility: hidden");
+                document.getElementsByName("data[" + String(day) + ",0]")[0].style.visibility = "hidden";
+                document.getElementsByName("data[" + String(day) + ",1]")[0].style.visibility = "hidden";
+                document.getElementsByName("data[" + String(day) + ",2]")[0].style.visibility = "hidden";
+                document.getElementById("row_" + String(day)).style.visibility = "hidden";
                 document.getElementById("label_6").innerHTML = "So.-Sa.";
             } else {
-                document.getElementById("lx_" + String(day)).setAttribute("style", "margin-top: 4px; color: black;");
+                document.getElementById("lx_" + String(day)).style.color = "black";
             }
         }
         else {
-            document.getElementsByName("data[" + String(day) + ",0]")[0].setAttribute("style", "visibility: visible");
-            document.getElementsByName("data[" + String(day) + ",1]")[0].setAttribute("style", "visibility: visible");
-            document.getElementsByName("data[" + String(day) + ",2]")[0].setAttribute("style", "visibility: visible");
-            document.getElementById("row_" + String(day)).setAttribute("style", "visibility: visible");
+            document.getElementsByName("data[" + String(day) + ",0]")[0].style.visibility = "visible";
+            document.getElementsByName("data[" + String(day) + ",1]")[0].style.visibility = "visible";
+            document.getElementsByName("data[" + String(day) + ",2]")[0].style.visibility = "visible";
+            document.getElementById("row_" + String(day)).style.visibility = "visible";
             document.getElementById("label_6").innerHTML = "Sonntag";
-            document.getElementById("lx_" + String(day)).setAttribute("style", "margin-top: 4px; color: black;");
+            document.getElementById("lx_" + String(day)).style.color = "black";
         }
         sel = document.getElementsByName("data[" + String(day) + ",2]")[0];
         document.getElementsByName("data[" + String(day) + ",0]")[0].disabled = false;
@@ -231,7 +254,7 @@ function parseDayNightMode() {
         else if (sel.options[sel.selectedIndex].innerHTML == "nur Zeit") {
             document.getElementsByName("data[" + String(day) + ",1]")[0].disabled = true;
             document.getElementsByName("data[" + String(day) + ",1]")[0].classList.add("disabled");
-            document.getElementById("lx_" + String(day)).setAttribute("style", "margin-top: 4px; color: #D3D3D3;");
+            document.getElementById("lx_" + String(day)).style.color = "hsl(0, 0%, 70%);";
         }
         else if (sel.options[sel.selectedIndex].innerHTML == "nur Helligkeit") {
             document.getElementsByName("data[" + String(day) + ",0]")[0].disabled = true;

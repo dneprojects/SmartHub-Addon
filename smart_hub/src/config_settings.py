@@ -151,7 +151,7 @@ class ConfigSettingsServer:
         lower_point = perc_set < 50
         await module.api_srv.block_network_if(module.rt_id, True)
         resp = await module.hdlr.get_air_quality()
-        # curr_aq = resp[0]
+        curr_aq = resp[0]
         curr_val = resp[1] + 256 * resp[2]
         perc_good = resp[3]
         val_good = resp[4] + 256 * resp[5]
@@ -904,6 +904,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
         if key in [
             "leds",
             "buttons",
+            "buttonslong",
             "dir_cmds",
             "messages",
         ]:
@@ -996,7 +997,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                 + f'<tr><td><label for="{id_name}">{prompt}</label></td><td><input name="data[{ci},0]" '
                 + f'type="text" id="{id_name}" class="desc_input1" maxlength="{maxl}" title="Beschriftung (max. {maxl} Zeichen)" value="{field_content}"></td>'
             )
-        if key in ["leds", "buttons", "dir_cmds", "messages"]:
+        if key in ["leds", "buttons", "buttonslong", "dir_cmds", "messages"]:
             tbl += (
                 f'<td><input name="data[{ci},1]" type="text" id="{id_name}" class="desc_input2" maxlength="14" '
                 + f'title="2. Zeile (max. 14 Zeichen)" value="{tbl_data[ci].name[18:].strip()}"></td>'
@@ -1536,7 +1537,7 @@ def parse_response_form(main_app, form_data):
                                 settings.covers[c_idx].type = abs(
                                     settings.covers[c_idx].type
                                 ) * (-1)
-                    case "leds" | "buttons" | "dir_cmds" | "messages":
+                    case "leds" | "buttons" | "buttonslong" | "dir_cmds" | "messages":
                         if indices[1] == 0:
                             # use only first part for parsing and look for second
                             if f"data[{indices[0]},1]" in form_data.keys():
@@ -1585,9 +1586,15 @@ def parse_response_form(main_app, form_data):
                             for day in settings.__getattribute__(key):
                                 day["module"] = int(form_data[form_key][0])
                         elif indices[1] == 2:
-                            settings.__getattribute__(key)[indices[0]]["mode"] = int(
-                                form_data[form_key][0]
-                            )
+                            mode = int(form_data[form_key][0])
+                            settings.__getattribute__(key)[indices[0]]["mode"] = mode
+                            if mode == 0:
+                                # set global light value
+                                settings.__getattribute__(key)[indices[0]]["light"] = 1
+                            elif mode == 3:
+                                # set global time value
+                                settings.__getattribute__(key)[indices[0]]["hour"] = 0
+                                settings.__getattribute__(key)[indices[0]]["minute"] = 0
                         elif indices[1] == 1:
                             settings.__getattribute__(key)[indices[0]]["light"] = int(
                                 int(form_data[form_key][0]) / 10
@@ -1627,6 +1634,9 @@ def get_property_kind(main_app, step) -> tuple[str, str, str]:
     match key:
         case "buttons":
             header = "Einstellungen Tasterbeschriftung"
+            prompt = "Taste"
+        case "buttonslong":
+            header = "Einstellungen Tastendruck lang"
             prompt = "Taste"
         case "leds":
             header = "Einstellungen LED-Beschriftung"
