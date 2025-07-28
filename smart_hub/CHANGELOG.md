@@ -1,4 +1,9 @@
+## v2.6.9
+
+### New:
+
 ## v2.6.8
+- Erweiterter Versionsvergleich für Firmware-Dateien
 
 ### New:
 - Beschriftung langer Tastendruck (nur für SC Touch)

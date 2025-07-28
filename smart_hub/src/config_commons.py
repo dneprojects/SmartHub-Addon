@@ -290,11 +290,44 @@ def show_update_router(rtr, new_fw: str) -> web.Response:
 
 def is_outdated(cur_fw: str, new_fw: str, logger) -> bool:
     """Compare two firmware strings and return update status."""
+    if cur_fw == new_fw:
+        return False
+    if cur_fw[-8] != " ":
+        cur_fw = cur_fw[:-8] + " " + cur_fw[-7:]
+    if new_fw[-8] != " ":
+        new_fw = new_fw[:-8] + " " + new_fw[-7:]
     try:
         cur_fw_fields = cur_fw.strip().split()
+        if len(cur_fw_fields) < 4:
+            logger.warning(f"Invalid current firmware format: {cur_fw}")
+            return False
+        if len(cur_fw_fields) > 4:
+            logger.warning(f"Invalid current firmware format: {cur_fw}")
+            return False
         new_fw_fields = new_fw.strip().split()
-        # cur_vers = float(cur_fw_fields[-2][1:])
-        # new_vers = float(new_fw_fields[-2][1:])
+        try:
+            cur_vers = float(cur_fw_fields[1][1:])
+            new_vers = float(new_fw_fields[1][1:])
+            try:
+                if cur_fw_fields[2][0] in "rR":
+                    cur_fw_fields[2] = cur_fw_fields[2][1:]
+                if new_fw_fields[2][0] in "rR":
+                    new_fw_fields[2] = new_fw_fields[2][1:]
+                cur_rev = int(cur_fw_fields[2], 16)
+                cur_vers = float(f"{cur_vers}" + f"{cur_rev:03d}")
+                new_rev = int(new_fw_fields[2], 16)
+                new_vers = float(f"{new_vers}" + f"{new_rev:03d}")
+            except ValueError:
+                logger.warning(
+                    f"Invalid firmware revision format: cur_fw='{cur_fw_fields[2]}', new_fw='{new_fw_fields[2]}'"
+                )
+        except ValueError:
+            logger.info(
+                f"Invalid firmware version format: cur_fw='{cur_fw_fields[1][1:]}', new_fw='{new_fw_fields[1][1:]}'"
+            )
+            cur_vers = 1.0
+            new_vers = 1.0
+
         cur_date = cur_fw_fields[-1]
         new_date = new_fw_fields[-1]
         cur_year = cur_date.split("/")[1][:4]
@@ -305,20 +338,13 @@ def is_outdated(cur_fw: str, new_fw: str, logger) -> bool:
             return True
         if (int(new_year) == int(cur_year)) and (int(new_month) > int(cur_month)):
             return True
-        # if (
-        #     (int(new_year) == int(cur_year))
-        #     and (int(new_month) == int(cur_month))
-        #     and new_vers > cur_vers
-        # ):
-        #     return True
         if (
             (int(new_year) == int(cur_year))
             and (int(new_month) == int(cur_month))
-            and (len(new_date.split("/")[1]) > 4)
+            and new_vers > cur_vers
         ):
             return True
-        # if (new_date == cur_date) and ():
-        #     return True
+
         return False
     except Exception as err_msg:
         logger.warning(f"Error checking versions: {err_msg}")

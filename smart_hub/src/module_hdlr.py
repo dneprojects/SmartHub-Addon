@@ -196,14 +196,12 @@ class ModHdlr(HdlrBase):
                 l_cnt += l_p
             elif resp_flg == 250:
                 self.logger.debug(
-                    f"List upload (SMC) returned unexpected flag, repeat flag 6 or 7: Count {resp_cnt} Flag {resp_flg}"
+                    f"List upload (SMC) returned flag 250, repeat flag 6: Count {resp_cnt} Flag {resp_flg}"
                 )
-                if not flg_250:
-                    flg = chr(6)  # first time: retry with flag 6
-                    flg_250 = True
-                else:
-                    flg = chr(7)  # retry with flag 7
-                    flg_250 = False
+                flg = chr(6)  # first time: retry with flag 6
+                l_cnt = 0
+                flg = chr(6)
+                cnt = 1
             elif resp_flg == 255:
                 self.logger.error(
                     f"List upload (SMC) returned error flag: Count {resp_cnt} Flag {resp_flg}"
