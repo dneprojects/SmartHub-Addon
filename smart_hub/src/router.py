@@ -297,6 +297,8 @@ class HbtnRouter:
             if self.api_srv._opr_mode:
                 self.logger.error("Not in Srv mode when switching to config mode!")
                 await self.api_srv.set_server_mode(self._id)
+        else:
+            await self.reset_config_mode()
         return
 
     async def reset_config_mode(self) -> None:

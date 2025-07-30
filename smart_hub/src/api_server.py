@@ -254,6 +254,7 @@ class ApiServer:
             else:
                 self.logger.info("-- Switched to Operate mode")
             self._opr_mode = True
+            self.routers[0]._in_config_mode = False
             await asyncio.sleep(0.1)
             return self._opr_mode
         if self._opr_mode:
@@ -271,6 +272,7 @@ class ApiServer:
         # if self.hdlr.rt_msg._resp_code == 133:
         self.logger.info("-- Switched to Operate mode")
         self._opr_mode = True
+        self.routers[0]._in_config_mode = False
         # Start event handler
         await self.evnt_srv.start()
         await asyncio.sleep(0.1)
@@ -333,6 +335,7 @@ class ApiServer:
         await self.hdlr.handle_router_cmd(rt_no, RT_CMDS.SET_SRV_MODE)
         await self.evnt_srv.stop()
         self._opr_mode = False
+        self.routers[0]._in_config_mode = True
         await asyncio.sleep(1)
         await self.ensure_empty_response_buf()
         if silent:
