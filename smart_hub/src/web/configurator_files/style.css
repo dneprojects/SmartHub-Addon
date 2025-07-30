@@ -1083,11 +1083,12 @@ input#send:hover {
    /*   cursor:crosshair;*/
 }
 
-input#rtr_timeout, input#new_mod_id, input#new_mod_ch, input#chan_reset, input#reset_ch, input#cov_autostop_cnt {
+input#rtr_timeout, input#new_mod_id, input#new_mod_ch, input#chan_reset, input#reset_ch, input#cov_autostop_cnt, #new_mod_ch {
    width: 50px;
+   margin-left: 0px;
 }
-#btn_rtr_timeout, #btn_new_mod_id, #btn_chan_reset, #btn_rt_reboot,  
-#btn_rt_fwdtable, #btn_cov_autostop_cnt, #btn_updcheck_toggle {
+#btn_rtr_timeout, #btn_new_mod_id, #btn_chan_reset, #btn_rt_reboot,
+#btn_rt_fwdtable, #btn_cov_autostop_cnt, #btn_updcheck_toggle, #btn_turnoff_config {
    width: 80px;
    height: 22px;
 }

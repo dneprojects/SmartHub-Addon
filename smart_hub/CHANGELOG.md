@@ -1,9 +1,14 @@
+## v2.7.0
+
+### New:
+- Erweiterte Einstellungen im Installationsbereich
+
 ## v2.6.9
 
 ### New:
+- Erweiterter Versionsvergleich für Firmware-Dateien
 
 ## v2.6.8
-- Erweiterter Versionsvergleich für Firmware-Dateien
 
 ### New:
 - Beschriftung langer Tastendruck (nur für SC Touch)

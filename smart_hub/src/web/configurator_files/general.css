@@ -299,7 +299,8 @@ img {
     #btn_rt_reboot, 
     #btn_rt_fwdtable,
     #btn_cov_autostop_cnt,
-    #btn_updcheck_toggle {
+    #btn_updcheck_toggle,
+    #btn_turnoff_config {
         width: 60px;
         font-size: 90%;
     }
