@@ -1046,7 +1046,7 @@ class RouterSettings:
         self.logger = logging.getLogger(__name__)
         self.channels = rtr.channels
         self.timeout = rtr.timeout[0] * 10
-        self.cov_autostop_cnt = 1
+        self.cov_autostop_del = 5
         self.mode_dependencies = rtr.mode_dependencies[1:]
         self.user_modes = rtr.user_modes
         self.serial = rtr.serial
@@ -1123,8 +1123,8 @@ class RouterSettings:
             elif desc.type == 5:  # FF 08: alarm commands
                 pass
             elif desc.type == 6:  # FF 0B: cover autostop
-                self.cov_autostop_cnt = desc.nmbr
-                rtr.cov_autostop_cnt = desc.nmbr
+                self.cov_autostop_del = desc.nmbr
+                rtr.cov_autostop_del = desc.nmbr
         if len(self.groups) == 0:
             self.groups.append(IfDescriptor("general", 0, 0))
         if len(self.areas) == 0:
@@ -1141,8 +1141,8 @@ class RouterSettings:
             desc.append(IfDescriptor(flg.name, flg.nmbr, 3))
         for cmd in self.coll_cmds:
             desc.append(IfDescriptor(cmd.name, cmd.nmbr, 4))
-        desc.append(IfDescriptor("Cover autostop", self.cov_autostop_cnt, 6))
-        return desc, self.cov_autostop_cnt
+        desc.append(IfDescriptor("Cover autostop", self.cov_autostop_del, 6))
+        return desc, self.cov_autostop_del
 
     def get_day_night(self) -> None:
         """Prepare day and night table."""

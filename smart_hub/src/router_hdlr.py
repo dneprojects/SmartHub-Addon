@@ -525,7 +525,7 @@ class RtHdlr(HdlrBase):
     async def send_rtr_descriptions(self) -> bool:
         """Store descriptions into router."""
 
-        await self.api_srv.set_server_mode(1, True)
+        await self.api_srv.block_network_if(self.rt_id, True)
         max_reps = 5
         rep_cnt = 0
         resp_cnt = 0xFFF0  # unknow flag for cnt 0
@@ -587,7 +587,7 @@ class RtHdlr(HdlrBase):
         self.logger.info(
             f"Description upload (router) terminated: Count {desc_cnt} Flag {resp_cnt}"
         )
-        await self.api_srv.set_operate_mode(1, True)
+        await self.api_srv.block_network_if(self.rt_id, False)
         return False
 
     async def restart_system(self) -> None:

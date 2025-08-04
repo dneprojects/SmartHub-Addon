@@ -28,7 +28,7 @@ from api_server import ApiServer, ApiServerMin
 from config_server import ConfigServer
 from query_server import QueryServer
 
-flash_only = False
+flash_only = False  # Set to True to run without router initialization, for directly enter to flash mode
 
 
 def remove_ctrl_chars(in_str: str) -> str:
@@ -55,6 +55,7 @@ class SmartHub:
         self.lan_mac: str = ""
         self.wlan_mac: str = ""
         self.curr_mac: str = ""
+        self.flash_only: bool = False
         self.info = self.get_info()
         self.start_datetime = datetime.now().strftime("%d.%m.%Y, %H:%M")
         self.get_macs()

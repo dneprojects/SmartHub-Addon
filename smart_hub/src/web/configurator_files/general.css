@@ -298,7 +298,7 @@ img {
     #btn_chan_reset, 
     #btn_rt_reboot, 
     #btn_rt_fwdtable,
-    #btn_cov_autostop_cnt,
+    #btn_cov_autostop_del,
     #btn_updcheck_toggle,
     #btn_turnoff_config {
         width: 60px;

@@ -185,9 +185,9 @@ class ConfigTestingServer:
         main_app = request.app["parent"]
         api_srv = main_app["api_srv"]
         rtr = api_srv.routers[0]
-        c_cnt = int(data["cov_autostop_cnt"])  # type: ignore
-        rtr.settings.cov_autostop_cnt = c_cnt
-        rtr.cov_autostop_cnt = c_cnt
+        c_cnt = int(data["cov_autostop_del"])  # type: ignore
+        rtr.settings.cov_autostop_del = c_cnt
+        rtr.cov_autostop_del = c_cnt
         await rtr.set_descriptions(rtr.settings)
         return await show_syssettings_page(main_app, "")
 
@@ -721,13 +721,13 @@ async def show_syssettings_page(main_app, popup_msg="") -> web.Response:
     tbl += indent(5) + "</tbody></table>\n"
     tbl += indent(4) + "<h3>Weitere Einstellungen</h3>\n"
     tbl += indent(5) + "<table><tbody>\n"
-    id_name = "cov_autostop_cnt"
-    prompt = "Rollladen Autostop-Zähler (0 = inaktiv)"
+    id_name = "cov_autostop_del"
+    prompt = "Rollladen Autostop-Zeit [s] (-1 = inaktiv)"
     tbl += indent(6) + '<form action="test/cov_autostop" method="post">\n'
     tbl += (
         indent(7)
         + f'<tr><td style="width: 230px;"><label for="{id_name}">{prompt}</label></td><td style="width: 55px;"></td>'
-        + f'<td><input name="{id_name}" type="number" min="0" max="10" id="{id_name}" value="{settings.cov_autostop_cnt}"/></td>\n'
+        + f'<td><input name="{id_name}" type="number" min="-1" max="20" id="{id_name}" value="{settings.cov_autostop_del}"/></td>\n'
         + f'<td><input name="btn_{id_name}" type="submit" id="btn_{id_name}" value="Speichern"/></td></tr>\n'
     )
     tbl += indent(6) + "</form>"

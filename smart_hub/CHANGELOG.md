@@ -1,38 +1,43 @@
+## v2.7.1
+
+### New:
+- Cover autostop delay
+
 ## v2.7.0
 
 ### New:
-- Erweiterte Einstellungen im Installationsbereich
+- Advanced settings for installers
 
 ## v2.6.9
 
 ### New:
-- Erweiterter Versionsvergleich für Firmware-Dateien
+- Improved version check for firmware files
 
 ## v2.6.8
 
 ### New:
-- Beschriftung langer Tastendruck (nur für SC Touch)
-- Disable von upload-Buttons, wenn keine Datei ausgewählt ist
+- Description for long button press (only SC Touch)
+- Disable of upload buttons, if no file is chosen
 
 ## v2.6.7
 
 ### New:
-- Tag-/Nachtumschaltung neu mit Option für identische Einstellungen für alle Tage
-- Neue Firmware für Smart Detect 180-1
-- Kleinere Verbesserungen
+- Day-/night switching with option for identical daily entries
+- New firmware for Smart Detect 180-1
+- Other small improvements
 
 ### Fix:
-- Tag-/Nachtumschaltung nur Uhrzeit: Umschaltung war disabled
+- Day-/night switching only time: switching was disabled
 
 ## v2.6.6
 
 ### New:
-- Menu Einstellungen für Installateure mit Auslesen der Weiterleitungstabelle
+- Menu Settings for installers: read-out of forward table
 
 ## v2.6.5
 
 ### New:
-- Option zum Flashen ohne Kompatibilitätsprüfung
+- Option for flashing without compatibility check
 
 ## v2.6.4
 

@@ -55,7 +55,7 @@ class HbtnRouter:
         self.groups: bytes = b"\x50" + b"\0" * 80
         self.mode_dependencies: bytes = b"\0" * 80
         self.mode0 = 0
-        self.cov_autostop_cnt = 1
+        self.cov_autostop_del = 5
         self.user_modes: bytes = b""
         self.serial: bytes = (chr(16) + "0010010824000010").encode("iso8859-1")
         self.day_night: bytes = (
@@ -406,7 +406,7 @@ class HbtnRouter:
                 self.descriptions.append(IfDescriptor(entry_name, entry_no, 1))
             elif content_code == 3071:  # FF 0B: cover autostop count
                 self.descriptions.append(IfDescriptor(entry_name, entry_no, 6))
-                self.cov_autostop_cnt = entry_no
+                self.cov_autostop_del = entry_no
             resp = resp[line_len:]
 
     def set_descriptions_to_file(self, descriptions: str = "") -> str:
@@ -619,7 +619,7 @@ class HbtnRouter:
     async def set_descriptions(self, settings: RouterSettings) -> None:
         """Store names into router descriptions."""
         # groups, group names, mode dependencies
-        self.descriptions, self.cov_autostop_cnt = settings.set_rtr_descriptions()
+        self.descriptions, self.cov_autostop_del = settings.set_rtr_descriptions()
         await self.store_descriptions()
 
     async def store_descriptions(self):
