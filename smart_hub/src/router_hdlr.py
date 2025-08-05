@@ -583,6 +583,7 @@ class RtHdlr(HdlrBase):
             self.logger.info(
                 f"Description upload terminated successfully, transferred {no_bytes} bytes of {desc_len} definitions to router"
             )
+            await self.api_srv.block_network_if(self.rt_id, False)
             return True
         self.logger.info(
             f"Description upload (router) terminated: Count {desc_cnt} Flag {resp_cnt}"
