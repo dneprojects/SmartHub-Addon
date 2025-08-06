@@ -38,8 +38,10 @@ class RtHdlr(HdlrBase):
         router_running = False
         while not (router_running):
             ret_msg = await self.get_rt_status(False)
-            router_running = (len(ret_msg) > 40) and (
-                ret_msg[-3] == RT_STAT_CODES.SYS_RUNNING
+            router_running = (
+                (len(ret_msg) > 40)
+                and (self.rt_msg._resp_buffer[3] == 100)
+                and (ret_msg[-3] == RT_STAT_CODES.SYS_RUNNING)
             )
             if not router_running:
                 self.logger.info("Waiting for router booting...")

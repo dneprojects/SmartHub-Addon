@@ -299,12 +299,33 @@ def is_outdated(cur_fw: str, new_fw: str, logger) -> bool:
     try:
         cur_fw_fields = cur_fw.strip().split()
         if len(cur_fw_fields) < 4:
-            logger.warning(f"Invalid current firmware format: {cur_fw}")
-            return False
+            if cur_fw_fields[1][0] in "vV" and cur_fw_fields[2][2] == "/":
+                # Handle firmware format with version and date
+                cur_fw_fields = [
+                    cur_fw_fields[0],
+                    cur_fw_fields[1],
+                    "r00",
+                    cur_fw_fields[2],
+                ]
+            else:
+                logger.warning(f"Invalid current firmware format: {cur_fw}")
+                return False
         if len(cur_fw_fields) > 4:
             logger.warning(f"Invalid current firmware format: {cur_fw}")
             return False
         new_fw_fields = new_fw.strip().split()
+        if len(new_fw_fields) < 4:
+            if new_fw_fields[1][0] in "vV" and new_fw_fields[2][2] == "/":
+                # Handle firmware format with version and date
+                new_fw_fields = [
+                    new_fw_fields[0],
+                    new_fw_fields[1],
+                    "r00",
+                    new_fw_fields[2],
+                ]
+            else:
+                logger.warning(f"Invalid new firmware format: {new_fw}")
+                return False
         try:
             cur_vers = float(cur_fw_fields[1][1:])
             new_vers = float(new_fw_fields[1][1:])

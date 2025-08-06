@@ -366,6 +366,15 @@ class ApiServer:
             await self.hdlr.handle_router_cmd(rt_no, RT_CMDS.SET_SRV_MODE)
         else:
             await self.hdlr.handle_router_cmd_resp(rt_no, RT_CMDS.SET_SRV_MODE)
+        while not (
+            (len(self.hdlr.rt_msg._resp_buffer) > 4)
+            and (self.hdlr.rt_msg._resp_buffer[3] == 0x85)
+        ):
+            # Wait for response from router
+            self.logger.debug(
+                f"Waiting for set server mode response: {self.hdlr.rt_msg._resp_buffer}"
+            )
+            await self.hdlr.handle_router_resp(rt_no)
         self._opr_mode = False
         await self.evnt_srv.stop()
         self.logger.debug("Operate mode turned off initially")

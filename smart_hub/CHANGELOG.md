@@ -1,3 +1,9 @@
+## v2.7.2
+
+### New:
+- Improved synchronization with router on startup
+
+
 ## v2.7.1
 
 ### New:
