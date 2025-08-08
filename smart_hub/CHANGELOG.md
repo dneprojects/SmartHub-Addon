@@ -1,3 +1,8 @@
+## v2.7.3
+
+### New:
+- Improved check of module boot status
+
 ## v2.7.2
 
 ### New:

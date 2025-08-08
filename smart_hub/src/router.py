@@ -172,12 +172,14 @@ class HbtnRouter:
                         self.api_srv,
                     )
                 )
-                self.logger.debug(f"   Module {mod_addr} instantiated")
+                self.logger.debug(f"   Module {mod_addr: >2} instantiated")
                 init_msg = await self.modules[-1].initialize()
                 if init_msg == "":
-                    self.logger.info(f"   Module {mod_addr} initialized")
+                    self.logger.info(f"   Module {mod_addr: >2} initialized")
                 else:
-                    self.logger.info(f"   Module {mod_addr} initialized: {init_msg}")
+                    self.logger.info(
+                        f"   Module {mod_addr: >2} initialized: {init_msg}"
+                    )
             except Exception as err_msg:
                 self.logger.error(f"   Failed to setup module {mod_addr}: {err_msg}")
                 self.err_modules.append(self.modules[-1])

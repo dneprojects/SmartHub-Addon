@@ -61,29 +61,34 @@ class RtHdlr(HdlrBase):
             err_mask = self.rtr.mod_boot_status[2 * err + 2]
             mod_boot_errs = ""
             if err_mask & 0x80:
-                mod_boot_errs += " error 128 "
+                mod_boot_errs += " Module not available, removed "
             if err_mask & 0x40:
-                mod_boot_errs += " error 64 "
+                mod_boot_errs += " Error 64 "
             if err_mask & 0x20:
-                mod_boot_errs += " error 32 "
+                mod_boot_errs += " Error 32 "
             if err_mask & 0x10:
-                mod_boot_errs += " error 16 "
+                mod_boot_errs += " Error 16 "
             if err_mask & 0x08:
-                mod_boot_errs += " error 8 "
+                mod_boot_errs += " Error 8 "
             if err_mask & 0x04:
                 mod_boot_errs += " Unknown module type "
             if err_mask & 0x02:
                 mod_boot_errs += " Mirror problems "
             if err_mask & 0x01:
-                mod_boot_errs += " Forward problems"
+                mod_boot_errs += " Forward problems "
             mod_boot_errs = mod_boot_errs.replace("  ", ", ")
             if len(mod_boot_errs) > 0:
                 self.rtr.mod_boot_errors[mod] = mod_boot_errs
         self.rtr.mod_boot_errors = dict(sorted(self.rtr.mod_boot_errors.items()))
         for mod_err in list(self.rtr.mod_boot_errors.keys()):
             self.logger.warning(
-                f"   Boot error with module {mod_err}: {self.rtr.mod_boot_errors[mod_err]}"
+                f"   Boot error with module {mod_err: >2}:{self.rtr.mod_boot_errors[mod_err]}"
             )
+            if "removed" in self.rtr.mod_boot_errors[mod_err]:
+                # remove router module entry from list
+                mod = self.rtr.get_module(mod_err)
+                self.rtr.removed_modules.append(mod)
+                self.rtr.remove_module(mod)
 
     async def set_mode(self, group: int, new_mode):
         """Changes system or group mode to new_mode"""
