@@ -1,3 +1,8 @@
+## v2.7.4
+
+### Fix:
+- Removing unavailable modules in boot phase
+
 ## v2.7.3
 
 ### New:

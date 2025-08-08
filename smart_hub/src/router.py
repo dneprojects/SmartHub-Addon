@@ -39,6 +39,7 @@ class HbtnRouter:
         self.mod_addrs = []
         self.modules = []
         self.err_modules = []
+        self.err1_modules = []
         self.removed_modules = []
         self.hdlr = RtHdlr(self, self.api_srv)
         self.descriptions_file: str = ""
@@ -158,7 +159,9 @@ class HbtnRouter:
 
         self.logger.info("Setting up modules...")
         for m_idx in range(modules[0]):
-            self.mod_addrs.append(modules[m_idx + 1])
+            mod_addr = modules[m_idx + 1]
+            if mod_addr not in self.err1_modules:
+                self.mod_addrs.append(mod_addr)
         self.mod_addrs.sort()
         mods_to_remove = []
         for mod_addr in self.mod_addrs:

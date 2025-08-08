@@ -86,9 +86,7 @@ class RtHdlr(HdlrBase):
             )
             if "removed" in self.rtr.mod_boot_errors[mod_err]:
                 # remove router module entry from list
-                mod = self.rtr.get_module(mod_err)
-                self.rtr.removed_modules.append(mod)
-                self.rtr.remove_module(mod)
+                self.rtr.err1_modules.append(mod_err)
 
     async def set_mode(self, group: int, new_mode):
         """Changes system or group mode to new_mode"""
