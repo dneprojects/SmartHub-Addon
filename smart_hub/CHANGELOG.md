@@ -1,3 +1,9 @@
+## v2.7.5
+
+### New:
+- Router event: changed flag
+
+
 ## v2.7.4
 
 ### Fix:

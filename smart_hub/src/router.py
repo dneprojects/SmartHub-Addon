@@ -446,7 +446,11 @@ class HbtnRouter:
     async def get_descriptions(self) -> None:
         """Load descriptions from router or file."""
         self.descriptions_file = ""
-        if float(self.version.decode("iso8859-1").strip().split()[1][1:]) >= 3.6:
+
+        if (
+            self.version.decode("iso8859-1").strip().split()[1][1:] == "3.5a"
+            or float(self.version.decode("iso8859-1").strip().split()[1][1:]) >= 3.6
+        ):
             # Router is capable to store descriptions
             await self.hdlr.get_rtr_descriptions()
             if len(self.descriptions) < 2:  # == 0:

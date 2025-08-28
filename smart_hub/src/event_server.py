@@ -196,7 +196,7 @@ class EventServer:
 
                 if prefix[3] < 4:
                     self.logger.warning(
-                        f"Operate mode router message too short, length: {prefix[3]-3} bytes"
+                        f"Operate mode router message too short, length: {prefix[3] - 3} bytes"
                     )
                 else:
                     # Read rest of message
@@ -410,7 +410,15 @@ class EventServer:
                     ]
                 case EVENT_IDS.FLG_CHG:
                     m_len += 1
-                    ev_list = [mod_id, HA_EVENTS.FLAG, args[0], args[1]]
+                    flg_no = args[0] + args[1]
+                    if mod_id == 0:
+                        flg_no -= 32
+                    ev_list = [
+                        mod_id,
+                        HA_EVENTS.FLAG,
+                        flg_no,
+                        int(args[0] > args[1]),
+                    ]
                 case EVENT_IDS.LOGIC_CHG:
                     m_len += 1
                     ev_list = [
@@ -585,7 +593,7 @@ class EventServer:
             self._uri = "ws://<ip>:8123/api/websocket".replace("<ip>", self._client_ip)
             self.logger.debug(f"URI: {self._uri}")
             # supervisor_token  "2f428d27e04db95b4c844b451af4858fba585aac82f70ee6259cf8ec1834a00abf6a448f49ee18d3fc162f628ce6f479fe4647c6f8624f88"
-            # token for local docker:    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmYTIzMmRhMDBhZTc0MmNmYTJiY2FiNjM1OGE5MzEzOSIsImlhdCI6MTcyNDMxNzMxNiwiZXhwIjoyMDM5Njc3MzE2fQ.0M83XHd6uspRqBl4Z1IdyM_ynML9M9ctlVx9vSrMGAY"
+            # token for local docker:    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIwZmNlNWMwYzc0OTI0MTliYWYxMWNlNWE2NTg1MzU3NyIsImlhdCI6MTc1NTkwMjY5MiwiZXhwIjoyMDcxMjYyNjkyfQ.TKotT8SR_-N-eqEnumAlv2sG8kJho-SG1utXGLi_2Iw"
             # token for 192.168.178.160: token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI5NGY2ZjMyZjdhYjE0NzAzYmI4MTc5YjZhOTdhYzdjNSIsImlhdCI6MTcxMzYyMjgxNywiZXhwIjoyMDI4OTgyODE3fQ.2iJQuKgpavJOelH_WHEDe06X2XmAmyHB3FlzkDPl4e0"
             # token for SmartCenter 5:   token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmN2UxMGFhNzcyZTE0ZWY0OGFmOTkzNDVlOTIwNTNlNiIsImlhdCI6MTcxMzUxNDM4MSwiZXhwIjoyMDI4ODc0MzgxfQ.9kpjxhElmWAqTY2zwSsTyLSZiJQZkaV5FX8Pyj9j8HQ"
 
@@ -751,7 +759,7 @@ class EventServer:
                 t_wait += 0.1
             if t_wait < t_max:
                 self.logger.debug(
-                    f"EventSrv terminated successfully after {round(t_wait,1)} sec"
+                    f"EventSrv terminated successfully after {round(t_wait, 1)} sec"
                 )
             else:
                 self.ev_srv_task.cancel()

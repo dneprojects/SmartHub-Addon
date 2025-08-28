@@ -327,8 +327,15 @@ def is_outdated(cur_fw: str, new_fw: str, logger) -> bool:
                 logger.warning(f"Invalid new firmware format: {new_fw}")
                 return False
         try:
-            cur_vers = float(cur_fw_fields[1][1:])
-            new_vers = float(new_fw_fields[1][1:])
+            forbidden_chars = set("abcdefABCDEF")
+            if any((c in forbidden_chars) for c in cur_fw_fields[1][1:]):
+                cur_vers = float(cur_fw_fields[1][1])
+            else:
+                cur_vers = float(cur_fw_fields[1][1:])
+            if any((c in forbidden_chars) for c in new_fw_fields[1][1:]):
+                new_vers = float(new_fw_fields[1][1])
+            else:
+                new_vers = float(new_fw_fields[1][1:])
             try:
                 if cur_fw_fields[2][0] in "rR":
                     cur_fw_fields[2] = cur_fw_fields[2][1:]
