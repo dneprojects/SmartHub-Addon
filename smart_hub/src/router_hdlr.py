@@ -933,28 +933,30 @@ class RtHdlr(HdlrBase):
             await self.handle_router_cmd_resp(
                 self.rt_id, RT_CMDS.RT_FORW_RD_ALL.replace("<cnt>", chr(rd_cnt))
             )
-            resp_code = self.rt_msg._resp_buffer[4]
-            rd_cnt = self.rt_msg._resp_buffer[5]
-            if resp_code == 2:
-                # No forward table entries, return empty
-                return b""
-            elif resp_code == 4 and rd_cnt == 1:
-                # First and last response, table complete
-                fwd_table += self.rt_msg._resp_msg[3:]
-                read_more = False
-            elif resp_code == 4 and rd_cnt > 1:
-                # Last response, table complete
-                fwd_table += self.rt_msg._resp_msg[1:]
-                read_more = False
-            elif rd_cnt == 1:
-                # First response, read more
-                tbl_len = int.from_bytes(self.rt_msg._resp_msg[1:3], "little")
-                fwd_table = self.rt_msg._resp_msg[3:]
-                read_more = len(fwd_table) < tbl_len * 4
-            else:
-                # Read more
-                fwd_table += self.rt_msg._resp_msg[1:]
-                read_more = len(fwd_table) < tbl_len * 4
+            if self.rt_msg._resp_buffer != b"\0\0":
+                # if timeout, retry reading
+                resp_code = self.rt_msg._resp_buffer[4]
+                rd_cnt = self.rt_msg._resp_buffer[5]
+                if resp_code == 2:
+                    # No forward table entries, return empty
+                    return b""
+                elif resp_code == 4 and rd_cnt == 1:
+                    # First and last response, table complete
+                    fwd_table += self.rt_msg._resp_msg[3:]
+                    read_more = False
+                elif resp_code == 4 and rd_cnt > 1:
+                    # Last response, table complete
+                    fwd_table += self.rt_msg._resp_msg[1:]
+                    read_more = False
+                elif rd_cnt == 1:
+                    # First response, read more
+                    tbl_len = int.from_bytes(self.rt_msg._resp_msg[1:3], "little")
+                    fwd_table = self.rt_msg._resp_msg[3:]
+                    read_more = len(fwd_table) < tbl_len * 4
+                else:
+                    # Read more
+                    fwd_table += self.rt_msg._resp_msg[1:]
+                    read_more = len(fwd_table) < tbl_len * 4
         return fwd_table
 
     async def forward_message(self, src_rt: int, fwd_cmd: bytes) -> bytes:

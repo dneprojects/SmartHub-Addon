@@ -1,3 +1,9 @@
+## v2.7.6
+
+### Modified
+- Improved stability with router timeouts
+
+
 ## v2.7.5
 
 ### New:

@@ -129,7 +129,7 @@ class HbtnRouter:
     async def get_full_status(self):
         """Load full router status."""
         await self.set_config_mode(True)
-        await self.hdlr.read_forward_table()
+        await self.reinit_forward_table()
         self.status = await self.hdlr.get_rt_full_status()
         self.chan_status = await self.hdlr.get_rt_status()
         self._in_config_mode = self.chan_status[1] == 75
