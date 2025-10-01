@@ -160,8 +160,8 @@ class HbtnRouter:
         self.logger.info("Setting up modules...")
         for m_idx in range(modules[0]):
             mod_addr = modules[m_idx + 1]
-            if mod_addr not in self.err1_modules:
-                self.mod_addrs.append(mod_addr)
+            # if mod_addr not in self.err1_modules:
+            self.mod_addrs.append(mod_addr)
         self.mod_addrs.sort()
         mods_to_remove = []
         for mod_addr in self.mod_addrs:
@@ -184,11 +184,18 @@ class HbtnRouter:
                         f"   Module {mod_addr: >2} initialized: {init_msg}"
                     )
             except Exception as err_msg:
-                self.logger.error(f"   Failed to setup module {mod_addr}: {err_msg}")
+                if mod_addr not in self.err1_modules:
+                    self.logger.error(
+                        f"   Failed to setup module {mod_addr}: {err_msg}"
+                    )
+                    self.logger.warning(f"   Module {mod_addr} removed")
+                else:
+                    self.logger.debug(
+                        f"   Failed to setup module {mod_addr}: {err_msg}"
+                    )
                 self.err_modules.append(self.modules[-1])
                 self.modules.remove(self.modules[-1])
                 mods_to_remove.append(mod_addr)
-                self.logger.warning(f"   Module {mod_addr} removed")
         await self.get_module_comm_status()
         for mod_addr in mods_to_remove:
             self.mod_addrs.remove(mod_addr)

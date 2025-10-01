@@ -5,6 +5,7 @@ from copy import deepcopy as dpcopy
 from const import (
     MODULE_FIRMWARE,
     MODULE_FIRMWARE_NEW,
+    MStatIdx,
     MirrIdx,
     SMGIdx,
     MODULE_CODES,
@@ -174,6 +175,19 @@ class HbtnModule:
         compact_status = b""
         for i0, i1 in CStatBlkIdx:
             compact_status += self.status[i0:i1]
+
+        if self._type in [
+            "Smart Controller XL-1",
+            "Smart Controller XL-2",
+            "Smart Controller XL-2 (LE2)",
+            "Smart Controller Touch",
+            "Smart Controller Mini",
+        ]:
+            compact_status = (
+                compact_status[: MStatIdx.CLIM_MODE]
+                + self.status[MirrIdx.CLIM_SETTINGS].to_bytes(1, "little")
+                + compact_status[MStatIdx.CLIM_MODE + 1 :]
+            )
         return compact_status
 
     def get_module_code(self) -> bytes:

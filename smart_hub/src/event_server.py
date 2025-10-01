@@ -24,6 +24,7 @@ class EVENT_IDS:
     IRDA_LONG = 24
     IRDA_LONG_END = 25
     SYS_ERR = 101
+    MODE_CHG = 137
     BTN_SHORT = 150
     BTN_LONG = 151
     SW_ON = 152
@@ -392,6 +393,9 @@ class EventServer:
                     ev_list = [mod_id, HA_EVENTS.OUTPUT, args[0], 1]
                 case EVENT_IDS.OUT_OFF:
                     ev_list = [mod_id, HA_EVENTS.OUTPUT, args[0], 0]
+                case EVENT_IDS.MODE_CHG:
+                    m_len += 1
+                    ev_list = [0, HA_EVENTS.MODE, args[0], args[1]]
                 case EVENT_IDS.EKEY_FNGR:
                     m_len += 1
                     ev_list = [
@@ -428,7 +432,7 @@ class EventServer:
                         args[1],
                     ]
                 case EVENT_IDS.DIR_CMD:
-                    ev_list = [mod_id, HA_EVENTS.DIR_CMD, args[0], 0]
+                    ev_list = [0, HA_EVENTS.DIR_CMD, args[0], 0]
                 case EVENT_IDS.SYS_ERR:
                     m_len += 1
                     ev_list = [0, HA_EVENTS.SYS_ERR, args[0], args[1]]
@@ -590,10 +594,11 @@ class EventServer:
                 self.logger.info("-- Open websocket to home assistant.")
             self.auth_token = self.get_ident()
             self._client_ip = self.api_srv._client_ip
+            # self._client_ip = "192.168.178.45"  # For local testing only
             self._uri = "ws://<ip>:8123/api/websocket".replace("<ip>", self._client_ip)
             self.logger.debug(f"URI: {self._uri}")
             # supervisor_token  "2f428d27e04db95b4c844b451af4858fba585aac82f70ee6259cf8ec1834a00abf6a448f49ee18d3fc162f628ce6f479fe4647c6f8624f88"
-            # token for local docker:    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIwZmNlNWMwYzc0OTI0MTliYWYxMWNlNWE2NTg1MzU3NyIsImlhdCI6MTc1NTkwMjY5MiwiZXhwIjoyMDcxMjYyNjkyfQ.TKotT8SR_-N-eqEnumAlv2sG8kJho-SG1utXGLi_2Iw"
+            # token for local docker:    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJiYTRkMDhiZDg2ZGM0YjkwODBhOTkyNzg0NjY2OWYyNCIsImlhdCI6MTc1NzQzMDgxNCwiZXhwIjoyMDcyNzkwODE0fQ.b2CPnnRLCNpox_c7cG-oJvCLJ4SIQxUOvYLhDITrRM8"
             # token for 192.168.178.160: token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI5NGY2ZjMyZjdhYjE0NzAzYmI4MTc5YjZhOTdhYzdjNSIsImlhdCI6MTcxMzYyMjgxNywiZXhwIjoyMDI4OTgyODE3fQ.2iJQuKgpavJOelH_WHEDe06X2XmAmyHB3FlzkDPl4e0"
             # token for SmartCenter 5:   token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmN2UxMGFhNzcyZTE0ZWY0OGFmOTkzNDVlOTIwNTNlNiIsImlhdCI6MTcxMzUxNDM4MSwiZXhwIjoyMDI4ODc0MzgxfQ.9kpjxhElmWAqTY2zwSsTyLSZiJQZkaV5FX8Pyj9j8HQ"
 

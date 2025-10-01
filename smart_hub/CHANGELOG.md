@@ -1,3 +1,8 @@
+## v2.7.7
+
+### Modified
+- Added climate mode to compact status
+
 ## v2.7.6
 
 ### Modified

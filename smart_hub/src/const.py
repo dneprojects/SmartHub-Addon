@@ -2,7 +2,7 @@
 
 from typing import Final
 
-SMHUB_VERSION = "2.7.6"
+SMHUB_VERSION = "2.7.7"
 
 OWN_IP = "192.168.178.110"
 ANY_IP = "0.0.0.0"
@@ -515,6 +515,7 @@ class RT_RESP:
 class MStatIdx:
     """Definition of module status index values."""
 
+    # Achtung: Die Werte sind alle um 1 zu hoch,
     BYTE_COUNT = 0  # in compact status included
     ADDR = 1
     MOD_DESC = 2  # low, high
@@ -550,6 +551,7 @@ class MStatIdx:
     BLAD_POS = 41  # 1..8: 41..48
     T_SETP_0 = 49  # low/high
     T_SETP_1 = 51  # low/high
+    CLIM_MODE = 52  # heating/cooling
     RAIN = 53  # General field 3
     Gen_4 = 54
     USER_CNT = 55

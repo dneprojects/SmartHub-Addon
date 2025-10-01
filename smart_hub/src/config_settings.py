@@ -698,6 +698,7 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
         "Smart Controller XL-1",
         "Smart Controller XL-2",
         "Smart Controller XL-2 (LE2)",
+        "Smart Controller Touch",
         "Smart Dimm",
         "Smart Dimm-1",
         "Smart Dimm-2",
@@ -713,6 +714,7 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
         "Smart Controller XL-1",
         "Smart Controller XL-2",
         "Smart Controller XL-2 (LE2)",
+        "Smart Controller Touch",
         "Smart Controller Mini",
         "Smart Sensor",
     ]:
@@ -751,6 +753,7 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
         "Smart Controller XL-1",
         "Smart Controller XL-2",
         "Smart Controller XL-2 (LE2)",
+        "Smart Controller Touch",
         "Smart Controller Mini",
     ]:
         id_name = "temp_1_2"
@@ -778,6 +781,7 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
         "Smart Controller XL-1",
         "Smart Controller XL-2",
         "Smart Controller XL-2 (LE2)",
+        "Smart Controller Touch",
     ]:
         id_name = "supply_prio"
         prompt = "Versorgungspriorität"
@@ -804,6 +808,7 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
         "Smart Controller XL-1",
         "Smart Controller XL-2",
         "Smart Controller XL-2 (LE2)",
+        "Smart Controller Touch",
         "Smart Controller Mini",
     ]:
         id_name = "airquality-val"
