@@ -413,9 +413,14 @@ class ApiServer:
         str_data += rtr.pack_descriptions()
         str_data += separator
         for mod in rtr.modules:
-            settings = mod.get_module_settings()
-            str_data += format_hmd(settings.smg, settings.list)
-            str_data += separator
+            try:
+                settings = mod.get_module_settings()
+                str_data += format_hmd(settings.smg, settings.list)
+                str_data += separator
+            except Exception as err:
+                self.logger.warning(
+                    "Error getting backup data for module %s: %s", mod._name, err
+                )
         return str_data
 
     def get_backup_files(self):
@@ -459,7 +464,8 @@ class ApiServer:
             self._last_check_day = time_now.day
             self.logger.info(f"Saved '{file_name.split('/')[1]}' backup file")
         except Exception as err_msg:
-            self.logger.error(f"Backup failed: {err_msg}")
+            self.logger.warning(f"Backup failed: {err_msg}")
+            return
 
         # clean up
         dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
