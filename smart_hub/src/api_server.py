@@ -459,7 +459,8 @@ class ApiServer:
             self._last_check_day = time_now.day
             self.logger.info(f"Saved '{file_name.split('/')[1]}' backup file")
         except Exception as err_msg:
-            self.logger.error(f"Backup failed: {err_msg}")
+            self.logger.warning(f"Backup failed: {err_msg}")
+            return
 
         # clean up
         dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
