@@ -1,3 +1,16 @@
+## v2.7.9
+
+### New:
+- Added automation to send message to TTS
+
+### Fix:
+- Configurator web server if offline
+
+## v2.7.8
+
+### Fix:
+- Problem with backups
+
 ## v2.7.7
 
 ### Modified

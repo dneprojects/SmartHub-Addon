@@ -769,7 +769,10 @@ def seperate_upload(upload_str: str) -> tuple[bytes, bytes]:
 
 async def send_to_router(app, content: str):
     """Send uploads to module."""
-    rtr = app["api_srv"].routers[0]
+    api_srv = app["api_srv"]
+    if api_srv.is_offline:
+        return
+    rtr = api_srv.routers[0]
     await rtr.api_srv.block_network_if(rtr._id, True)
     try:
         lines = content.split("\n")
@@ -792,7 +795,10 @@ async def send_to_router(app, content: str):
 
 async def send_to_module(app, content: str, mod_addr: int):
     """Send uploads to module."""
-    rtr = app["api_srv"].routers[0]
+    api_srv = app["api_srv"]
+    if api_srv.is_offline:
+        return
+    rtr = api_srv.routers[0]
     module = rtr.get_module(mod_addr)
     if module is None:
         rtr.modules.append(

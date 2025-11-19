@@ -442,16 +442,16 @@ async def main(ev_loop):
                 f"   Initialization of serial connection with {RT_BAUDRATE[bd_rate]} baud succeeded"
             )
             running_online = True
-        if running_online:
+        if True:  # running_online:
             # Instantiate query object
             logger.debug("   Initializing query server")
             sm_hub.q_srv = QueryServer(ev_loop, sm_hub.lan_mac)
             await sm_hub.q_srv.initialize()
             # Instantiate api_server object
-            sm_hub.api_srv = ApiServer(ev_loop, sm_hub, rt_serial)
-        else:
-            # Instantiate api_server object
-            sm_hub.api_srv = ApiServerMin(ev_loop, sm_hub)
+            if running_online:
+                sm_hub.api_srv = ApiServer(ev_loop, sm_hub, rt_serial)
+            else:
+                sm_hub.api_srv = ApiServerMin(ev_loop, sm_hub)
         # Instantiate config server object
         logger.debug("   Initializing config server")
         sm_hub.conf_srv = ConfigServer(sm_hub.api_srv)

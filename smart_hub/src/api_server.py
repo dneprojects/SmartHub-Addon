@@ -533,12 +533,16 @@ class ApiServerMin(ApiServer):
         self._init_mode: bool = True
         self._first_api_cmd: bool = True
         self.is_offline = True  # Always offline
+        self._pc_mode: bool = False
+        self.release_block_next = False
         self.is_testing = False
         self.token = os.getenv("SUPERVISOR_TOKEN")
         if self.token is None:
             self.is_addon: bool = False
         else:
             self.is_addon: bool = True
+        self.ha_version = "0.0.0"
+        self.hbtint_version = "0.0.0"
 
     async def shutdown(self, rt, restart_flg):
         """Terminating all tasks and self."""

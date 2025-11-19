@@ -24,6 +24,7 @@ ActionNames = {
     56: "Meldung setzen",
     57: "Meldung zurücksetzen",
     58: "Meldung auf Zeit",
+    59: "Meldung ansagen",
     64: "Modus setzen",
     91: "Logikeingang setzen",
     92: "Logikeingang rücksetzen",
@@ -361,7 +362,10 @@ class AutomationAction:
                     f"Meldung {self.get_dict_entry('messages', self.action_args[0])}"
                 )
                 if self.action_code == 58:
-                    actn_desc = f"für {self.action_args[1]} Min. setzen"
+                    if self.action_args[1] == 255:
+                        actn_desc = "ansagen"
+                    else:
+                        actn_desc = f"für {self.action_args[1]} Min. setzen"
                 elif self.action_code == 56:
                     actn_desc = "setzen"
                 elif self.action_code == 57:
@@ -602,6 +606,12 @@ class AutomationAction:
                 f'<option value="{SelActCodes["msg"]}" disabled>{self.actions_dict[SelActCodes["msg"]]}',
             )
 
+        if self.automation.settings.typ == b"\x01\x04":  # Smart Controller Touch
+            page = page.replace(
+                '<option value="59" disabled>ansagen<',
+                '<option value="59">ansagen<',
+            )
+
         if len(sel_atm.settings.gsm_messages) > 0:
             opt_str = '<option value="">-- SMS-Meldung wählen --</option>'
             for msg in sel_atm.settings.gsm_messages:
@@ -781,6 +791,9 @@ class AutomationAction:
             self.action_args.append(int(form_data["act_msg"][0]))
             if self.action_code == 58:
                 self.action_args.append(int(form_data["msgset_time"][0]))
+            if self.action_code == 59:
+                self.action_code = 58
+                self.action_args.append(255)
 
         elif self.action_code in ActionsSets[SelActCodes["call"]]:
             self.action_args.append(int(form_data["act_gsm"][0]))

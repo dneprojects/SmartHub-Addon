@@ -626,8 +626,14 @@ function enableOption(elem, opt) {
     }
 }
 function setMsgTime() {
-    if (document.getElementById("msgopt-act").value == 58)
+    if ((document.getElementById("msgopt-act").value == 58) && (document.getElementById("msgset-time").value != 255))
         setElementVisibility("msgset-time", "visible");
+    else if ((document.getElementById("msgopt-act").value == 58) && (document.getElementById("msgset-time").value == 255)) {
+        setElementVisibility("msgset-time", "hidden");
+        document.getElementById("msgopt-act").value = 59;
+    }
     else
         setElementVisibility("msgset-time", "hidden");
+    if (document.getElementById("msgopt-act").value == 59)
+        document.getElementById("msgset-time").value = 1;
 }
