@@ -4,7 +4,6 @@ from aiohttp import web
 from urllib.parse import parse_qs
 from multidict import MultiDict
 import yaml
-from automation import AutomationsSet
 from config_settings import (
     ConfigSettingsServer,
     show_router_overview,
@@ -53,7 +52,6 @@ from const import (
     MirrIdx,
     MOD_CHANGED,
 )
-from configuration import ModuleSettingsLight, ModuleSettings, RouterSettings
 
 routes = web.RouteTableDef()
 root_path = pathlib.Path(__file__).parent
@@ -165,7 +163,8 @@ class ConfigServer:
     async def get_exit(request: web.Request) -> web.Response:  # type: ignore
         inspect_header(request)
         api_srv = request.app["api_srv"]
-        api_srv.sm_hub.tg.create_task(terminate_delayed(api_srv))
+        if api_srv._in_shutdown:
+            api_srv.sm_hub.tg.create_task(terminate_delayed(api_srv))
         return show_exitpage(request.app)
 
     @routes.get("/router")
@@ -339,10 +338,6 @@ class ConfigServer:
                     app.logger.info(
                         f"Module configuration file for module {mod_addr} uploaded"
                     )
-                if app["api_srv"].is_offline:
-                    for mod_addr in app["api_srv"].routers[0].mod_addrs:
-                        module = app["api_srv"].routers[0].get_module(mod_addr)
-                        module.settings.automtns_def = AutomationsSet(module.settings)  # augment with automations after all uploads
                 init_side_menu(app)
                 return show_modules(app)
             elif data["ModUpload"] == "ModAddress":
@@ -775,6 +770,8 @@ def seperate_upload(upload_str: str) -> tuple[bytes, bytes]:
 async def send_to_router(app, content: str):
     """Send uploads to module."""
     api_srv = app["api_srv"]
+    if api_srv.is_offline:
+        return
     rtr = api_srv.routers[0]
     await rtr.api_srv.block_network_if(rtr._id, True)
     try:
@@ -783,18 +780,14 @@ async def send_to_router(app, content: str):
         for byt in lines[0].split(";")[:-1]:
             buf += int.to_bytes(int(byt))
         rtr.smr_upload = buf
-        
         rtr.hdlr.set_rt_full_status()
-        if not api_srv.is_offline:
+        if not app["api_srv"].is_offline:
             await rtr.hdlr.send_rt_full_status()
         rtr.smr_upload = b""
         desc_lines = lines[1:]
         if len(desc_lines) > 0:
             rtr.get_glob_descriptions(rtr.unpack_descriptions(desc_lines))
-            if not api_srv.is_offline:
-                await rtr.store_descriptions()
-        if  "settings" not in rtr.__dir__():
-            rtr.settings = RouterSettings(rtr)
+            await rtr.store_descriptions()
     except Exception as err_msg:
         app.logger.error(f"Error while uploading router settings: {err_msg}")
     await rtr.api_srv.block_network_if(rtr._id, False)
@@ -803,8 +796,8 @@ async def send_to_router(app, content: str):
 async def send_to_module(app, content: str, mod_addr: int):
     """Send uploads to module."""
     api_srv = app["api_srv"]
-    # if api_srv.is_offline:
-    #     return
+    if api_srv.is_offline:
+        return
     rtr = api_srv.routers[0]
     module = rtr.get_module(mod_addr)
     if module is None:
@@ -821,17 +814,15 @@ async def send_to_module(app, content: str, mod_addr: int):
         module.changed = MOD_CHANGED.NEW
     if app["api_srv"].is_offline or module.changed & MOD_CHANGED.NEW:
         module.smg_upload, module.list = seperate_upload(content)
+        module.settings.list = dpcopy(module.list)
         module.calc_SMG_crc(module.smg_upload)
         module.calc_SMC_crc(module.list)
         module._name = module.smg_upload[52 : 52 + 32].decode("iso8859-1").strip()
-        module._serial = module.smg_upload[84 : 84 + 16].decode("iso8859-1").strip()
         module._typ = module.smg_upload[1:3]
         module._type = MODULE_CODES[module._typ.decode("iso8859-1")]
         module.status = b"\0" * MirrIdx.END
         module.build_status(module.smg_upload)
         module.io_properties, module.io_prop_keys = module.get_io_properties()
-        module.settings = ModuleSettingsLight(module)  # augment with automations later
-        module.settings.list = dpcopy(module.list)
         return
 
     module.smg_upload, module.list_upload = seperate_upload(content)

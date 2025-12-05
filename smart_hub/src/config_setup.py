@@ -11,7 +11,6 @@ from config_commons import (
     show_homepage,
     web_lock,
 )
-from configuration import RouterSettings
 from const import CONF_PORT, MODULE_TYPES, MOD_CHANGED
 
 
@@ -51,14 +50,12 @@ class ConfigSetupServer:
         inspect_header(request)
         main_app = request.app["parent"]
         api_srv = main_app["api_srv"]
+        rtr = api_srv.routers[0]
+        if len(rtr.modules) == 0:
+            rtr._name = "NewRouter"
+            rtr.get_router_settings()
         if client_not_authorized(request):
             return show_not_authorized(main_app)
-        rtr = api_srv.routers[0]
-        new_router = False
-        if "settings" not in rtr.__dir__():
-            rtr.settings = RouterSettings(rtr)
-            rtr._name = "NewRouter"
-            new_router = True
         mod_type = int(request.match_info["mod_cat"])
         mod_subtype = int(request.match_info["mod_subtype"])
         mod_typ = (chr(mod_type) + chr(mod_subtype)).encode("iso8859-1")
@@ -68,9 +65,6 @@ class ConfigSetupServer:
         mod_serial = request.query["mod_serial"]
         mod_name = f"NewModule_{len(rtr.modules) + 1}"
         rtr.new_module(rtr_chan, mod_addr, mod_typ, mod_name, mod_serial)
-        await rtr.set_settings(rtr.settings)
-        if new_router:
-            await rtr.set_descriptions(rtr.settings)
         if api_srv.is_offline:
             return show_module_types(main_app)
         else:

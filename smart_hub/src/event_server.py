@@ -594,7 +594,7 @@ class EventServer:
                 self.logger.info("-- Open websocket to home assistant.")
             self.auth_token = self.get_ident()
             self._client_ip = self.api_srv._client_ip
-            # self._client_ip = "192.168.178.204"  # For local testing only
+            # self._client_ip = "192.168.178.45"  # For local testing only
             self._uri = "ws://<ip>:8123/api/websocket".replace("<ip>", self._client_ip)
             self.logger.debug(f"URI: {self._uri}")
             # supervisor_token  "2f428d27e04db95b4c844b451af4858fba585aac82f70ee6259cf8ec1834a00abf6a448f49ee18d3fc162f628ce6f479fe4647c6f8624f88"

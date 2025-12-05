@@ -467,7 +467,7 @@ class RtHdlr(HdlrBase):
             self.rtr.smr_upload, smr_ptr
         )
         self.rtr.name, smr_ptr = self.get_smr_item(self.rtr.smr_upload, smr_ptr)
-        self.rtr._name = self.rtr.name[1:self.rtr.name[1]].decode("iso8859-1").strip()
+        self.rtr._name = self.rtr.name.decode("iso8859-1").strip()
         umd_name1, smr_ptr = self.get_smr_item(self.rtr.smr_upload, smr_ptr)
         umd_name2, smr_ptr = self.get_smr_item(self.rtr.smr_upload, smr_ptr)
         self.rtr.user_modes = umd_name1 + umd_name2

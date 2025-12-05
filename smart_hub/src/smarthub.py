@@ -445,7 +445,7 @@ async def main(ev_loop):
         if True:  # running_online:
             # Instantiate query object
             logger.debug("   Initializing query server")
-            sm_hub.q_srv = QueryServer(ev_loop, sm_hub)
+            sm_hub.q_srv = QueryServer(ev_loop, sm_hub.lan_mac)
             await sm_hub.q_srv.initialize()
             # Instantiate api_server object
             if running_online:
@@ -484,7 +484,6 @@ async def main(ev_loop):
             await sm_hub.conf_srv.prepare()
             sm_hub.tg.create_task(sm_hub.conf_srv.site.start(), name="conf_srv")
             logger.info("Config server running")
-
     except Exception as err_msg:
         logger.error(
             f"Error starting servers, SmartHub already running? Msg: {err_msg}"

@@ -61,7 +61,6 @@ class HbtnModule:
             .decode("iso8859-1")
             .strip()
         )
-        self._serial = self.status[MirrIdx.MOD_SERIAL : MirrIdx.MOD_SERIAL + 16].decode("iso8859-1").strip()
         sw_vers = (
             self.status[MirrIdx.SW_VERSION : MirrIdx.SW_VERSION + 22]
             .decode("iso8859-1")
@@ -114,7 +113,6 @@ class HbtnModule:
         return (
             self.status[MirrIdx.SW_VERSION : MirrIdx.SW_VERSION + 22]
             .decode("iso8859-1")
-            .replace('\00','')
             .strip()
         )
 
