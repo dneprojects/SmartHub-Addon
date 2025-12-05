@@ -54,7 +54,7 @@ class HbtnRouter:
         self.comm_errors = b"\x00\x00\x00"
         self.timeout: bytes = b"\x14"
         self.groups: bytes = b"\x50" + b"\0" * 80
-        self.mode_dependencies: bytes = b"\0" * 80
+        self.mode_dependencies: bytes = b"\x50" + b"\0" * 80
         self.mode0 = 0
         self.cov_autostop_del = 5
         self.user_modes: bytes = b""
@@ -541,40 +541,39 @@ class HbtnRouter:
         """Store settings into router."""
         self.settings = settings
         self.day_night = self.settings.day_night
-        if self.api_srv.is_offline:
-            self._name = settings.name
-            self.name = (chr(len(self._name)) + self._name).encode("iso8859-1")
-            self.user_modes = (
-                b"\n"
-                + (settings.user1_name + " " * (10 - len(settings.user1_name))).encode(
-                    "iso8859-1"
-                )
-                + b"\n"
-                + (settings.user2_name + " " * (10 - len(settings.user2_name))).encode(
-                    "iso8859-1"
-                )
+        await self.set_descriptions(settings)
+        self._name = settings.name
+        self.name = (chr(len(self._name)) + self._name).encode("iso8859-1")
+        self.user_modes = (
+            b"\n"
+            + (settings.user1_name + " " * (10 - len(settings.user1_name))).encode(
+                "iso8859-1"
             )
-            self.mode_dependencies = (
-                chr(len(settings.mode_dependencies)).encode("iso8859-1")
-                + settings.mode_dependencies
+            + b"\n"
+            + (settings.user2_name + " " * (10 - len(settings.user2_name))).encode(
+                "iso8859-1"
             )
-            self.build_smr()
-            settings.smr = self.smr
-        else:
+        )
+        self.mode_dependencies = (
+            chr(len(settings.mode_dependencies)).encode("iso8859-1")
+            + settings.mode_dependencies
+        )
+        self.build_smr()
+        settings.smr = self.smr
+
+        if not self.api_srv.is_offline:
             await self.api_srv.block_network_if(self._id, True)
             await self.hdlr.send_rt_name(settings.name)
             await self.hdlr.send_mode_names(settings.user1_name, settings.user2_name)
             await self.hdlr.send_rt_day_night_changes(self.day_night)
-            await self.hdlr.send_rt_group_deps(settings.mode_dependencies)
+            await self.hdlr.send_rt_group_deps(self.mode_dependencies[1:])
             await self.get_full_status()
             await self.api_srv.block_network_if(self._id, False)
 
     async def reinit_forward_table(self):
         """Reinit forward table."""
-        mod_list = self.mod_addrs
-        for md in mod_list:
-            rt_command = RT_CMDS.START_RT_FORW_MOD.replace("<mod>", chr(md))
-            await self.hdlr.handle_router_cmd_resp(self._id, rt_command)
+        rt_command = RT_CMDS.START_RT_FORW_SYS
+        await self.hdlr.handle_router_cmd_resp(self._id, rt_command)
         return self.hdlr.rt_msg._resp_buffer
 
     async def get_module_comm_status(self, mod_addrs: list[int] = []):
@@ -640,11 +639,15 @@ class HbtnRouter:
 
     async def store_descriptions(self):
         """Store router descriptions to router or file."""
-        if float(self.version.decode("iso8859-1").strip().split()[1][1:]) >= 3.6:
-            await self.hdlr.send_rtr_descriptions()
-        else:
+        if (
+            float(self.version.decode("iso8859-1").strip().split()[1][1:]) < 3.6
+            or self.api_srv.is_offline
+            or self.api_srv._pc_mode
+        ):
             self.descriptions_file = self.set_descriptions_to_file()
             self.save_descriptions_file()
+        else:
+            await self.hdlr.send_rtr_descriptions()
 
     def get_properties(self) -> tuple[dict[str, int], list[str]]:
         """Return number of flags, commands, etc."""
@@ -713,7 +716,9 @@ class HbtnRouter:
         new_module.status = (
             chr(mod_addr)
             + mod_typ.decode("iso8859-1")
-            + "\x00" * (MirrIdx.MOD_SERIAL - 3)
+            + "\x00" * (MirrIdx.MOD_NAME - 3)
+            + mod_name
+            + "\x20" * (32 - len(mod_name))
             + mod_serial
             + "\x00" * (MirrIdx.END - MirrIdx.MOD_SERIAL - 16)
         ).encode("iso8859-1")
@@ -784,7 +789,7 @@ class HbtnRouter:
         rm_list = []
         for m_i in range(len(self.modules)):
             mod = self.modules[m_i]
-            mod_group = old_groups[mod._id - 1]
+            mod_group = old_groups[mod._id]
             if "modid_" + mod._serial in changes_dict.keys():
                 old_id = mod._id
                 new_id = int(changes_dict["modid_" + mod._serial])

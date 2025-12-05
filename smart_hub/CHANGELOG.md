@@ -1,3 +1,13 @@
+## v2.8.1
+
+### New: 
+- Special logging timeout events
+
+## v2.8.0
+
+### Modified:
+- Improved UI for adding items in configurator
+
 ## v2.7.9
 
 ### New:

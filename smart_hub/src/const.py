@@ -2,7 +2,7 @@
 
 from typing import Final
 
-SMHUB_VERSION = "2.7.9"
+SMHUB_VERSION = "2.8.1"
 
 OWN_IP = "192.168.178.110"
 ANY_IP = "0.0.0.0"
@@ -361,7 +361,6 @@ class RT_CMDS:
     SEND_RT_GRPMODE_DEP = "\x2a<rtr>\xff\x66\x01\x89\x66"
     SEND_RT_DAYNIGHT = "\x2a<rtr>\xff\x8c\x53"
     SEND_RT_MODENAM = "\x2a<rtr>\xff\x68\x53<umd>\x01"
-    START_RT_FORW_MOD = "\x2a<rtr>\x09\x44<mod>\x05\xc7\x58\xff"
     START_RT_FORW_SYS = "\x2a<rtr>\x06\x58\x58\xff"
     RT_FORW_SET = "\x2a<rtr>\x0a\x58\x01<mod_src><cmd_src><rt_trg><mod_trg>\xff"
     RT_FORW_DEL_1 = "\x2a<rtr>\x0a\x58\x00<mod_src><cmd_src><rt_trg><mod_trg>\xff"
