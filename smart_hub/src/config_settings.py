@@ -87,8 +87,6 @@ class ConfigSettingsServer:
         inspect_header(request)
         if client_not_authorized(request):
             return show_not_authorized(request.app)
-        if client_not_authorized(request):
-            return show_not_authorized(request.app)
         resp = await request.text()
         form_data = parse_qs(resp)
         settings = request.app["parent"]["settings"]
@@ -804,13 +802,17 @@ def prepare_basic_settings(main_app, mod_addr, mod_type):
             + f'<div id="check_btn_line"><label for="{id_name}_24" style="vertical-align: middle;">24V</label><input type="radio" '
             + f'name="{id_name}" id="{id_name}_24" value="24" {v24_checked}></div></div></td></tr>\n'
         )
-    if settings.type in [
-        "Smart Controller XL-1",
-        "Smart Controller XL-2",
-        "Smart Controller XL-2 (LE2)",
-        "Smart Controller Touch",
-        "Smart Controller Mini",
-    ]:
+    if (
+        settings.type
+        in [
+            "Smart Controller XL-1",
+            "Smart Controller XL-2",
+            "Smart Controller XL-2 (LE2)",
+            "Smart Controller Touch",
+            "Smart Controller Mini",
+        ]
+        and main_app["api_srv"].is_offline is False
+    ):
         id_name = "airquality-val"
         prompt = "Luftqualität [%]"
         tbl += (
@@ -1339,10 +1341,12 @@ def parse_response_form(main_app, form_data):
             pass  # checked, but no delete command; area_sel handled later
         elif form_key == "new_entry":
             # add element
-            if form_data["ModSettings"][0].startswith("next") or form_data[
-                "ModSettings"
-            ][0].startswith("back"):
-                continue  # skip "new_entry" if step buttons pressed
+            if (
+                form_data["ModSettings"][0].startswith("next")
+                or form_data["ModSettings"][0].startswith("back")
+                or form_data["ModSettings"][0].startswith("save")
+            ):
+                continue  # skip "new_entry" if step buttons or save pressed
             entry_found = False
             for elem in settings.__getattribute__(key):
                 if elem.nmbr == int(form_data[form_key][0]):
@@ -1562,9 +1566,13 @@ def parse_response_form(main_app, form_data):
                             grp_nmbr = (
                                 settings.__getattribute__(key)[int(indices[0])].nmbr - 1
                             )
+                            mod_dep = int(form_data[form_key][0])
+                            settings.__getattribute__(key)[
+                                int(indices[0])
+                            ].type = mod_dep
                             settings.mode_dependencies = (
                                 settings.mode_dependencies[:grp_nmbr]
-                                + int.to_bytes(int(form_data[form_key][0]))
+                                + int.to_bytes(mod_dep, length=1, byteorder="big")
                                 + settings.mode_dependencies[grp_nmbr + 1 :]
                             )
                     case "gsm_numbers" | "gsm_messages":

@@ -1,3 +1,4 @@
+from automtn_trigger import SelTrgCodes
 from const import MirrIdx
 
 ActionNames = {
@@ -517,24 +518,34 @@ class AutomationAction:
         page = page.replace('<option value="">-- Aktion wählen --</option>', opt_str)
 
         opt_str = '<option value="">-- Ausgang wählen --</option>'
-        for outp in sel_atm.settings.outputs:
-            opt_str += f'<option value="{outp.nmbr}">{outp.name}</option>\n'
-        page = page.replace('<option value="">-- AcAusgang wählen --</option>', opt_str)
         opt_str = '<option value="">-- Ausgang wählen --</option>'
         for outp in sel_atm.settings.outputs:
-            opt_str += f'<option value="{outp.nmbr}">{outp.name}</option>\n'
+            if len(outp.name.strip()) > 0:
+                opt_str += f'<option value="{outp.nmbr}">{outp.name}</option>\n'
+        page = page.replace('<option value="">-- AcAusgang wählen --</option>', opt_str)
         page = page.replace('<option value="">-- ClAusgang wählen --</option>', opt_str)
+
         opt_str = '<option value="">-- Dimm-Ausgang wählen --</option>'
         for dimm in sel_atm.settings.dimmers:
-            opt_str += f'<option value="{dimm.nmbr}">{dimm.name}</option>'
+            if len(dimm.name.strip()) > 0:
+                opt_str += f'<option value="{dimm.nmbr}">{dimm.name}</option>'
         page = page.replace(
             '<option value="">-- ActDimm-Ausgang wählen --</option>', opt_str
         )
+        if opt_str == '<option value="">-- Dimm-Ausgang wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelActCodes["dimm"]}">{self.actions_dict[SelActCodes["dimm"]]}',
+                f'<option value="{SelActCodes["dimm"]}" disabled>{self.actions_dict[SelActCodes["dimm"]]}',
+            )
+            page = page.replace(
+                f'<option value="{SelTrgCodes["dimm"]}">{self.automation.trigger.triggers_dict[SelTrgCodes["dimm"]]}',
+                f'<option value="{SelTrgCodes["dimm"]}" disabled>{self.automation.trigger.triggers_dict[SelTrgCodes["dimm"]]}',
+            )
 
         opt_str = '<option value="">-- Rollladen/Jalousie wählen --</option>'
         no_covs = 0
         for cov in sel_atm.settings.covers:
-            if abs(cov.type) > 0:
+            if abs(cov.type) > 0 and len(cov.name.strip()) > 0:
                 opt_str += f'<option value="{cov.nmbr}">{cov.name}</option>'
                 no_covs += 1
         if (no_covs == 0) and (SelActCodes["cover"] in self.actions_dict.keys()):
@@ -547,7 +558,8 @@ class AutomationAction:
         )
         opt_str = '<option value="">-- LED wählen --</option>'
         for led in sel_atm.settings.leds:
-            opt_str += f'<option value="{led.nmbr + 16}">{led.name}</option>\n'
+            if led.name != "":
+                opt_str += f'<option value="{led.nmbr + 16}">{led.name}</option>\n'
         page = page.replace('<option value="">-- LED wählen --</option>', opt_str)
 
         opt_str = '<option value="">-- Befehl wählen --</option>'
@@ -556,13 +568,22 @@ class AutomationAction:
         page = page.replace(
             '<option value="">-- AcCKommando wählen --</option>', opt_str
         )
+        if opt_str == '<option value="">-- Befehl wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelActCodes["collcmd"]}">{self.actions_dict[SelActCodes["collcmd"]]}',
+                f'<option value="{SelActCodes["collcmd"]}" disabled>{self.actions_dict[SelActCodes["collcmd"]]}',
+            )
         opt_str = '<option value="">-- Merker wählen --</option>'
         for flg in sel_atm.settings.flags:
             opt_str += f'<option value="{flg.nmbr}">{flg.name}</option>\n'
         for flg in sel_atm.settings.glob_flags:
             opt_str += f'<option value="{flg.nmbr + 32}">{flg.name}</option>\n'
         page = page.replace('<option value="">-- AcMerker wählen --</option>', opt_str)
-
+        if opt_str == '<option value="">-- Merker wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelActCodes["flag"]}">{self.actions_dict[SelActCodes["flag"]]}',
+                f'<option value="{SelActCodes["flag"]}" disabled>{self.actions_dict[SelActCodes["flag"]]}',
+            )
         opt_str = '<option value="">-- Logikeingang wählen --</option>'
         for lgc in sel_atm.settings.logic:
             for lgci in range(lgc.inputs):
@@ -571,6 +592,11 @@ class AutomationAction:
         page = page.replace(
             '<option value="">-- Logikeingang wählen --</option>', opt_str
         )
+        if opt_str == '<option value="">-- Logikeingang wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelActCodes["logic"]}">{self.actions_dict[SelActCodes["logic"]]}',
+                f'<option value="{SelActCodes["logic"]}" disabled>{self.actions_dict[SelActCodes["logic"]]}',
+            )
 
         opt_str = '<option value="">-- Zähler wählen --</option>'
         max_cnt = []

@@ -64,7 +64,6 @@ class ApiServer:
         self.is_offline: bool = False
         self._test_mode = False
         self._pc_mode: bool = False
-        self._in_shutdown = False
         self.token = os.getenv("SUPERVISOR_TOKEN")
         self.is_addon: bool = self.sm_hub.is_addon
         self.release_block_next = False  # Set if middleware should release block next

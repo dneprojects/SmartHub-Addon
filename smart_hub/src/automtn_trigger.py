@@ -806,6 +806,11 @@ class AutomationTrigger:
                     f'<option value="{inp.nmbr + no_buttons}">{inp.name}</option>\n'
                 )
         page = page.replace('<option value="">-- Taster wählen --</option>', opt_str)
+        if opt_str == '<option value="">-- Taster wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelTrgCodes["button"]}">',
+                f'<option value="{SelTrgCodes["button"]}" disabled>',
+            )
 
         opt_str = '<option value="">-- Schalter wählen --</option>'
         no_switches = 0
@@ -818,8 +823,8 @@ class AutomationTrigger:
         page = page.replace('<option value="">-- Schalter wählen --</option>', opt_str)
         if no_switches == 0:
             page = page.replace(
-                '<select name="trigger_switch"',
-                '<select name="trigger_switch" disabled',
+                f'<option value="{SelTrgCodes["switch"]}">',
+                f'<option value="{SelTrgCodes["switch"]}" disabled>',
             )
 
         opt_str = '<option value="">-- Ausgang oder LED wählen --</option>'
@@ -844,6 +849,15 @@ class AutomationTrigger:
         page = page.replace(
             '<option value="">-- Dimm-Ausgang wählen --</option>', opt_str
         )
+        if opt_str == '<option value="">-- Dimm-Ausgang wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelTrgCodes["dimmval"]}">',
+                f'<option value="{SelTrgCodes["dimmval"]}" disabled>',
+            )
+            # page = page.replace(
+            #     f'<option value="{SelTrgCodes["dimm"]}">',
+            #     f'<option value="{SelTrgCodes["dimm"]}" disabled>',
+            # )
         opt_str = '<option value="">-- Rolladen/Jalousie wählen --</option>'
         for cov in self.settings.covers:
             if len(cov.name.strip()) > 0:
@@ -866,6 +880,11 @@ class AutomationTrigger:
         page = page.replace(
             '<option value="">-- Logikfunktion wählen --</option>', opt_str
         )
+        if opt_str == '<option value="">-- Logikfunktion wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelTrgCodes["logic"]}">',
+                f'<option value="{SelTrgCodes["logic"]}" disabled>',
+            )
 
         opt_str = '<option value="">-- Modus wählen --</option>'
         md_lst = self.get_modes()
@@ -893,6 +912,11 @@ class AutomationTrigger:
             else:
                 opt_str += f'<option value="{flg.nmbr + 32}">{flg.name}</option>\n'
         page = page.replace('<option value="">-- TrMerker wählen --</option>', opt_str)
+        if opt_str == '<option value="">-- Merker wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelTrgCodes["flag"]}">',
+                f'<option value="{SelTrgCodes["flag"]}" disabled>',
+            )
         if self.event_code == 6:
             if self.event_arg1 > self.event_arg2:
                 page = page.replace(
@@ -924,6 +948,11 @@ class AutomationTrigger:
         page = page.replace(
             '<option value="">-- TrCKommando wählen --</option>', opt_str
         )
+        if opt_str == '<option value="">-- Befehl wählen --</option>':
+            page = page.replace(
+                f'<option value="{SelTrgCodes["collcmd"]}">',
+                f'<option value="{SelTrgCodes["collcmd"]}" disabled>',
+            )
         opt_str = '<option value="">-- Befehl wählen --</option>'
         if len(self.settings.dir_cmds) > 0:
             for cmd in self.settings.dir_cmds:

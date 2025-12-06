@@ -1029,8 +1029,14 @@ class ModuleSettingsLight(ModuleSettings):
         self.get_logic()
         self.get_names()
         self.get_settings()
-        # self.get_descriptions()
+        self.get_descriptions()
+        self.is_outdoor = (
+            self.status[MirrIdx.OUTDOOR_MODE] == 65
+        )  # only for sensor module
+        self.sim_pin: str = ""
+        self.sim_pin_changed = False
 
+        
 
 class RouterSettings:
     """Object with all router settings."""

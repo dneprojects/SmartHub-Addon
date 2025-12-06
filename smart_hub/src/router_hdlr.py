@@ -372,6 +372,13 @@ class RtHdlr(HdlrBase):
         """Send router mode dependencies."""
         cmd_str = RT_CMDS.SEND_RT_GRPMODE_DEP + rt_groupdep.decode("iso8859-1") + "\xff"
         await self.rtr.set_config_mode(True)
+        # for grp in range(1, 6):
+        #     cmd_str = (
+        #         RT_CMDS.SEND_RT_GRPMODE_DEP[:-1]
+        #         + chr(grp)
+        #         + rt_groupdep[grp - 1 : grp].decode("iso8859-1")
+        #         + "\xff"
+        #     )
         await self.handle_router_cmd_resp(self.rt_id, cmd_str)
         resp = self.rt_msg._resp_msg
         await self.rtr.set_config_mode(False)
@@ -467,7 +474,7 @@ class RtHdlr(HdlrBase):
             self.rtr.smr_upload, smr_ptr
         )
         self.rtr.name, smr_ptr = self.get_smr_item(self.rtr.smr_upload, smr_ptr)
-        self.rtr._name = self.rtr.name.decode("iso8859-1").strip()
+        self.rtr._name = self.rtr.name[1 : self.rtr.name[1]].decode("iso8859-1").strip()
         umd_name1, smr_ptr = self.get_smr_item(self.rtr.smr_upload, smr_ptr)
         umd_name2, smr_ptr = self.get_smr_item(self.rtr.smr_upload, smr_ptr)
         self.rtr.user_modes = umd_name1 + umd_name2

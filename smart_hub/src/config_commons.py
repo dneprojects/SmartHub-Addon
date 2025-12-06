@@ -79,20 +79,21 @@ def show_homepage(app) -> web.Response:
     side_menu = activate_side_menu(
         app["side_menu"], "", api_srv.is_offline or api_srv._pc_mode
     )
-    info_obj = api_srv.sm_hub.get_info_obj()
-    mem_str = f"{info_obj['hardware']['memory']['total']}, genutzt {info_obj['hardware']['memory']['percent']}".replace(
-        "%", "%25"
-    )
-    sd_str = f"{info_obj['hardware']['disk']['total']}, genutzt {info_obj['hardware']['disk']['percent']}".replace(
-        "%", "%25"
-    )
-    page = page.replace("<!-- SideMenu -->", side_menu)
-    page = page.replace("<v_smhub>", SMHUB_INFO.SW_VERSION)
-    page = page.replace("<v_ha>", api_srv.ha_version)
-    page = page.replace("<v_hbtn>", api_srv.hbtint_version)
-    page = page.replace("<mem_quota>", mem_str)
-    page = page.replace("<sd_quota>", sd_str)
-    page = page.replace("<start_time>", api_srv.sm_hub.start_datetime)
+    if not api_srv._pc_mode and not api_srv.is_offline:
+        info_obj = api_srv.sm_hub.get_info_obj()
+        mem_str = f"{info_obj['hardware']['memory']['total']}, genutzt {info_obj['hardware']['memory']['percent']}".replace(
+            "%", "%25"
+        )
+        sd_str = f"{info_obj['hardware']['disk']['total']}, genutzt {info_obj['hardware']['disk']['percent']}".replace(
+            "%", "%25"
+        )
+        page = page.replace("<!-- SideMenu -->", side_menu)
+        page = page.replace("<v_smhub>", SMHUB_INFO.SW_VERSION)
+        page = page.replace("<v_ha>", api_srv.ha_version)
+        page = page.replace("<v_hbtn>", api_srv.hbtint_version)
+        page = page.replace("<mem_quota>", mem_str)
+        page = page.replace("<sd_quota>", sd_str)
+        page = page.replace("<start_time>", api_srv.sm_hub.start_datetime)
     if api_srv.is_offline or api_srv._pc_mode:
         page = page.replace(">Hub<", ">Home<")
     return web.Response(text=page, content_type="text/html", charset="utf-8")
@@ -121,17 +122,10 @@ def show_exitpage(app) -> web.Response:
     side_menu = activate_side_menu(
         app["side_menu"], "", api_srv.is_offline or api_srv._pc_mode
     )
-    if api_srv._in_shutdown:
-        page = page.replace(
-            "Passen Sie hier die Grundeinstellungen des Systems an.",
-            "Das Fenster kann geschlossen werden.",
-        )
-    else:
-        page = page.replace(
-            "Passen Sie hier die Grundeinstellungen des Systems an.", "Beendet."
-        )
-        api_srv._in_shutdown = True
-    page = page.replace("<!-- SideMenu -->", side_menu)
+    page = page.replace(
+        "Passen Sie hier die Grundeinstellungen des Systems an.",
+        "Das Fenster kann geschlossen werden.",
+    )
     if api_srv.is_offline or api_srv._pc_mode:
         page = page.replace(">Hub<", ">Home<")
     return web.Response(text=page, content_type="text/html", charset="utf-8")
@@ -142,7 +136,8 @@ def show_hub_overview(app) -> web.Response:
 
     api_srv = app["api_srv"]
     smhub = api_srv.sm_hub
-    smhub_info = smhub.get_info()
+    if not api_srv._pc_mode:
+        smhub_info = smhub.get_info()
     hub_name = smhub._host
     side_menu = activate_side_menu(
         app["side_menu"], ">Hub<", api_srv.is_offline or api_srv._pc_mode
@@ -164,73 +159,74 @@ def show_hub_overview(app) -> web.Response:
         pic_file, subtitle = get_module_image(b"\xc9\x00")
         html_str = get_html(HUB_HOMEPAGE).replace("HubTitle", f"Smart Hub '{hub_name}'")
 
-    info_obj = api_srv.sm_hub.get_info_obj()
-    props = "<h3>Eigenschaften</h3>\n"
-    props += "<table>\n"
-    props += f'<tr><td style="width:140px;">Typ:</td><td>{info_obj["software"]["type"]}</td></tr>\n'
-    props += f"<tr><td>Version:</td><td>{info_obj['software']['version']}</td></tr>\n"
-    props += f"<tr><td>Letzter Start:</td><td>{smhub.start_datetime}</td></tr>\n"
-    props += f"<tr><td>Logging:</td><td>Ausgabe: {LOGGING_LEVELS[info_obj['software']['loglevel']['console']]}, Datei: {LOGGING_LEVELS[info_obj['software']['loglevel']['file']]}</td></tr>\n"
-    props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
-    props += f"<tr><td>Hardware:</td><td>{info_obj['hardware']['platform']['type']} #{info_obj['hardware']['platform']['serial']}</td></tr>\n"
-    props += f"<tr><td>CPU:</td><td>{info_obj['hardware']['cpu']['type']}, Takt {info_obj['hardware']['cpu']['frequency max']}</td></tr>\n"
-    props += f"<tr><td>Auslastung:</td><td>{info_obj['hardware']['cpu']['load']}, akt. Takt {info_obj['hardware']['cpu']['frequency current']}, Temperatur {info_obj['hardware']['cpu']['temperature']}</td></tr>\n"
-    props += f"<tr><td>Arbeitsspeicher:</td><td>{info_obj['hardware']['memory']['total']}, genutzt {info_obj['hardware']['memory']['percent']}</td></tr>\n"
-    props += f"<tr><td>Dateispeicher:&nbsp;</td><td>{info_obj['hardware']['disk']['total']}, genutzt {info_obj['hardware']['disk']['percent']}</td></tr>\n"
-    props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
-    props += f"<tr><td>Netzwerk:</td><td>{info_obj['hardware']['network']['ip']}, Host {info_obj['hardware']['network']['host']}</td></tr>\n"
-    if (
-        info_obj["hardware"]["network"]["mac"]
-        == info_obj["hardware"]["network"]["lan mac"]
-    ):
-        props += f"<tr><td>Verbindung:</td><td>LAN, MAC Adresse {info_obj['hardware']['network']['mac']}</td></tr>\n"
-    else:
-        props += f"<tr><td>Verbindung:</td><td>WLAN, MAC Adresse {info_obj['hardware']['network']['mac']}</td></tr>\n"
-    props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
-    props += f"<tr><td>Home Assistant Version:</td><td>{api_srv.ha_version}</td></tr>\n"
-    props += f"<tr><td>Habitron Version:</td><td>{api_srv.hbtint_version}</td></tr>\n"
-    props += "</table>\n"
-    props = props.replace(".0MHz", " MHz")
-    html_str = html_str.replace("Overview", subtitle)
-    html_str = html_str.replace("smart-Ip.jpg", pic_file)
-    html_str = html_str.replace("ContentText", props)
-    rtr = api_srv.routers[0]
-    rtr.check_firmware()
-    if rtr.update_fw_file == "":
-        html_str = html_str.replace('"rtr">Lokal<', '"rtr" disabled="true">aktuell<')
-    opt_str = ""
-    mod_updates: list[bytes] = []
-    for mod in rtr.modules:
-        mod.check_firmware()
-        if mod.update_available and mod._typ not in mod_updates:
-            opt_str += f'\n<option value="{mod._id}">{mod._type}</option>'
-            mod_updates.append(mod._typ)
-    if len(mod_updates) > 0:
+    if not api_srv._pc_mode:
+        info_obj = api_srv.sm_hub.get_info_obj()
+        props = "<h3>Eigenschaften</h3>\n"
+        props += "<table>\n"
+        props += f'<tr><td style="width:140px;">Typ:</td><td>{info_obj["software"]["type"]}</td></tr>\n'
+        props += f"<tr><td>Version:</td><td>{info_obj['software']['version']}</td></tr>\n"
+        props += f"<tr><td>Letzter Start:</td><td>{smhub.start_datetime}</td></tr>\n"
+        props += f"<tr><td>Logging:</td><td>Ausgabe: {LOGGING_LEVELS[info_obj['software']['loglevel']['console']]}, Datei: {LOGGING_LEVELS[info_obj['software']['loglevel']['file']]}</td></tr>\n"
+        props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
+        props += f"<tr><td>Hardware:</td><td>{info_obj['hardware']['platform']['type']} #{info_obj['hardware']['platform']['serial']}</td></tr>\n"
+        props += f"<tr><td>CPU:</td><td>{info_obj['hardware']['cpu']['type']}, Takt {info_obj['hardware']['cpu']['frequency max']}</td></tr>\n"
+        props += f"<tr><td>Auslastung:</td><td>{info_obj['hardware']['cpu']['load']}, akt. Takt {info_obj['hardware']['cpu']['frequency current']}, Temperatur {info_obj['hardware']['cpu']['temperature']}</td></tr>\n"
+        props += f"<tr><td>Arbeitsspeicher:</td><td>{info_obj['hardware']['memory']['total']}, genutzt {info_obj['hardware']['memory']['percent']}</td></tr>\n"
+        props += f"<tr><td>Dateispeicher:&nbsp;</td><td>{info_obj['hardware']['disk']['total']}, genutzt {info_obj['hardware']['disk']['percent']}</td></tr>\n"
+        props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
+        props += f"<tr><td>Netzwerk:</td><td>{info_obj['hardware']['network']['ip']}, Host {info_obj['hardware']['network']['host']}</td></tr>\n"
+        if (
+            info_obj["hardware"]["network"]["mac"]
+            == info_obj["hardware"]["network"]["lan mac"]
+        ):
+            props += f"<tr><td>Verbindung:</td><td>LAN, MAC Adresse {info_obj['hardware']['network']['mac']}</td></tr>\n"
+        else:
+            props += f"<tr><td>Verbindung:</td><td>WLAN, MAC Adresse {info_obj['hardware']['network']['mac']}</td></tr>\n"
+        props += '<tr style="line-height:8px;"><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
+        props += f"<tr><td>Home Assistant Version:</td><td>{api_srv.ha_version}</td></tr>\n"
+        props += f"<tr><td>Habitron Version:</td><td>{api_srv.hbtint_version}</td></tr>\n"
+        props += "</table>\n"
+        props = props.replace(".0MHz", " MHz")
+        html_str = html_str.replace("Overview", subtitle)
+        html_str = html_str.replace("smart-Ip.jpg", pic_file)
+        html_str = html_str.replace("ContentText", props)
+        rtr = api_srv.routers[0]
+        rtr.check_firmware()
+        if rtr.update_fw_file == "":
+            html_str = html_str.replace('"rtr">Lokal<', '"rtr" disabled="true">aktuell<')
+        opt_str = ""
+        mod_updates: list[bytes] = []
+        for mod in rtr.modules:
+            mod.check_firmware()
+            if mod.update_available and mod._typ not in mod_updates:
+                opt_str += f'\n<option value="{mod._id}">{mod._type}</option>'
+                mod_updates.append(mod._typ)
+        if len(mod_updates) > 0:
+            html_str = html_str.replace(
+                ">-- Modultyp --</option>", ">-- Modultyp --</option>" + opt_str
+            )
+        else:
+            html_str = html_str.replace(
+                'name="mod_type_select">', 'name="mod_type_select" disabled="true">'
+            )
+            html_str = html_str.replace(
+                'title="Modultyp für Updates auswählen"',
+                'title="Firmware aller Module aktuell"',
+            )
+            html_str = html_str.replace(
+                ">-- Modultyp --<",
+                ">alle aktuell<",
+            )
+        local_backup_files = api_srv.get_unique_backup_list()
+        opt_str = ""
+        for file_date in local_backup_files.keys():
+            opt_str = (
+                f'\n<option value="{local_backup_files[file_date]}">{file_date}</option>'
+                + opt_str
+            )
         html_str = html_str.replace(
-            ">-- Modultyp --</option>", ">-- Modultyp --</option>" + opt_str
+            ">-- Lokales Backup --</option>", ">-- Lokales Backup --</option>" + opt_str
         )
-    else:
-        html_str = html_str.replace(
-            'name="mod_type_select">', 'name="mod_type_select" disabled="true">'
-        )
-        html_str = html_str.replace(
-            'title="Modultyp für Updates auswählen"',
-            'title="Firmware aller Module aktuell"',
-        )
-        html_str = html_str.replace(
-            ">-- Modultyp --<",
-            ">alle aktuell<",
-        )
-    local_backup_files = api_srv.get_unique_backup_list()
-    opt_str = ""
-    for file_date in local_backup_files.keys():
-        opt_str = (
-            f'\n<option value="{local_backup_files[file_date]}">{file_date}</option>'
-            + opt_str
-        )
-    html_str = html_str.replace(
-        ">-- Lokales Backup --</option>", ">-- Lokales Backup --</option>" + opt_str
-    )
     html_str = html_str.replace("<!-- SideMenu -->", side_menu)
     return web.Response(text=html_str, content_type="text/html", charset="utf-8")
 
@@ -573,6 +569,9 @@ def get_module_image(type_code: bytes) -> tuple[str, str]:
         case 1:
             mod_image = "controller.jpg"
             type_desc = "Smart Controller - Raumzentrale mit Sensorik und Aktorik"
+            if type_code[1] == 4:
+                mod_image = "sc_touch.png"
+                type_desc = "Smart Controller Touch - Raumzentrale mit Touch-Display und Sprachbedienung"
         case 10:
             match type_code[1]:
                 case 1:
