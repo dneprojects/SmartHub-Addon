@@ -1,14 +1,29 @@
+## v2.8.2
+
+### Fix
+- Bugfix of router command in 2.8.1
+
+## v2.8.1
+
+### New 
+- Special logging timeout events
+
+## v2.8.0
+
+### Modified
+- Improved UI for adding items in configurator
+
 ## v2.7.9
 
-### New:
+### New
 - Added automation to send message to TTS
 
-### Fix:
+### Fix
 - Configurator web server if offline
 
 ## v2.7.8
 
-### Fix:
+### Fix
 - Problem with backups
 
 ## v2.7.7
@@ -24,7 +39,7 @@
 
 ## v2.7.5
 
-### New:
+### New
 - Router event: changed flag
 
 
