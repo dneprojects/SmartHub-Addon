@@ -1,3 +1,8 @@
+## v2.8.5
+
+### Fix
+- HTML files
+
 ## v2.8.3
 
 ### Modified
