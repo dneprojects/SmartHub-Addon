@@ -41,6 +41,7 @@
   <!--[if lte IE 7]><link rel="stylesheet" href="system/iefixes.css" type="text/css" media="screen" /><![endif]-->
   <link rel="stylesheet" href="configurator_files/tinymce.css" type="text/css" media="screen">
   <script type="text/javascript" src="configurator_files/tablesort.js"></script>
+  <script type="text/javascript" src="configurator_files/sort_persistence.js"></script>
 </head>
 
 <body id="top" class="modules">
@@ -108,16 +109,16 @@
         const hai_table = document.getElementById('lic-hai-table')
         const os_table = document.getElementById('lic-os-table')
         if (hub_table != null) {
-          new Tablesort(hub_table);
+          enablePersistentSort('hub_table');
         }
         if (core_table != null) {
-          new Tablesort(core_table);
+          enablePersistentSort('core_table');
         }
         if (hai_table != null) {
-          new Tablesort(hai_table);
+          enablePersistentSort('hai_table');
         }
         if (os_table != null) {
-          new Tablesort(os_table);
+          enablePersistentSort('os_table');
         }
       </script>
       </body>

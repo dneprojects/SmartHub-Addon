@@ -1,9 +1,9 @@
-; (function () {
+(function () {
   function Tablesort(el, options) {
     if (!(this instanceof Tablesort)) return new Tablesort(el, options);
 
-    if (!el || el.tagName !== 'TABLE') {
-      throw new Error('Element must be a table');
+    if (!el || el.tagName !== "TABLE") {
+      return;
     }
     this.init(el, options || {});
   }
@@ -13,8 +13,8 @@
   var createEvent = function (name) {
     var evt;
 
-    if (!window.CustomEvent || typeof window.CustomEvent !== 'function') {
-      evt = document.createEvent('CustomEvent');
+    if (!window.CustomEvent || typeof window.CustomEvent !== "function") {
+      evt = document.createEvent("CustomEvent");
       evt.initCustomEvent(name, false, false, undefined);
     } else {
       evt = new CustomEvent(name);
@@ -25,14 +25,18 @@
 
   var getInnerText = function (el, options, key) {
     if (key == "selected_value") {
-      return el.getElementsByTagName("select")[0].value || '';
+      return el.getElementsByTagName("select")[0].value || "";
     }
     if (key) {
-      return el.getElementsByTagName("input")[0].getAttribute(key) || '';
+      return el.getElementsByTagName("input")[0].getAttribute(key) || "";
     }
-    return el.getAttribute(options.sortAttribute || 'data-sort') || el.textContent || el.innerText || '';
+    return (
+      el.getAttribute(options.sortAttribute || "data-sort") ||
+      el.textContent ||
+      el.innerText ||
+      ""
+    );
   };
-
 
   // Default sort method if no better sort method is found
   var caseInsensitiveSort = function (a, b) {
@@ -47,7 +51,7 @@
 
   var getCellByKey = function (cells, key) {
     return [].slice.call(cells).find(function (cell) {
-      return cell.getAttribute('data-sort-column-key') === key;
+      return cell.getAttribute("data-sort-column-key") === key;
     });
   };
 
@@ -68,19 +72,18 @@
   };
 
   Tablesort.extend = function (name, pattern, sort) {
-    if (typeof pattern !== 'function' || typeof sort !== 'function') {
-      throw new Error('Pattern and sort must be a function');
+    if (typeof pattern !== "function" || typeof sort !== "function") {
+      throw new Error("Pattern and sort must be a function");
     }
 
     sortOptions.push({
       name: name,
       pattern: pattern,
-      sort: sort
+      sort: sort,
     });
   };
 
   Tablesort.prototype = {
-
     init: function (el, options) {
       var that = this,
         firstRow,
@@ -95,7 +98,7 @@
       if (el.rows && el.rows.length > 0) {
         if (el.tHead && el.tHead.rows.length > 0) {
           for (i = 0; i < el.tHead.rows.length; i++) {
-            if (el.tHead.rows[i].getAttribute('data-sort-method') === 'thead') {
+            if (el.tHead.rows[i].getAttribute("data-sort-method") === "thead") {
               firstRow = el.tHead.rows[i];
               break;
             }
@@ -113,7 +116,7 @@
 
       var onClick = function () {
         if (that.current && that.current !== this) {
-          that.current.removeAttribute('aria-sort');
+          that.current.removeAttribute("aria-sort");
         }
 
         that.current = this;
@@ -123,12 +126,12 @@
       // Assume first row is the header and attach a click handler to each.
       for (i = 0; i < firstRow.cells.length; i++) {
         cell = firstRow.cells[i];
-        cell.setAttribute('role', 'columnheader');
-        if (cell.getAttribute('data-sort-method') !== 'none') {
+        cell.setAttribute("role", "columnheader");
+        if (cell.getAttribute("data-sort-method") !== "none") {
           cell.tabindex = 0;
-          cell.addEventListener('click', onClick, false);
+          cell.addEventListener("click", onClick, false);
 
-          if (cell.getAttribute('data-sort-default') !== null) {
+          if (cell.getAttribute("data-sort-default") !== null) {
             defaultSort = cell;
           }
         }
@@ -142,29 +145,29 @@
 
     sortTable: function (header, update) {
       var that = this,
-        columnKey = header.getAttribute('data-sort-column-key'),
-        inputKey = header.getAttribute('data-sort-input-attr'),
+        columnKey = header.getAttribute("data-sort-column-key"),
+        inputKey = header.getAttribute("data-sort-input-attr"),
         column = header.cellIndex,
         sortFunction = caseInsensitiveSort,
-        item = '',
+        item = "",
         items = [],
         i = that.thead ? 0 : 1,
-        sortMethod = header.getAttribute('data-sort-method'),
-        sortOrder = header.getAttribute('aria-sort');
+        sortMethod = header.getAttribute("data-sort-method"),
+        sortOrder = header.getAttribute("aria-sort");
 
-      that.table.dispatchEvent(createEvent('beforeSort'));
+      that.table.dispatchEvent(createEvent("beforeSort"));
 
       // If updating an existing sort, direction should remain unchanged.
       if (!update) {
-        if (sortOrder === 'ascending') {
-          sortOrder = 'descending';
-        } else if (sortOrder === 'descending') {
-          sortOrder = 'ascending';
+        if (sortOrder === "ascending") {
+          sortOrder = "descending";
+        } else if (sortOrder === "descending") {
+          sortOrder = "ascending";
         } else {
-          sortOrder = that.options.descending ? 'descending' : 'ascending';
+          sortOrder = that.options.descending ? "descending" : "ascending";
         }
 
-        header.setAttribute('aria-sort', sortOrder);
+        header.setAttribute("aria-sort", sortOrder);
       }
 
       if (that.table.rows.length < 2) return;
@@ -223,7 +226,7 @@
           var cell;
 
           item = that.table.tBodies[i].rows[j];
-          if (item.getAttribute('data-sort-method') === 'none') {
+          if (item.getAttribute("data-sort-method") === "none") {
             // keep no-sorts in separate list to be able to insert
             // them back at their original position later
             noSorts[totalRows] = item;
@@ -236,8 +239,8 @@
             // Save the index for stable sorting
             newRows.push({
               tr: item,
-              td: cell ? getInnerText(cell, that.options, inputKey) : '',
-              index: totalRows
+              td: cell ? getInnerText(cell, that.options, inputKey) : "",
+              index: totalRows,
             });
           }
           totalRows++;
@@ -245,7 +248,7 @@
         // Before we append should we reverse the new array or not?
         // If we reverse, the sort needs to be `anti-stable` so that
         // the double negatives cancel out
-        if (sortOrder === 'descending') {
+        if (sortOrder === "descending") {
           newRows.sort(stabilize(sortFunction, true));
         } else {
           newRows.sort(stabilize(sortFunction, false));
@@ -267,17 +270,17 @@
         }
       }
 
-      that.table.dispatchEvent(createEvent('afterSort'));
+      that.table.dispatchEvent(createEvent("afterSort"));
     },
 
     refresh: function () {
       if (this.current !== undefined) {
         this.sortTable(this.current, true);
       }
-    }
+    },
   };
 
-  if (typeof module !== 'undefined' && module.exports) {
+  if (typeof module !== "undefined" && module.exports) {
     module.exports = Tablesort;
   } else {
     window.Tablesort = Tablesort;

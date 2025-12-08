@@ -30,110 +30,111 @@ for (let i = 0; i < teach_buttons.length; i++) {
 const mode_sels = document.getElementsByTagName("select");
 for (let i = 0; i < mode_sels.length; i++) {
     if (mode_sels[i].className == "daytime") {
-        parseDayNightMode()
+        parseDayNightMode();
         mode_sels[i].addEventListener("change", function () {
-            parseDayNightMode()
-        })
+            parseDayNightMode();
+        });
     }
 }
 
-var new_lgc_btn = null
+var new_lgc_btn = null;
 var new_cntr_btn = document.getElementsByClassName("new_cntr_button")[0];
 if (new_cntr_btn == null) {
     new_lgc_btn = document.getElementsByClassName("new_lgc_button")[0];
     if (new_lgc_btn == null) {
         new_btn = document.getElementsByClassName("new_button")[1];
-    }
-    else {
+    } else {
         new_btn = new_lgc_btn;
     }
-}
-else {
+} else {
     new_btn = new_cntr_btn;
 }
 
-const max_btn = document.getElementById("max_cnt")
-const max_inpts = document.getElementById("max_inputs")
-const new_addr = document.getElementsByName("new_entry")[0]
-const setngs_tbl = document.getElementById("set_tbl");
+const max_btn = document.getElementById("max_cnt");
+const max_inpts = document.getElementById("max_inputs");
+const new_addr = document.getElementsByName("new_entry")[0];
+const setngs_tbl = document.getElementById("set_tbl_data");
 const new_modid = document.getElementById("new_mod_id");
 const rt_reboot = document.getElementById("btn_rt_reboot");
 const chk_sens_type = document.getElementById("sens_type");
 
 if (week_global != null) {
     week_global.addEventListener("change", function () {
-        parseDayNightMode()
-    })
+        parseDayNightMode();
+    });
 }
 if (new_addr != null) {
     new_addr.addEventListener("change", function () {
-        parseNewAddr()
-    })
+        parseNewAddr();
+    });
 }
 if (new_modid != null) {
     new_modid.addEventListener("change", function () {
-        parseNewId()
-    })
-    parseNewId()
+        parseNewId();
+    });
+    parseNewId();
 }
 if (new_cntr_btn != null) {
     new_cntr_btn.addEventListener("click", function () {
-        getCounterOptions()
-    })
+        getCounterOptions();
+    });
 }
 if (new_lgc_btn != null) {
     new_lgc_btn.addEventListener("click", function () {
-        getLogicOptions()
-    })
+        getLogicOptions();
+    });
 }
 if (aircal_button != null) {
     aircal_button.addEventListener("click", function () {
-        calAirQuality()
-    })
+        calAirQuality();
+    });
 }
 if (chk_sens_type != null) {
     chk_sens_type.addEventListener("change", function () {
-        setHeatingVis(chk_sens_type)
-    })
-    setHeatingVis(chk_sens_type)
+        setHeatingVis(chk_sens_type);
+    });
+    setHeatingVis(chk_sens_type);
 }
 if (max_inpts != null) {
     max_inpts.addEventListener("click", function () {
-        getLogicOpts()
-    })
+        getLogicOpts();
+    });
 }
 if (max_btn != null) {
     max_btn.addEventListener("click", function () {
-        getMaxCount()
-    })
+        getMaxCount();
+    });
 }
 for (let i = 0; i < check_boxes.length; i++) {
     check_boxes[i].addEventListener("change", function () {
         controlDelButton();
-    })
+    });
 }
 controlNewButton();
 controlDelButton();
 
 function controlNewButton() {
     if (new_btn != null) {
+
+        new_addr.value = 1;
+        parseNewAddr();
         new_btn.disabled = true;  // for modules only
-        if ((new_addr.value != "") & (setngs_tbl.rows.length - 2 < parseInt(new_addr.max))) {
+        if ((new_addr.value != "") & (setngs_tbl.rows.length < parseInt(new_addr.max))) {
             new_btn.disabled = false;
         }
-        if (setngs_tbl.rows.length - 2 >= parseInt(new_addr.max)) {
+        if (setngs_tbl.rows.length >= parseInt(new_addr.max)) {
             new_addr.disabled = true;
         }
     }
 
 }
 function setHeatingVis(chk_box) {
-    document.getElementsByTagName("tr")[4].hidden = chk_box.checked
+    document.getElementsByTagName("tr")[4].hidden = chk_box.checked;
 }
 
 function controlDelButton() {
     if (del_btn != null) {
-        del_btn.disabled = true;  // for modules only
+        del_btn.disabled = true; // for modules only
         for (let i = 0; i < check_boxes.length; i++) {
             if (check_boxes[i].checked) {
                 del_btn.disabled = false;
@@ -145,9 +146,14 @@ function controlDelButton() {
 
 if (rld_btn != null) {
     rld_btn.addEventListener("click", function () {
-
-        sav_popup.innerHTML = sav_popup.innerHTML.replace("Upload", "Router wird initialisiert,<br>Module werden neu eingelesen...");
-        sav_popup.innerHTML = sav_popup.innerHTML.replace("ContentTitle", "Neustart Router");
+        sav_popup.innerHTML = sav_popup.innerHTML.replace(
+            "Upload",
+            "Router wird initialisiert,<br>Module werden neu eingelesen..."
+        );
+        sav_popup.innerHTML = sav_popup.innerHTML.replace(
+            "ContentTitle",
+            "Neustart Router"
+        );
         openMsgPopup();
     });
 }
@@ -176,42 +182,40 @@ if (close_popup != null) {
 
 function openMsgPopup() {
     msg_popup.classList.add("show");
-};
+}
 function openSavPopup() {
     sav_popup.classList.add("show");
-};
+}
 function openTeachPopup() {
     fngrNmbr = settings_table.elements["new_entry"].value;
-    fngr_nmbr_2_teach.value = fngrNmbr + ' ' + fngrNames[fngrNmbr];
+    fngr_nmbr_2_teach.value = fngrNmbr + " " + fngrNames[fngrNmbr];
     teach_start.value = teach_start.value.slice(0, -1) + fngrNmbr;
     teach_popup.classList.add("show");
     document.getElementById("teach_start").addEventListener("click", function () {
         disableTeachButtons();
     });
-};
+}
 function disableTeachButtons() {
     document.getElementById("teach_start").innerHTML = "aktiv";
     document.getElementById("close_popup").disabled = true;
 }
 function getCounterOptions() {
-    if (new_addr.value != "")
-        count_popup.classList.add("show");
-};
+    if (new_addr.value != "") count_popup.classList.add("show");
+}
 function getLogicOptions() {
-    if (new_addr.value != "")
-        logic_popup.classList.add("show");
-};
+    if (new_addr.value != "") logic_popup.classList.add("show");
+}
 function calAirQuality() {
     var air_quality = document.getElementById("airquality-val").value;
     const calUrl = "settings/air_cal?value=" + air_quality;
-    fetch(calUrl)
-};
+    fetch(calUrl);
+}
 function getMaxCount() {
-    max_btn.value += document.getElementById("max_count_input").value
+    max_btn.value += document.getElementById("max_count_input").value;
 }
 function getLogicOpts() {
-    max_inpts.value += document.getElementById("logic_type").value
-    max_inpts.value += "-" + document.getElementById("max_lgc_inputs").value
+    max_inpts.value += document.getElementById("logic_type").value;
+    max_inpts.value += "-" + document.getElementById("max_lgc_inputs").value;
 }
 
 function parseDayNightMode() {
@@ -220,49 +224,87 @@ function parseDayNightMode() {
     for (let day = 0; day < 7; day++) {
         if (week_global != null && week_global.checked) {
             if (day < 6) {
-                document.getElementsByName("data[" + String(day) + ",0]")[0].value = document.getElementsByName("data[6,0]")[0].value;
-                document.getElementsByName("data[" + String(day) + ",1]")[0].value = document.getElementsByName("data[6,1]")[0].value;
-                document.getElementsByName("data[" + String(day) + ",2]")[0].value = document.getElementsByName("data[6,2]")[0].value;
-                document.getElementsByName("data[" + String(day) + ",0]")[0].style.visibility = "hidden";
-                document.getElementsByName("data[" + String(day) + ",1]")[0].style.visibility = "hidden";
-                document.getElementsByName("data[" + String(day) + ",2]")[0].style.visibility = "hidden";
-                document.getElementById("row_" + String(day)).style.visibility = "hidden";
+                document.getElementsByName("data[" + String(day) + ",0]")[0].value =
+                    document.getElementsByName("data[6,0]")[0].value;
+                document.getElementsByName("data[" + String(day) + ",1]")[0].value =
+                    document.getElementsByName("data[6,1]")[0].value;
+                document.getElementsByName("data[" + String(day) + ",2]")[0].value =
+                    document.getElementsByName("data[6,2]")[0].value;
+                document.getElementsByName(
+                    "data[" + String(day) + ",0]"
+                )[0].style.visibility = "hidden";
+                document.getElementsByName(
+                    "data[" + String(day) + ",1]"
+                )[0].style.visibility = "hidden";
+                document.getElementsByName(
+                    "data[" + String(day) + ",2]"
+                )[0].style.visibility = "hidden";
+                document.getElementById("row_" + String(day)).style.visibility =
+                    "hidden";
                 document.getElementById("label_6").innerHTML = "So.-Sa.";
             } else {
                 document.getElementById("lx_" + String(day)).style.color = "black";
             }
-        }
-        else {
-            document.getElementsByName("data[" + String(day) + ",0]")[0].style.visibility = "visible";
-            document.getElementsByName("data[" + String(day) + ",1]")[0].style.visibility = "visible";
-            document.getElementsByName("data[" + String(day) + ",2]")[0].style.visibility = "visible";
-            document.getElementById("row_" + String(day)).style.visibility = "visible";
+        } else {
+            document.getElementsByName(
+                "data[" + String(day) + ",0]"
+            )[0].style.visibility = "visible";
+            document.getElementsByName(
+                "data[" + String(day) + ",1]"
+            )[0].style.visibility = "visible";
+            document.getElementsByName(
+                "data[" + String(day) + ",2]"
+            )[0].style.visibility = "visible";
+            document.getElementById("row_" + String(day)).style.visibility =
+                "visible";
             document.getElementById("label_6").innerHTML = "Sonntag";
             document.getElementById("lx_" + String(day)).style.color = "black";
         }
         sel = document.getElementsByName("data[" + String(day) + ",2]")[0];
-        document.getElementsByName("data[" + String(day) + ",0]")[0].disabled = false;
-        document.getElementsByName("data[" + String(day) + ",0]")[0].classList.remove("disabled");
-        document.getElementsByName("data[" + String(day) + ",1]")[0].disabled = false;
-        document.getElementsByName("data[" + String(day) + ",1]")[0].classList.remove("disabled");
+        document.getElementsByName(
+            "data[" + String(day) + ",0]"
+        )[0].disabled = false;
+        document
+            .getElementsByName("data[" + String(day) + ",0]")[0]
+            .classList.remove("disabled");
+        document.getElementsByName(
+            "data[" + String(day) + ",1]"
+        )[0].disabled = false;
+        document
+            .getElementsByName("data[" + String(day) + ",1]")[0]
+            .classList.remove("disabled");
         if (sel.options[sel.selectedIndex].innerHTML == "inaktiv") {
-            document.getElementsByName("data[" + String(day) + ",0]")[0].disabled = true;
-            document.getElementsByName("data[" + String(day) + ",0]")[0].classList.add("disabled");
-            document.getElementsByName("data[" + String(day) + ",1]")[0].disabled = true;
-            document.getElementsByName("data[" + String(day) + ",1]")[0].classList.add("disabled");
-        }
-        else if (sel.options[sel.selectedIndex].innerHTML == "nur Zeit") {
-            document.getElementsByName("data[" + String(day) + ",1]")[0].disabled = true;
-            document.getElementsByName("data[" + String(day) + ",1]")[0].classList.add("disabled");
-            document.getElementById("lx_" + String(day)).style.color = "hsl(0, 0%, 70%);";
-        }
-        else if (sel.options[sel.selectedIndex].innerHTML == "nur Helligkeit") {
-            document.getElementsByName("data[" + String(day) + ",0]")[0].disabled = true;
-            document.getElementsByName("data[" + String(day) + ",0]")[0].classList.add("disabled");
+            document.getElementsByName(
+                "data[" + String(day) + ",0]"
+            )[0].disabled = true;
+            document
+                .getElementsByName("data[" + String(day) + ",0]")[0]
+                .classList.add("disabled");
+            document.getElementsByName(
+                "data[" + String(day) + ",1]"
+            )[0].disabled = true;
+            document
+                .getElementsByName("data[" + String(day) + ",1]")[0]
+                .classList.add("disabled");
+        } else if (sel.options[sel.selectedIndex].innerHTML == "nur Zeit") {
+            document.getElementsByName(
+                "data[" + String(day) + ",1]"
+            )[0].disabled = true;
+            document
+                .getElementsByName("data[" + String(day) + ",1]")[0]
+                .classList.add("disabled");
+            document.getElementById("lx_" + String(day)).style.color =
+                "hsl(0, 0%, 70%);";
+        } else if (sel.options[sel.selectedIndex].innerHTML == "nur Helligkeit") {
+            document.getElementsByName(
+                "data[" + String(day) + ",0]"
+            )[0].disabled = true;
+            document
+                .getElementsByName("data[" + String(day) + ",0]")[0]
+                .classList.add("disabled");
             document.getElementsByName("data[6,3]")[0].disabled = false;
             document.getElementsByName("data[6,3]")[0].classList.remove("disabled");
-        }
-        else {
+        } else {
             document.getElementsByName("data[6,3]")[0].disabled = false;
             document.getElementsByName("data[6,3]")[0].classList.remove("disabled");
         }
@@ -270,7 +312,6 @@ function parseDayNightMode() {
 }
 
 function parseNewAddr() {
-    controlNewButton()
 
     existing_numbers = [];
     for (var i = 0; i < reserved_numbers.length; i++) {
@@ -283,7 +324,7 @@ function parseNewAddr() {
     }
     min_number = new_addr.min;
     max_number = parseInt(new_addr.max);
-    for (var i = 0; i < setngs_tbl.rows.length - 2; i++) {
+    for (var i = 0; i < setngs_tbl.rows.length; i++) {
         lbl = setngs_tbl.rows[i].cells[0].innerText.split(/\s*[\s,]\s*/);
         existing_numbers.push(lbl[lbl.length - 1]);
     }
@@ -300,22 +341,44 @@ function parseNewAddr() {
     new_addr.value = nn
 }
 function parseNewId() {
-
     existing_numbers = [];
     for (var i = 0; i < reserved_numbers.length; i++) {
         existing_numbers.push(String(reserved_numbers[i]));
     }
     min_number = new_modid.min;
     max_number = parseInt(new_modid.max);
-    let nn = new_modid.value
+    let nn = new_modid.value;
     while (existing_numbers.includes(nn)) {
         nn = String(parseInt(nn) + 1);
     }
     if (parseInt(nn) > max_number) {
-        nn = String(parseInt(nn) - 1)
+        nn = String(parseInt(nn) - 1);
         while (existing_numbers.includes(nn)) {
             nn = String(parseInt(nn) - 1);
         }
     }
-    new_modid.value = nn
+    new_modid.value = nn;
 }
+function syncTableWidths() {
+    // Get first row of data table (source) and control table (target)
+    const sourceRow = document.querySelector('#set_tbl_data tr');
+    const targetRow = document.querySelector('#set_tbl_controls tr');
+
+    if (!sourceRow || !targetRow) return;
+
+    const sourceCells = sourceRow.children;
+    const targetCells = targetRow.children;
+
+    // Loop through cells and apply width
+    if (targetCells[0]) {
+        // Get exact rendered width
+        const width = sourceCells[0].getBoundingClientRect().width;
+
+        // Apply to target cell
+        targetCells[0].style.width = `${width - 4}px`;
+    }
+}
+
+// Run on load and resize
+window.addEventListener('load', syncTableWidths);
+window.addEventListener('resize', syncTableWidths);

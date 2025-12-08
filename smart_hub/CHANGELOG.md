@@ -1,3 +1,8 @@
+## v2.8.3
+
+### Modified
+- Improved UI in configurator
+
 ## v2.8.2
 
 ### Fix

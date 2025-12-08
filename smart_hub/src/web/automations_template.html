@@ -3,13 +3,6 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <!--
-
-	This website is powered by Contao Open Source CMS :: Licensed under GNU/LGPL
-	Copyright ©2005-2023 by Leo Feyer :: Extensions are copyright of their respective owners
-	Visit the project website at http://www.contao.org for more information
-
-//-->
   <base href="/">
 
   <title>habitron - Smart Configurator</title>
@@ -17,28 +10,17 @@
 
   <meta http-equiv="Content-Style-Type" content="text/css">
   <meta http-equiv="Content-Script-Type" content="text/javascript">
-  <meta name="description" content="">
-  <meta name="keywords" content="">
   <link href="configurator_files/style.css" rel="stylesheet" type="text/css" media="screen">
   <link href="configurator_files/nav.css" rel="stylesheet" type="text/css" media="screen">
   <link href="configurator_files/popup.css" rel="stylesheet" type="text/css" media="screen">
   <link href="configurator_files/tablesort.css" rel="stylesheet" type="text/css" media="screen">
-  <!--[if IE]>
-<link href="tl_files/habitron/style_ie.css" rel="stylesheet" type="text/css" media="screen"  />
-<![endif]-->
-
+  
   <meta name="robots" content="index,follow">
-  <style type="text/css" media="screen">
-    <!--/*
-    -->
-  <![CDATA[/*><!--*/
-/*]]>*/-->
-  </style>
   <link rel="stylesheet" href="configurator_files/general.css" type="text/css" media="screen">
-  <!--[if lte IE 7]><link rel="stylesheet" href="system/iefixes.css" type="text/css" media="screen" /><![endif]-->
   <link rel="stylesheet" href="configurator_files/tinymce.css" type="text/css" media="screen">
   <script type="text/javascript" src="configurator_files/tablesort.js"></script>
   <script type="text/javascript" src="configurator_files/tablesort.number.min.js"></script>
+  <script type="text/javascript" src="configurator_files/sort_persistence.js"></script>
 </head>
 
 <body id="top" class="modules">
@@ -78,21 +60,20 @@
             </div>
           </div>
         </div>
+        
         <div id="mitte_automtn">
           <div class="inside">
             <div class="mod_article block" id="text-231">
 
-
               <div class="ce_text block">
-                <!-- MainContentStart -->
                 <h1>ContentTitle</h1>
 
                 <h2>ContentSubtitle</h2>
                 <p>ContentSubtext</p>
                 <br>
                 <p>ContentText</p>
-                <!-- MainContentEnd -->
-              </div>
+                </div>
+
               <div id="autmnbuttons">
                 <button name="NewAutomtn" class="config_button" form="automations_table" 
                   type="submit" id="new_button" value="new">Neu</button>
@@ -101,11 +82,13 @@
                   form="automations_table" value="change">Ändern</button>
                 <button name="DelAutomtn" class="config_button" id="del_button" value="del">Löschen</button>
               </div>
+
             </div>
           </div>
         </div>
         <div id="clear"></div>
       </div>
+
       <div id="footer">
         <div class="inside">
           <div id="confbuttons">
@@ -125,6 +108,7 @@
 
     </div>
   </div>
+
   <div id="automtn_del_popup" class="popup">
     <div class="popup-content">
       <h1>ContentTitle</h1>
@@ -266,5 +250,5 @@
   function openWaitPopup() {
     wait_popup.classList.add("show");
   };
-  new Tablesort(document.getElementById('atm-table'));
+  enablePersistentSort('atm-table');
 </script>

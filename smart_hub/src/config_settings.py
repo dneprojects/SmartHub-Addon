@@ -865,9 +865,12 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
 
     tbl_data = getattr(main_app["settings"], key)
     tbl = (
-        indent(4) + '<form id="settings_table" action="settings/step" method="post">\n'
+        indent(4)
+        + '<form id="settings_table" action="settings/step" method="post" class="settings-flex-layout">\n'
     )
-    tbl += "\n" + indent(5) + '<table id="set_tbl">\n'
+
+    tbl += indent(5) + '<div class="table-scroll">\n'
+    tbl += indent(6) + '<table id="set_tbl_data">\n'
 
     tbl_entries = dict()
     for ci in range(len(tbl_data)):
@@ -903,6 +906,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
         tbl_entries = tbl_entries[1:]
     ci = 0
     wd = 50  # code for weekdays, starting with Sunday
+
     for entry in tbl_entries:
         ci = entry[1]
         id_name = key[:-1] + str(ci)
@@ -944,7 +948,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                     + indent(8)
                     + '<td><label for="global">Alle Tage</label></td>'
                     + indent(8)
-                    + f'<td><input type="checkbox" title="Einheitliche Einstellung für alle Wochentage" name="global" class="daytime" id="global" style="margin-left: 5px; margin-bottom: 2px;" {sw_checked}>\n'
+                    + f'<td id="day_night_sel"><input type="checkbox" title="Einheitliche Einstellung für alle Wochentage" name="global" class="daytime" id="global" style="margin-left: 5px; margin-bottom: 2px;" {sw_checked}>\n'
                 )
             tbl += (
                 indent(7)
@@ -1112,6 +1116,8 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                     f'<td><label title="{title_rise}" for="{id_name}_cvr">Anschnitt</label><input type="radio" '
                     + f'name="data[{ci},1]" id="{id_name}_cvr" title="{title_rise}" value="rise" {cvr_chkd}></td>'
                 )
+            # elif (ci % 2) != 0 and (ci < 2 * len(covers)):
+            #     pass  # Skip second output of cover pair
         elif key == "covers":
             if covers[ci].type != 0:
                 cov_t = main_app["settings"].cover_times
@@ -1171,7 +1177,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                             indent(8)
                             + f'<option title="{dep_titles[dep]}" value="{dep}">{dep_names[dep]}</option>\n'
                         )
-                tbl += indent(7) + "/select></td>\n"
+                tbl += indent(7) + "</select></td>\n"
             else:
                 tbl += "<td>&nbsp;&nbsp;Modi von Gruppe 0</td>"
         elif key == "users":
@@ -1218,6 +1224,7 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
             if key == "groups" and tbl_data[ci].nmbr == 0:
                 pass  # group 0 not removable
             else:
+                # This checkbox belongs to the scrollable area
                 tbl += f'<td><input type="checkbox" class="sel_element" name="sel_{ci}" title="{title_txt}" value="{ci}"></td>'
         if key in ["counters", "logic"]:
             if key == "logic":
@@ -1226,6 +1233,10 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                 hlp_txt = "Zähler / Maximalwert"
             tbl += f'<td title="{hlp_txt}">[{tbl_data[ci].longname.split("[")[1]}</td>'
         tbl += "</tr>\n"
+
+    tbl += indent(6) + "</table>\n"
+    tbl += indent(5) + "</div>\n"  # Close .table-scroll
+
     if key in [
         "glob_flags",
         "flags",
@@ -1242,6 +1253,10 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
         "gsm_numbers",
         "gsm_messages",
     ]:
+        tbl += indent(5) + '<div class="table-fixed">\n'
+        tbl += indent(6) + '<table id="set_tbl_controls">\n'
+        tbl += indent(7) + "<tbody>\n"
+
         # Add additional lines to append or delete element
         prompt = key_prompt
         id_name = key[:-1] + str(ci + 1)
@@ -1256,6 +1271,8 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                     min_new = elem_nmbrs[n_idx] + 1
                 else:
                     break
+            else:  # Added for...else structure, executes if loop completes without break
+                pass
         else:
             min_new = 1
         if key in ["glob_flags", "flags"]:
@@ -1274,16 +1291,20 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
             max_new = 10
         elif key in ["gsm_numbers"]:
             max_new = 50
-        tbl += indent(7) + "<tr><td>&nbsp;</td></tr>\n"
+
         tbl += (
             indent(7)
-            + "<tr><td>&nbsp;</td><td></td><td>"
+            + '<tr><td style="height: 10px;"></td><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
+        )
+        tbl += (
+            indent(7)
+            + "<tr><td>&nbsp;</td><td>&nbsp;</td><td>"  # Keep structure to match alignment: Label | Input | Button/Checkbox
             + '<button name="ModSettings" class="new_button" id="config_button" type="submit" '
             + f'form="settings_table" value="del-{mod_addr}-{step}">entfernen</button></td></tr>\n'
         )
         tbl += (
             indent(7)
-            + f'<tr><td><label for="{id_name}">{prompt}</label></td><td><input name="new_entry" '
+            + f'<tr><td><label for="{id_name}">{prompt}&nbsp;</label></td><td><input name="new_entry" '
             + f'type="number" class="desc_input1"  min="{min_new}" max="{max_new}" placeholder="Neue Nummer eintragen" id="{id_name}"/></td>\n'
         )
         if key == "counters":
@@ -1310,7 +1331,22 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
                 '<button name="TeachNewFinger" class="new_button" id="config_button" type="button" form="settings_table" value="new',
             )
         tbl += indent(7) + "</tr>\n"
-    tbl += indent(5) + "</table>\n"
+
+        tbl += indent(7) + "</tbody>\n"
+        tbl += indent(6) + "</table>\n"
+        tbl += indent(5) + "</div>\n"  # Close .table-fixed
+
+    # Entferne die alten, unnötigen Zeilen aus dem ursprünglichen Code,
+    # da sie jetzt in .table-fixed sind.
+    # Original:
+    # tbl += indent(7) + "<tr><td>&nbsp;</td></tr>\n"
+    # tbl += (
+    #     indent(7)
+    #     + "<tr><td>&nbsp;</td><td></td><td>"
+    #     + '...
+    # )
+    # tbl += indent(7) + "</tr>\n"
+
     tbl += indent(4) + "</form>\n"
     return tbl
 
