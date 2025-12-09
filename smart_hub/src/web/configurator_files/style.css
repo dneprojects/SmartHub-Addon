@@ -136,9 +136,13 @@ div.left { float: left; position: relative; min-width: 400px; }
   height: 100%;
   overflow: hidden;
 }
-#mitte_automtn {
+#mitte, #mitte_automtn {
   height: calc(100vh - 276px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+#mitte::-webkit-scrollbar { display: none; }
+
 /* Generic Settings Flex Container (Legacy/Alternative) */
 .settings-flex-layout {
   display: flex; flex-direction: column; align-items: flex-start;
@@ -301,13 +305,18 @@ input#clear:hover, input#send:hover { cursor: pointer; }
 /* Button Sizes */
 button.config_button, #config_button.config_button, #config_button_sv.config_button, #config_button_sav.config_button {
   height: 22px; 
+  width: 80px;
+  margin-left: 0px;
+}
+#config_button_bck, #config_button_nxt, #config_button_cnc, #config_button_sav {
+  height: 22px; 
   width: 80px !important;
   margin-left: 0px;
 }
 #config_button, #config_button_sv, transfer_button, files_button, #chan_reset_button, #config_button_extra,
 #add-mod-ok, #close-button, #test-button, #rem-button, #upd_cancel_button, #flash_button, #config_button_cnc,
-#automtns_button, #showlogs_button, #updates_button, #tbl-button, #reload-button, #reload_button, 
-#files_button, #finish_button, #transfer_button, #exit_button, #config_button_acc {
+#automtns_button, #showlogs_button, #updates_button, #tbl-button, #reload-button, #reload_button, #config_button_canc, 
+#files_button, #finish_button, #transfer_button, #exit_button, #config_button_acc, #config_button_rst {
   height: 22px; width: 125px; margin-left: 0px;
   font-family: "Lucida Sans", Arial, Verdana, Helvetica, sans-serif;
   font: 11px arial, helvetica, clean, sans-serif;

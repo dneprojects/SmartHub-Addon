@@ -275,8 +275,6 @@ img {
     width: 100%;
     margin-left: 0px;
     margin-top: -80px;
-  }
-  #mitte_automtn {
     height: calc(100vh - 196px);
   }
   #left {
@@ -339,6 +337,8 @@ img {
   #config_button_sv,
   #config_button_acc,
   #config_button_cnc,
+  #config_button_canc, 
+  #config_button_rst,
   #files_button,
   #reload_button,
   #reload-button,

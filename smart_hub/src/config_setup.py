@@ -196,6 +196,7 @@ def show_setup_page(app, popup_msg="") -> web.Response:
             'id="reload_button" type="submit"',
         )
         page = page.replace("Abbruch", "Neustart")
+        page = page.replace('id="config_button_cnc"', 'id="config_button_rst"')
 
     return web.Response(text=page, content_type="text/html", charset="utf-8")
 
@@ -316,6 +317,7 @@ def show_module_table(app) -> web.Response:
         '">Systemkonfiguration<', ' visibility: hidden;">Systemkonfiguration<'
     )
     page = page.replace('action="setup/table_transfer"', 'action="setup/table_close"')
+    page = page.replace('id="config_button_cnc"', 'id="config_button_canc"')
     return web.Response(text=page, content_type="text/html", charset="utf-8")
 
 
