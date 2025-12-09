@@ -116,47 +116,72 @@ div.left { float: left; position: relative; min-width: 400px; }
   display: flex; flex-direction: column; height: 100%; width: 100%;
 }
 
-/* Generic Settings Flex Container */
+/* Text Container (Flex Wrapper): Keeps Headers fixed at top */
+#mitte_automtn .ce_text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Force full height usage */
+  overflow: hidden; /* Prevent container scrolling */
+  margin-bottom: 10px;
+  padding-right: 0;
+}
+
+/* The Form must also act as a flex container to pass height down */
+#mitte_automtn .ce_text form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto; /* Grow to fill space below headers */
+  min-height: 0;  /* Critical for Firefox */
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Generic Settings Flex Container (Legacy/Alternative) */
 .settings-flex-layout {
   display: flex; flex-direction: column; align-items: flex-start;
-  height: calc(100vh - 355px);
+  flex: 1 1 auto; 
+  min-height: 0; /* Crucial for nested flex scrolling */
   width: 100%; border: none; font-family: sans-serif;
   overflow: hidden;
 }
 
-/* Scrollable Areas */
-#mitte_automtn .ce_text,
+/* Scrollable Table Area: Only this part scrolls */
 .table-scroll {
   flex: 1 1 auto;
-  overflow-y: auto;
-  margin-bottom: 10px;
+  overflow-y: auto; /* Enable scroll here */
+  width: 100%;
   padding-right: 0;
   /* Hide scrollbars */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-#mitte_automtn,
-.table-scroll {
-  width: 100%;
-}
-#mitte_automtn .ce_text::-webkit-scrollbar,
 .table-scroll::-webkit-scrollbar { display: none; }
 
-/* Fixed Footer/Button Areas */
-#autmnbuttons {
-  flex: 0 0 auto;
+.separator-line {
   width: 100%;
-  border-top: 1px solid #ccc;
+  height: 1px;
+  background-color: #ccc;
+  margin-top: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+/* Fixed Footer/Button Areas */
+#autmnbuttons {flex: 0 0 auto;
+  width: 100%;
+  padding-left: 0px !important; 
+  margin-left: -95px;
   
-  margin-left: 0 !important;
-  margin-right: 40px !important;
-  
-  padding-left: 100px; /* Indent buttons */
-  padding-top: 10px; padding-bottom: 5px;
+  display: flex;
+  justify-content: center; 
+  gap: 10px;
+
+  padding-top: 0px; padding-bottom: 5px;
   
   background-color: transparent;
   z-index: 10;
-  box-sizing: border-box;display: flex;
+  box-sizing: border-box;
 }
 .table-fixed {
   flex: 0 0 auto;
@@ -166,7 +191,7 @@ div.left { float: left; position: relative; min-width: 400px; }
   margin-left: 0 !important;
   margin-right: 40px !important;
   
-  padding-left: 0 !important; /* No indent -> aligns with set_tbl_data */
+  padding-left: 0 !important; /* No indent -> aligns with table */
   padding-top: 10px; padding-bottom: 5px;
   
   background-color: transparent;
@@ -317,6 +342,13 @@ div.tableform label { float: left; }
 div#confbutton { margin-left: 20px; }
 form#confbutton, form#confbuttons { padding-right: 10px; padding-top: 20px; float: right; position: relative; }
 div#setup-buttons { position: absolute; bottom: 20px; }
+#confbuttons form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;             
+    gap: 10px;          
+}
 
 /* Disabled inputs */
 input[type="number"].disabled, input[type="time"].disabled, .disabled {
@@ -361,6 +393,7 @@ table#mod-inputs-table, table#mod-outputs-table, table#mod-events-table { width:
 #automations_table table, #atm-table {
   width: 100%;
   table-layout: fixed;
+  margin-bottom: 2px;
 }
 /* Column widths for Automation Table */
 #atm-table th:nth-child(1) { width: 35%; }

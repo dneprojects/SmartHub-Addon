@@ -416,10 +416,15 @@ def prepare_automations_list(main_app, step):
     else:
         automations = main_app["automations_def"].forward
         last_source_header = ""
+
+    # Open Form
     tbl = (
         indent(4)
         + '<form id="automations_table" action="automations/automtns" method="post">\n'
     )
+
+    tbl += indent(5) + '<div class="table-scroll">\n'
+
     for at_i in range(len(automations)):
         if step in [1, 3]:
             src_mod = automations[at_i].src_mod
@@ -475,6 +480,7 @@ def prepare_automations_list(main_app, step):
                 )
                 tbl += indent(6) + "</thead>\n"
                 tbl += indent(6) + "<tbody>\n"
+
         tbl += indent(6) + '<tr id="atm-tr">\n'
         evnt_desc = automations[at_i].trigger.description
         cond_desc = automations[at_i].condition.name
@@ -496,9 +502,15 @@ def prepare_automations_list(main_app, step):
         tbl += indent(7) + f"<td>{actn_desc}</td>\n"
         tbl += f'<td id="{ext_mod}"><input title="Auswahl zum Ändern oder Löschen oder als Voreinstellung für neue Automatisierungsregel" type="radio" name="{id_name}" id="{id_name}" value="{at_i}" {sel_chkd}></td>'
         tbl += indent(6) + "</tr>\n"
-    tbl += indent(6) + "</tbody>\n"
-    tbl += indent(5) + "</table>\n"
+
+    if len(automations) > 0:
+        tbl += indent(6) + "</tbody>\n"
+        tbl += indent(5) + "</table>\n"
+
+    tbl += indent(5) + "</div>\n"
+
     tbl += indent(4) + "</form>\n"
+    tbl += indent(4) + '<div class="separator-line"></div>'
     return tbl
 
 
