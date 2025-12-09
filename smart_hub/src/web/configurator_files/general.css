@@ -122,7 +122,6 @@ body,
   background: #fff;
   overflow-y: auto;
   scroll-behavior: smooth;
-  height: calc(100vh - 280px);
 }
 
 #mitte {
@@ -242,7 +241,7 @@ img {
     visibility: hidden;
   }
   .settings-flex-layout {
-    height: calc(100vh - 275px);
+    height: calc(100vh - 265px);
   }
   #header {
     height: 70px;
@@ -276,7 +275,9 @@ img {
     width: 100%;
     margin-left: 0px;
     margin-top: -80px;
-    height: calc(100vh - 200px);
+  }
+  #mitte_automtn {
+    height: calc(100vh - 196px);
   }
   #left {
     margin-top: -80px;

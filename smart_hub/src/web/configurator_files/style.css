@@ -136,13 +136,16 @@ div.left { float: left; position: relative; min-width: 400px; }
   height: 100%;
   overflow: hidden;
 }
-
+#mitte_automtn {
+  height: calc(100vh - 276px);
+}
 /* Generic Settings Flex Container (Legacy/Alternative) */
 .settings-flex-layout {
   display: flex; flex-direction: column; align-items: flex-start;
   flex: 1 1 auto; 
   min-height: 0; /* Crucial for nested flex scrolling */
   width: 100%; border: none; font-family: sans-serif;
+  height: calc(100vh - 345px);
   overflow: hidden;
 }
 
@@ -180,6 +183,7 @@ div.left { float: left; position: relative; min-width: 400px; }
   width: 100%;
   border-top: 1px solid #ccc;
   
+  margin-top: 5px;
   margin-left: 0 !important;
   margin-right: 40px !important;
   
@@ -196,6 +200,7 @@ div.left { float: left; position: relative; min-width: 400px; }
   height: 1px;
   background-color: #ccc;
   margin-top: 10px;
+  margin-bottom: 5px;
   padding-left: 5px;
   padding-right: 5px;
 }
@@ -294,6 +299,11 @@ input.submit:hover { padding: 1px 2px; color: #343434; }
 input#clear:hover, input#send:hover { cursor: pointer; }
 
 /* Button Sizes */
+button.config_button, #config_button.config_button, #config_button_sv.config_button, #config_button_sav.config_button {
+  height: 22px; 
+  width: 80px !important;
+  margin-left: 0px;
+}
 #config_button, #config_button_sv, transfer_button, files_button, #chan_reset_button, #config_button_extra,
 #add-mod-ok, #close-button, #test-button, #rem-button, #upd_cancel_button, #flash_button, #config_button_cnc,
 #automtns_button, #showlogs_button, #updates_button, #tbl-button, #reload-button, #reload_button, 
@@ -314,9 +324,6 @@ input#clear:hover, input#send:hover { cursor: pointer; }
 #btn_rtr_timeout, #btn_new_mod_id, #btn_chan_reset, #btn_rt_reboot,
 #btn_rt_fwdtable, #btn_cov_autostop_del, #btn_updcheck_toggle, #btn_turnoff_config {
   width: 80px; height: 22px;
-}
-button.config_button, #config_button.config_button, #config_button_sv.config_button {
-  height: 22px; width: 80px; margin-left: 0px;
 }
 /* Small buttons */
 button.ekey_pair { height: 22px; width: 60px; margin-left: 20px; }
