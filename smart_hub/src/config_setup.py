@@ -189,7 +189,7 @@ def show_setup_page(app, popup_msg="") -> web.Response:
     else:
         page = page.replace(
             'value="cancel" style="visibility: hidden;"',
-            'value="cancel" style="width: 140px;"',
+            'value="cancel"',
         )
         page = page.replace(
             'id="config_button" type="submit"',

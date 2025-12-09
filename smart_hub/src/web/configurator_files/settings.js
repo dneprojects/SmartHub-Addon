@@ -359,26 +359,4 @@ function parseNewId() {
     }
     new_modid.value = nn;
 }
-function syncTableWidths() {
-    // Get first row of data table (source) and control table (target)
-    const sourceRow = document.querySelector('#set_tbl_data tr');
-    const targetRow = document.querySelector('#set_tbl_controls tr');
 
-    if (!sourceRow || !targetRow) return;
-
-    const sourceCells = sourceRow.children;
-    const targetCells = targetRow.children;
-
-    // Loop through cells and apply width
-    if (targetCells[0]) {
-        // Get exact rendered width
-        const width = sourceCells[0].getBoundingClientRect().width;
-
-        // Apply to target cell
-        targetCells[0].style.width = `${width - 4}px`;
-    }
-}
-
-// Run on load and resize
-window.addEventListener('load', syncTableWidths);
-window.addEventListener('resize', syncTableWidths);

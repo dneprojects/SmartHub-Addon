@@ -312,9 +312,7 @@ img {
     margin-left: 10px;
     margin-right: 10px;
   }
-  #config_button.config_button,
-  #config_button_sv.config_button,
-  button.config_button,
+  
   #file_button,
   #close_file_popup,
   #reset_button,
@@ -330,10 +328,23 @@ img {
     width: 60px;
     font-size: 90%;
   }
+  #change_button, #del_button, #new_button, #new_ext_button {
+    width: 80px;
+    font-size: 90%;
+  }
+
   #automtns_button,
   #config_button,
+  #config_button_sv,
+  #config_button_acc,
+  #config_button_cnc,
   #files_button,
-  #finish_button {
+  #reload_button,
+  #reload-button,
+  #finish_button,
+  #transfer_button,
+  #updates_button,
+  button.config_button {
     width: 110px;
     font-size: 90%;
   }
@@ -342,6 +353,7 @@ img {
   input#upd_updwnload,
   input#sys_upload {
     width: 250px;
+    font-size: 90%;
   }
   #file_button_l {
     width: 255px;

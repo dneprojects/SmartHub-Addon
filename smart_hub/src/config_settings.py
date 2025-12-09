@@ -1292,60 +1292,70 @@ def prepare_table(main_app, mod_addr, step, key) -> str:
         elif key in ["gsm_numbers"]:
             max_new = 50
 
-        tbl += (
-            indent(7)
-            + '<tr><td style="height: 10px;"></td><td>&nbsp;</td><td>&nbsp;</td></tr>\n'
-        )
-        tbl += (
-            indent(7)
-            + "<tr><td>&nbsp;</td><td>&nbsp;</td><td>"  # Keep structure to match alignment: Label | Input | Button/Checkbox
-            + '<button name="ModSettings" class="new_button" id="config_button" type="submit" '
-            + f'form="settings_table" value="del-{mod_addr}-{step}">entfernen</button></td></tr>\n'
-        )
-        tbl += (
-            indent(7)
-            + f'<tr><td><label for="{id_name}">{prompt}&nbsp;</label></td><td><input name="new_entry" '
-            + f'type="number" class="desc_input1"  min="{min_new}" max="{max_new}" placeholder="Neue Nummer eintragen" id="{id_name}"/></td>\n'
-        )
+        # Determine button properties based on key (logic from original code consolidated)
+        btn_name = "ModSettings"
+        btn_type = "submit"
+        btn_cls = "new_button"
+        btn_val = f"new-{mod_addr}-{step}"
+
         if key == "counters":
-            tbl += (
-                indent(7)
-                + '<td><button name="ModSettings" class="new_cntr_button" id="config_button" '
-                + f'type="button" value="new-{mod_addr}-{step}">anlegen</button>\n'
-            )
+            btn_cls = "new_cntr_button"
+            btn_type = "button"
         elif key == "logic":
-            tbl += (
-                indent(7)
-                + '<td><button name="ModSettings" class="new_lgc_button" id="config_button" '
-                + f'type="button" value="new-{mod_addr}-{step}">anlegen</button>\n'
-            )
-        else:
-            tbl += (
-                indent(7)
-                + '<td><button name="ModSettings" class="new_button" id="config_button" type="submit" '
-                + f'form="settings_table" value="new-{mod_addr}-{step}">anlegen</button>\n'
-            )
-        if key in ["fingers"]:
-            tbl = tbl.replace(
-                '<button name="ModSettings" class="new_button" id="config_button" type="submit" form="settings_table" value="new',
-                '<button name="TeachNewFinger" class="new_button" id="config_button" type="button" form="settings_table" value="new',
-            )
-        tbl += indent(7) + "</tr>\n"
+            btn_cls = "new_lgc_button"
+            btn_type = "button"
+        elif key == "fingers":
+            btn_name = "TeachNewFinger"
+            btn_type = "button"
+            btn_val = "new"
+
+        # Create single row
+        tbl += indent(7) + "<tr><td>\n"
+
+        # Flex container: Centered
+        tbl += (
+            indent(8)
+            + '<div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 5px 0;">\n'
+        )
+
+        # Block 1: Create/Add (Anlegen)
+        tbl += (
+            indent(9) + '<div style="display: flex; align-items: center; gap: 5px;">\n'
+        )
+        tbl += (
+            indent(10) + f'<label for="{id_name}" style="margin:0;">{prompt}</label>\n'
+        )
+        tbl += (
+            indent(10)
+            + f'<input name="new_entry" type="number" class="desc_input1" min="{min_new}" max="{max_new}" placeholder="Nr" id="{id_name}" style="width: 50px; padding-top: 1px; margin:0; text-align: center;"/>\n'
+        )
+        tbl += (
+            indent(10)
+            + f'<button name="{btn_name}" class="{btn_cls}" id="config_button" type="{btn_type}" form="settings_table" value="{btn_val}">anlegen</button>\n'
+        )
+        tbl += indent(9) + "</div>\n"
+
+        tbl += indent(8) + "</td>\n"
+        tbl += indent(8) + '<td style="width: 25px;">\n'
+        tbl += indent(8) + "</td>\n"
+        tbl += indent(8) + "<td>\n"
+        # Block 2: Remove (Entfernen)
+        tbl += (
+            indent(9) + '<div style="display: flex; align-items: center; gap: 5px;">\n'
+        )
+        tbl += indent(10) + '<label style="margin:0;">Auswahl</label>\n'
+        tbl += (
+            indent(10)
+            + f'<button name="ModSettings" class="new_button" id="config_button" type="submit" form="settings_table" value="del-{mod_addr}-{step}">entfernen</button>\n'
+        )
+        tbl += indent(9) + "</div>\n"
+
+        tbl += indent(8) + "</div>\n"  # End flex container
+        tbl += indent(7) + "</td></tr>\n"  # End table row
 
         tbl += indent(7) + "</tbody>\n"
         tbl += indent(6) + "</table>\n"
         tbl += indent(5) + "</div>\n"  # Close .table-fixed
-
-    # Entferne die alten, unnötigen Zeilen aus dem ursprünglichen Code,
-    # da sie jetzt in .table-fixed sind.
-    # Original:
-    # tbl += indent(7) + "<tr><td>&nbsp;</td></tr>\n"
-    # tbl += (
-    #     indent(7)
-    #     + "<tr><td>&nbsp;</td><td></td><td>"
-    #     + '...
-    # )
-    # tbl += indent(7) + "</tr>\n"
 
     tbl += indent(4) + "</form>\n"
     return tbl

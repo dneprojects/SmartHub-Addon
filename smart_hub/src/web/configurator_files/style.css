@@ -158,14 +158,6 @@ div.left { float: left; position: relative; min-width: 400px; }
 }
 .table-scroll::-webkit-scrollbar { display: none; }
 
-.separator-line {
-  width: 100%;
-  height: 1px;
-  background-color: #ccc;
-  margin-top: 10px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
 
 /* Fixed Footer/Button Areas */
 #autmnbuttons {flex: 0 0 auto;
@@ -198,6 +190,16 @@ div.left { float: left; position: relative; min-width: 400px; }
   z-index: 10;
   box-sizing: border-box;
 }
+
+.separator-line {
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+  margin-top: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 /* ==========================================================================
    5. FORMS & INPUTS
    ========================================================================== */
@@ -264,7 +266,7 @@ select.daytime { width: 120px; }
 
 /* Large Inputs */
 input#file_updwnload, input#sys_upload, input#file_upload_edit, input#upd_updwnload {
-  width: 360px; margin-left: 0px; margin-right: 10px; padding: 2px; margin-bottom: 2px; text-align: left;
+  width: 360px; margin-left: 0px; margin-right: 10px; padding: 1px; padding-left: 2px; padding-top: 2px; margin-bottom: 2px; text-align: left;
 }
 textarea {
   background: url(design/input_shadow.gif) no-repeat left top;
@@ -292,10 +294,10 @@ input.submit:hover { padding: 1px 2px; color: #343434; }
 input#clear:hover, input#send:hover { cursor: pointer; }
 
 /* Button Sizes */
-#config_button, transfer_button, files_button, #chan_reset_button, #config_button_extra,
-#add-mod-ok, #close-button, #test-button, #rem-button, #upd_cancel_button, #flash_button,
-#automtns_button, #showlogs_button, #updates_button, #tbl-button, #reload-button,
-#files_button, #finish_button, #transfer_button, #exit_button {
+#config_button, #config_button_sv, transfer_button, files_button, #chan_reset_button, #config_button_extra,
+#add-mod-ok, #close-button, #test-button, #rem-button, #upd_cancel_button, #flash_button, #config_button_cnc,
+#automtns_button, #showlogs_button, #updates_button, #tbl-button, #reload-button, #reload_button, 
+#files_button, #finish_button, #transfer_button, #exit_button, #config_button_acc {
   height: 22px; width: 125px; margin-left: 0px;
   font-family: "Lucida Sans", Arial, Verdana, Helvetica, sans-serif;
   font: 11px arial, helvetica, clean, sans-serif;
@@ -383,6 +385,9 @@ table#mod-inputs-table, table#mod-outputs-table, table#mod-events-table { width:
   border-collapse: collapse;
   table-layout: fixed;
 }
+#set_tbl_controls {
+  justify-self: center;
+} 
 #set_tbl_data tr td:nth-child(1), #set_tbl_controls tr td:nth-child(1) {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
@@ -539,26 +544,3 @@ body.acc #mitte, body.acc #mitte_automtn {
 body.acc #right .image_container, body.acc #right img {
   position: relative; left: 0; top: 0; padding-top: 0px;
 }
-
-/* Products Sub */
-body.produkte.sub #right img { padding-top: 0px; padding-bottom: 0px; }
-body.produkte.sub #right h1 { padding-top: 0px; padding-bottom: 0px; }
-
-/* Login */
-body.login p.error { padding-top: 5px; padding-bottom: 5px; }
-body.login .mod_article { padding-bottom: 35px; }
-
-/* Cooperation */
-body.kooperation img { margin-right: 20px; margin-bottom: 20px; }
-body.kooperation td { padding-top: 10px; padding-bottom: 10px; border-top: 1px solid #e2e2e2; }
-body.unternehmen td { width: 50%; }
-
-/* News */
-.mod_newslist { height: 190px; max-height: 190px; }
-.mod_newslist h1 a { color: #c0372d; }
-.mod_newslist h1 { color: #c0372d; font-size: 12px; font-weight: bold; padding-bottom: 5px; }
-.layout_short.first { padding-top: 0px; }
-.layout_short { padding-bottom: 5px; padding-top: 5px; line-height: 16px; }
-.layout_short.last { border-bottom: none; }
-p.info { color: #666; font-style: italic; background: none; font-weight: bold; }
-.mod_newsreader .image_container img { padding-left: 10px; padding-bottom: 10px; }
