@@ -2,6 +2,7 @@ import logging
 import math
 from copy import deepcopy as dpcopy
 from const import (
+    GrpDescriptor,
     IfDescriptor,
     IoDescriptor,
     LgcDescriptor,
@@ -1061,7 +1062,7 @@ class RouterSettings:
         self.user1_name = rtr.user_modes[1:11].decode("iso8859-1").strip()
         self.user2_name = rtr.user_modes[12:].decode("iso8859-1").strip()
         self.glob_flags: list[IfDescriptor] = []
-        self.groups: list[IfDescriptor] = []
+        self.groups: list[GrpDescriptor] = []
         self.coll_cmds: list[IfDescriptor] = []
         self.areas: list[IfDescriptor] = []
         self.chan_list = []
@@ -1132,7 +1133,7 @@ class RouterSettings:
                 self.cov_autostop_del = desc.nmbr
                 rtr.cov_autostop_del = desc.nmbr
         if len(self.groups) == 0:
-            self.groups.append(IfDescriptor("general", 0, 0))
+            self.groups.append(GrpDescriptor("general", 0, 0, 2))
         if len(self.areas) == 0:
             self.areas.append(IfDescriptor("House", 1, 0))
 

@@ -339,7 +339,6 @@ button.ekey_pair { height: 22px; width: 60px; margin-left: 20px; }
 #config_button.new_button, #config_button.new_cntr_button, #config_button.new_lgc_button {
   height: 21.78px; width: 55px; margin-left: 5px; margin-right: 2px;
 }
-button.config_button { margin-right: 25px; } /* Generic override */
 
 /* Form Layouts */
 form input, form select { display: block; float: left; }

@@ -1615,7 +1615,7 @@ def parse_response_form(main_app, form_data):
                             mod_dep = int(form_data[form_key][0])
                             settings.__getattribute__(key)[
                                 int(indices[0])
-                            ].type = mod_dep
+                            ].mddep = mod_dep
                             settings.mode_dependencies = (
                                 settings.mode_dependencies[:grp_nmbr]
                                 + int.to_bytes(mod_dep, length=1, byteorder="big")

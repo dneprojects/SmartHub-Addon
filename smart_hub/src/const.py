@@ -893,6 +893,12 @@ class IoDescriptor(IfDescriptor):
         super().__init__(iname, inmbr, itype)
         self.area: int = iarea
 
+class GrpDescriptor(IfDescriptor):
+    """Habitron group interface descriptor."""
+
+    def __init__(self, iname, inmbr, mddep=0, itype=2) -> None:
+        super().__init__(iname, inmbr, itype)
+        self.mddep: int = mddep
 
 class LgcDescriptor(IfDescriptor):
     """Habitron logic interface descriptor."""

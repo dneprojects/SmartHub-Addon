@@ -84,7 +84,7 @@ class HdlrBase:
             try:
                 await asyncio.wait_for(self.rt_msg.rt_recv(), timeout=3)
             except TimeoutError:
-                self.logger.warning("Timeout receiving router response, returning 0 0")
+                self.logger.warning("Timeout receiving router response, logging stored")
                 self.logger.parent.handlers[1].doRollover()  # type: ignore
                 date_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
                 copyfile("smhub.log.1", f"smhub_timeout_{date_time}.log")
@@ -112,7 +112,7 @@ class HdlrBase:
         try:
             await asyncio.wait_for(self.rt_msg.rt_recv(), timeout=1.5)
         except TimeoutError:
-            self.logger.warning("Timeout receiving router response, returning 0 0")
+            self.logger.warning("Timeout receiving router response, logging stored")
             self.logger.parent.handlers[1].doRollover()  # type: ignore
             date_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
             copyfile("smhub.log.1", f"smhub_timeout_{date_time}.log")
