@@ -85,9 +85,7 @@ class HdlrBase:
                 await asyncio.wait_for(self.rt_msg.rt_recv(), timeout=3)
             except TimeoutError:
                 self.logger.warning("Timeout receiving router response, logging stored")
-                self.logger.parent.handlers[1].doRollover()  # type: ignore
-                date_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-                copyfile("smhub.log.1", f"smhub_timeout_{date_time}.log")
+                self.store_timeout_log()
             except Exception as err_msg:
                 self.logger.warning(
                     f"Error receiving router response: {err_msg}, returning 0 0"
@@ -113,9 +111,7 @@ class HdlrBase:
             await asyncio.wait_for(self.rt_msg.rt_recv(), timeout=1.5)
         except TimeoutError:
             self.logger.warning("Timeout receiving router response, logging stored")
-            self.logger.parent.handlers[1].doRollover()  # type: ignore
-            date_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-            copyfile("smhub.log.1", f"smhub_timeout_{date_time}.log")
+            self.store_timeout_log()
         return
 
     async def send_api_response(self, msg: str, flag: int):
@@ -123,3 +119,13 @@ class HdlrBase:
         resp_msg = msg.replace("<flg>", chr(flag))
         self.msg.resp_prepare_stat(resp_msg)
         await self.api_srv.send_status_to_client()
+
+    def store_timeout_log(self):
+        """Take logfile and store it with a timestamp."""
+
+        self.logger.parent.handlers[1].doRollover()  # type: ignore
+        date_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        copyfile(
+            self.api_srv.get_config_path() + "smhub.log.1",
+            f"{self.api_srv.get_config_path()}smhub_timeout_{date_time}.log",
+        )

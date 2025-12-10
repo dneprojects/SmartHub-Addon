@@ -497,12 +497,15 @@ class ApiServer:
                 f"Saved '{new_month_file.split('/')[1]}' as monthly backup file"
             )
 
+    def get_config_path(self) -> str:
+        """Return config path."""
+        if self.is_addon:
+            return DATA_FILES_ADDON_DIR
+        return DATA_FILES_DIR
+
     def get_last_backupday(self) -> int:
         """Return day of last backup."""
-        if self.is_addon:
-            backup_path = DATA_FILES_ADDON_DIR
-        else:
-            backup_path = DATA_FILES_DIR
+        backup_path = self.get_config_path()
         try:
             dayly_backup_file_list = glob(f"{backup_path}*_d.hcf")
             dayly_backup_file_list.sort()

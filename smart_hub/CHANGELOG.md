@@ -1,3 +1,8 @@
+## v2.8.6
+
+### Fix
+- Log file storage
+
 ## v2.8.5
 
 ### Modified
