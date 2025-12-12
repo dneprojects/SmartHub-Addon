@@ -83,7 +83,6 @@ jobs:
           cp -R source_temp/* $TARGET/
           rm -rf source_temp
           echo "Code temporarily injected into $TARGET"
-
       # 5. Sync version (read const.py -> write config.yaml)
       - name: Sync Version
         id: versioning
@@ -102,13 +101,9 @@ jobs:
               gh.write(f'version={version}\n')
           "
 
-      # --- NEW: Required for cross-compilation (aarch64) ---
+      # --- Only QEMU, NO explicit Buildx setup ---
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      # -----------------------------------------------------
 
       # 6. Login to GHCR
       - name: Login to GHCR
@@ -119,7 +114,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # 7. Build Add-on
-      # Added --amd64 to build for standard PC as well
       - name: Build Add-on
         uses: home-assistant/builder@2024.03.5
         with:
