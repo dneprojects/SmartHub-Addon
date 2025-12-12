@@ -22,4 +22,4 @@ ingress_stream : true
 panel_title: Smart Configurator (beta)
 panel_icon: hbt:habitron-logo
 panel_admin: true
-image: "ghcr.io/dneprojects/smart_hub_beta/{arch}"
+image: "ghcr.io/dneprojects/smart_hub_beta"
