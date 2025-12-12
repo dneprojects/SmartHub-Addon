@@ -1,11 +1,10 @@
-# .github/workflows/release.yaml
-name: Manage Releases (Beta & Public)
+name: Release Manager (Hidden Beta)
 
 on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Select Release Channel'
+        description: 'Wähle den Kanal:'
         required: true
         default: 'beta'
         type: choice
@@ -21,76 +20,63 @@ jobs:
       packages: write
 
     steps:
-      # 1. Checkout the Addon repository
+      # 1. Richtigen Branch auschecken
+      # Public -> main Branch
+      # Beta -> beta Branch
       - name: Checkout Addon Repo
         uses: actions/checkout@v4
         with:
           path: addon
+          ref: ${{ inputs.release_type == 'beta' && 'beta' || 'main' }}
 
-      # 2. Checkout the source code from SmartHub repo
-      - name: Checkout Source Code
+      # 2. Source Code holen
+      - name: Checkout SmartHub Source
         uses: actions/checkout@v4
         with:
-          repository: DEIN_USER/SmartHub  # <--- REPLACE THIS
+          repository: DEIN_USER/SmartHub # <--- ANPASSEN
           path: source_temp
           ref: main
 
-      # 3. Determine target directory based on selection
-      - name: Set Target Variables
+      # 3. Variablen setzen
+      - name: Set Environment
         id: target
         run: |
           if [[ "${{ inputs.release_type }}" == "beta" ]]; then
             echo "folder=smart_hub_beta" >> $GITHUB_OUTPUT
             echo "image_name=smart_hub_beta" >> $GITHUB_OUTPUT
-            echo "Selected BETA channel."
           else
             echo "folder=smart_hub" >> $GITHUB_OUTPUT
             echo "image_name=smart_hub" >> $GITHUB_OUTPUT
-            echo "Selected PUBLIC channel."
           fi
 
-      # 4. Inject source code into the correct addon folder
+      # 4. Code injizieren (wird durch .gitignore ignoriert)
       - name: Inject Source Code
         run: |
           TARGET="addon/${{ steps.target.outputs.folder }}/src"
           mkdir -p $TARGET
           cp -R source_temp/* $TARGET/
-          rm -rf source_temp
-          echo "Code injected into $TARGET"
+          rm -rf source_temp # Aufräumen der Quelle
+          echo "Code temporarily injected into $TARGET"
 
-      # 5. Extract version from const.py and update config.yaml
-      - name: Update Version in Config
+      # 5. Version updaten (in const.py lesen -> config.yaml schreiben)
+      - name: Sync Version
         id: versioning
         run: |
           python3 -c "
-          import re
-          import os
-
-          # Define paths
-          target_folder = '${{ steps.target.outputs.folder }}'
-          const_path = f'addon/{target_folder}/src/const.py'
-          config_path = f'addon/{target_folder}/config.yaml'
-
-          # Read version from const.py
-          with open(const_path, 'r') as f:
-              content = f.read()
-              match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', content)
-              if match:
-                  version = match.group(1)
-                  print(f'Found version: {version}')
-              else:
-                  print('Error: Version not found in const.py')
-                  exit(1)
-
-          # Update config.yaml using sed
-          os.system(f\"sed -i 's/^version:.*/version: {version}/' {config_path}\")
+          import re, os
+          const_path = 'addon/${{ steps.target.outputs.folder }}/src/const.py'
+          config_path = 'addon/${{ steps.target.outputs.folder }}/config.yaml'
           
-          # Set output for next steps
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as gh_out:
-              gh_out.write(f'version={version}\n')
+          with open(const_path, 'r') as f:
+              match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', f.read())
+              version = match.group(1) if match else '0.0.0'
+          
+          os.system(f\"sed -i 's/^version:.*/version: {version}/' {config_path}\")
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as gh:
+              gh.write(f'version={version}\n')
           "
 
-      # 6. Login to GitHub Container Registry
+      # 6. Login GHCR
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -98,7 +84,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 7. Build and Push the Docker Image
+      # 7. Bauen
       - name: Build Add-on
         uses: home-assistant/builder@2024.03.5
         with:
@@ -109,22 +95,30 @@ jobs:
             --docker-hub "ghcr.io/${{ github.repository_owner }}" \
             --addon
 
-      # 8. Commit the updated config.yaml back to the repo
-      # This triggers the update notification in Home Assistant
+      # 8. Source Code wieder löschen (Sicherheitsmaßnahme)
+      # Obwohl .gitignore hilft, löschen wir es physisch vor dem Commit
+      - name: Cleanup Source Code
+        run: |
+          rm -rf addon/${{ steps.target.outputs.folder }}/src
+          echo "Source code removed from runner."
+
+      # 9. Commit & Push (landet im entsprechenden Branch)
       - name: Commit Config Update
         working-directory: ./addon
         run: |
           git config --global user.name "SmartHub Bot"
           git config --global user.email "bot@smarthub.local"
           
-          FILE_TO_COMMIT="${{ steps.target.outputs.folder }}/config.yaml"
+          FILE="smart_hub_beta/config.yaml"
+          if [[ "${{ inputs.release_type }}" == "public" ]]; then
+            FILE="smart_hub/config.yaml"
+          fi
           
-          # Only commit if changed
-          if [[ -n $(git status --porcelain $FILE_TO_COMMIT) ]]; then
-            git add $FILE_TO_COMMIT
-            git commit -m "Release (${{ inputs.release_type }}): ${{ steps.versioning.outputs.version }}"
+          # Nur config.yaml adden, nichts anderes!
+          if [[ -n $(git status --porcelain $FILE) ]]; then
+            git add $FILE
+            git commit -m "Release ${{ inputs.release_type }}: ${{ steps.versioning.outputs.version }}"
             git push
-            echo "Config updated in repo. HA will see the update soon."
           else
-            echo "No changes in config.yaml."
+            echo "No version change detected."
           fi
