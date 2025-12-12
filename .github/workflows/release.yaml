@@ -1,0 +1,116 @@
+name: Manual Build & Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Wähle den Modus:'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - public_release
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      # 1. Checkout Addon Repo
+      - name: Checkout Addon Repo
+        uses: actions/checkout@v4
+        with:
+          path: addon
+
+      # 2. Checkout Source Code (SmartHub)
+      - name: Checkout SmartHub Source
+        uses: actions/checkout@v4
+        with:
+          repository: DEIN_USER/SmartHub # <--- ANPASSEN
+          path: source_temp
+          ref: main
+
+      # 3. Struktur vorbereiten (Source in src/ kopieren)
+      - name: Prepare Directory Structure
+        run: |
+          mkdir -p addon/smart_hub/src
+          cp -R source_temp/* addon/smart_hub/src/
+          rm -rf source_temp
+          echo "Source code injected into addon/smart_hub/src"
+
+      # 4. Version aus const.py extrahieren und in config.yaml schreiben
+      - name: Sync Version Number
+        id: versioning
+        run: |
+          # Wir nutzen Python für sauberes Parsing
+          python3 -c "
+          import re
+          import yaml
+
+          # Pfade definieren
+          const_path = 'addon/smart_hub/src/const.py' # <--- Pfad zur const.py anpassen falls nötig
+          config_path = 'addon/smart_hub/config.yaml'
+
+          # 1. Version aus const.py lesen
+          with open(const_path, 'r') as f:
+              content = f.read()
+              # Suche nach VERSION = 'x.x.x' oder ähnlichem
+              match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', content)
+              if match:
+                  version = match.group(1)
+                  print(f'Found version: {version}')
+              else:
+                  print('Error: Could not find VERSION in const.py')
+                  exit(1)
+
+          # 2. config.yaml aktualisieren (nur die Version Zeile, ohne Kommentare zu zerstören)
+          # Da YAML Parser oft Formatierung ändern, nutzen wir hier sed für minimale Invasivität
+          import os
+          os.system(f\"sed -i 's/^version:.*/version: {version}/' {config_path}\")
+          
+          # Output für GitHub Actions setzen
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as gh_out:
+              gh_out.write(f'version={version}\n')
+          "
+
+      # 5. Login bei GitHub Container Registry
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 6. Build & Push Docker Image
+      # Wir nutzen den HA Builder. Er taggt automatisch basierend auf der Version in config.yaml
+      - name: Build Addon
+        uses: home-assistant/builder@2024.03.5
+        with:
+          args: |
+            --aarch64 \
+            --target /data/addon/smart_hub \
+            --image "smart_hub" \
+            --docker-hub "ghcr.io/${{ github.repository_owner }}" \
+            --addon
+
+      # 7. NUR BEI PUBLIC RELEASE: Commit & Push der neuen config.yaml
+      - name: Commit Version Update to Repo
+        if: inputs.release_type == 'public_release'
+        working-directory: ./addon
+        run: |
+          git config --global user.name "SmartHub Bot"
+          git config --global user.email "bot@smarthub.local"
+          
+          # Checken ob sich was geändert hat
+          if [[ -n $(git status --porcelain smart_hub/config.yaml) ]]; then
+            git add smart_hub/config.yaml
+            git commit -m "Release: Update version to ${{ steps.versioning.outputs.version }}"
+            git push
+            echo "Public Release successful. Config.yaml updated."
+          else
+            echo "No changes in config.yaml detected (Version might be same as before)."
+          fi
