@@ -1,0 +1,124 @@
+name: Release Manager (Hidden Beta)
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Wähle den Kanal:'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - beta
+          - public
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      # 1. Richtigen Branch auschecken
+      # Public -> main Branch
+      # Beta -> beta Branch
+      - name: Checkout Addon Repo
+        uses: actions/checkout@v4
+        with:
+          path: addon
+          ref: ${{ inputs.release_type == 'beta' && 'beta' || 'main' }}
+
+      # 2. Source Code holen
+      - name: Checkout SmartHub Source
+        uses: actions/checkout@v4
+        with:
+          repository: DEIN_USER/SmartHub # <--- ANPASSEN
+          path: source_temp
+          ref: main
+
+      # 3. Variablen setzen
+      - name: Set Environment
+        id: target
+        run: |
+          if [[ "${{ inputs.release_type }}" == "beta" ]]; then
+            echo "folder=smart_hub_beta" >> $GITHUB_OUTPUT
+            echo "image_name=smart_hub_beta" >> $GITHUB_OUTPUT
+          else
+            echo "folder=smart_hub" >> $GITHUB_OUTPUT
+            echo "image_name=smart_hub" >> $GITHUB_OUTPUT
+          fi
+
+      # 4. Code injizieren (wird durch .gitignore ignoriert)
+      - name: Inject Source Code
+        run: |
+          TARGET="addon/${{ steps.target.outputs.folder }}/src"
+          mkdir -p $TARGET
+          cp -R source_temp/* $TARGET/
+          rm -rf source_temp # Aufräumen der Quelle
+          echo "Code temporarily injected into $TARGET"
+
+      # 5. Version updaten (in const.py lesen -> config.yaml schreiben)
+      - name: Sync Version
+        id: versioning
+        run: |
+          python3 -c "
+          import re, os
+          const_path = 'addon/${{ steps.target.outputs.folder }}/src/const.py'
+          config_path = 'addon/${{ steps.target.outputs.folder }}/config.yaml'
+          
+          with open(const_path, 'r') as f:
+              match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', f.read())
+              version = match.group(1) if match else '0.0.0'
+          
+          os.system(f\"sed -i 's/^version:.*/version: {version}/' {config_path}\")
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as gh:
+              gh.write(f'version={version}\n')
+          "
+
+      # 6. Login GHCR
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 7. Bauen
+      - name: Build Add-on
+        uses: home-assistant/builder@2024.03.5
+        with:
+          args: |
+            --aarch64 \
+            --target /data/addon/${{ steps.target.outputs.folder }} \
+            --image "${{ steps.target.outputs.image_name }}" \
+            --docker-hub "ghcr.io/${{ github.repository_owner }}" \
+            --addon
+
+      # 8. Source Code wieder löschen (Sicherheitsmaßnahme)
+      # Obwohl .gitignore hilft, löschen wir es physisch vor dem Commit
+      - name: Cleanup Source Code
+        run: |
+          rm -rf addon/${{ steps.target.outputs.folder }}/src
+          echo "Source code removed from runner."
+
+      # 9. Commit & Push (landet im entsprechenden Branch)
+      - name: Commit Config Update
+        working-directory: ./addon
+        run: |
+          git config --global user.name "SmartHub Bot"
+          git config --global user.email "bot@smarthub.local"
+          
+          FILE="smart_hub_beta/config.yaml"
+          if [[ "${{ inputs.release_type }}" == "public" ]]; then
+            FILE="smart_hub/config.yaml"
+          fi
+          
+          # Nur config.yaml adden, nichts anderes!
+          if [[ -n $(git status --porcelain $FILE) ]]; then
+            git add $FILE
+            git commit -m "Release ${{ inputs.release_type }}: ${{ steps.versioning.outputs.version }}"
+            git push
+          else
+            echo "No version change detected."
+          fi
