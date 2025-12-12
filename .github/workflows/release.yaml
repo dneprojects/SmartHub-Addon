@@ -33,7 +33,7 @@ jobs:
       - name: Checkout SmartHub Source
         uses: actions/checkout@v4
         with:
-          repository: DEIN_USER/SmartHub # <--- ANPASSEN
+          repository: dneprojects/SmartHub # <--- ANPASSEN
           path: source_temp
           ref: main
 
