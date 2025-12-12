@@ -1,4 +1,4 @@
-name: Release Manager (Hidden Beta)
+name: SmartHub Release Manager
 
 on:
   workflow_dispatch:
