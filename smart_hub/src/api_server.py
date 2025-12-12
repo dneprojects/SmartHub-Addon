@@ -319,7 +319,7 @@ class ApiServer:
             if self.evnt_srv.websck_is_closed:
                 self.logger.info("Waiting for web socket connection")
             self._netw_blocked = False
-            return "Init mode reset"
+            return "Init mode finished"
 
     async def set_server_mode(self, rt_no=1, silent=False) -> bool:
         """Turn on client/server mode: disable router events"""
