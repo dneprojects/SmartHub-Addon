@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Wähle den Kanal:'
+        description: 'Wähle die Art des Release:'
         required: true
         default: 'beta'
         type: choice
