@@ -1,0 +1,8 @@
+# .gitignore in the root folder
+
+# Ignore src folders in any subdirectory (stable or beta)
+**/src/
+
+# Optional: Ignore system files
+.DS_Store
+Thumbs.db
