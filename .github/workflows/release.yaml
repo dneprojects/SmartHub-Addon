@@ -1,16 +1,21 @@
 name: SmartHub Release Manager
 
 on:
+  # 1. Manueller start
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Wähle die Art des Release:'
+        description: 'Wähle den Kanal:'
         required: true
         default: 'beta'
         type: choice
         options:
           - beta
           - public
+  
+  # 2. Automatic trigger by SmartHub Repo
+  repository_dispatch:
+    types: [build-beta-event]
 
 jobs:
   build_and_publish:
@@ -20,6 +25,27 @@ jobs:
       packages: write
 
     steps:
+      # HIER IST DER TRICK: Wir definieren eine Variable 'TYPE'.
+      # Sie nimmt den manuellen Input ODER den Payload vom automatischen Trigger.
+      # Wenn beides fehlt (sollte nicht passieren), Fallback auf 'beta'.
+      - name: Determine Release Type
+        id: config
+        run: |
+          # Prüfen ob manueller Input existiert
+          MANUAL="${{ inputs.release_type }}"
+          # Prüfen ob Payload vom Dispatch existiert
+          AUTO="${{ github.event.client_payload.release_type }}"
+          
+          if [[ -n "$MANUAL" ]]; then
+            echo "mode=$MANUAL" >> $GITHUB_OUTPUT
+            echo "Selected mode (manual): $MANUAL"
+          elif [[ -n "$AUTO" ]]; then
+             echo "mode=$AUTO" >> $GITHUB_OUTPUT
+             echo "Selected mode (auto): $AUTO"
+          else
+             echo "mode=beta" >> $GITHUB_OUTPUT
+             echo "No input found, defaulting to beta."
+          fi
       # 1. Richtigen Branch auschecken
       # Public -> main Branch
       # Beta -> beta Branch
@@ -27,13 +53,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: addon
-          ref: ${{ inputs.release_type == 'beta' && 'beta' || 'main' }}
+          ref: ${{ steps.config.outputs.mode == 'beta' && 'beta' || 'main' }}
 
       # 2. Source Code holen
       - name: Checkout SmartHub Source
         uses: actions/checkout@v4
         with:
-          repository: dneprojects/SmartHub # <--- ANPASSEN
+          repository: dneprojects/SmartHub
           path: source_temp
           ref: main
           token: ${{ secrets.PAT_TOKEN }}
@@ -42,7 +68,8 @@ jobs:
       - name: Set Environment
         id: target
         run: |
-          if [[ "${{ inputs.release_type }}" == "beta" ]]; then
+          MODE="${{ steps.config.outputs.mode }}"
+          if [[ "$MODE" == "beta" ]]; then
             echo "folder=smart_hub_beta" >> $GITHUB_OUTPUT
             echo "image_name=smart_hub_beta" >> $GITHUB_OUTPUT
           else
