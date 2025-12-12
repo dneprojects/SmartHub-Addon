@@ -1,16 +1,21 @@
 name: SmartHub Release Manager
 
 on:
+  # 1. Manual trigger
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Wähle die Art des Release:'
+        description: 'Select channel:'
         required: true
         default: 'beta'
         type: choice
         options:
           - beta
           - public
+   
+  # 2. Automatic trigger by SmartHub Repo
+  repository_dispatch:
+    types: [build-beta-event]
 
 jobs:
   build_and_publish:
@@ -20,29 +25,49 @@ jobs:
       packages: write
 
     steps:
-      # 1. Richtigen Branch auschecken
-      # Public -> main Branch
-      # Beta -> beta Branch
+      # Determine variable 'TYPE' (Manual input OR Auto payload)
+      # Fallback to 'beta'
+      - name: Determine Release Type
+        id: config
+        run: |
+          # Check for manual input
+          MANUAL="${{ inputs.release_type }}"
+          # Check for dispatch payload
+          AUTO="${{ github.event.client_payload.release_type }}"
+           
+          if [[ -n "$MANUAL" ]]; then
+            echo "mode=$MANUAL" >> $GITHUB_OUTPUT
+            echo "Selected mode (manual): $MANUAL"
+          elif [[ -n "$AUTO" ]]; then
+             echo "mode=$AUTO" >> $GITHUB_OUTPUT
+             echo "Selected mode (auto): $AUTO"
+          else
+             echo "mode=beta" >> $GITHUB_OUTPUT
+             echo "No input found, defaulting to beta."
+          fi
+
+      # 1. Checkout correct branch (Public->main, Beta->beta)
       - name: Checkout Addon Repo
         uses: actions/checkout@v4
         with:
           path: addon
-          ref: ${{ inputs.release_type == 'beta' && 'beta' || 'main' }}
+          ref: ${{ steps.config.outputs.mode == 'beta' && 'beta' || 'main' }}
 
-      # 2. Source Code holen
+      # 2. Checkout Source Code
       - name: Checkout SmartHub Source
         uses: actions/checkout@v4
         with:
-          repository: dneprojects/SmartHub # <--- ANPASSEN
+          repository: dneprojects/SmartHub
           path: source_temp
           ref: main
           token: ${{ secrets.PAT_TOKEN }}
 
-      # 3. Variablen setzen
+      # 3. Set variables
       - name: Set Environment
         id: target
         run: |
-          if [[ "${{ inputs.release_type }}" == "beta" ]]; then
+          MODE="${{ steps.config.outputs.mode }}"
+          if [[ "$MODE" == "beta" ]]; then
             echo "folder=smart_hub_beta" >> $GITHUB_OUTPUT
             echo "image_name=smart_hub_beta" >> $GITHUB_OUTPUT
           else
@@ -50,16 +75,16 @@ jobs:
             echo "image_name=smart_hub" >> $GITHUB_OUTPUT
           fi
 
-      # 4. Code injizieren (wird durch .gitignore ignoriert)
+      # 4. Inject source code (ignored by .gitignore)
       - name: Inject Source Code
         run: |
           TARGET="addon/${{ steps.target.outputs.folder }}/src"
           mkdir -p $TARGET
           cp -R source_temp/* $TARGET/
-          rm -rf source_temp # Aufräumen der Quelle
+          rm -rf source_temp
           echo "Code temporarily injected into $TARGET"
 
-      # 5. Version updaten (in const.py lesen -> config.yaml schreiben)
+      # 5. Sync version (read const.py -> write config.yaml)
       - name: Sync Version
         id: versioning
         run: |
@@ -67,17 +92,25 @@ jobs:
           import re, os
           const_path = 'addon/${{ steps.target.outputs.folder }}/src/const.py'
           config_path = 'addon/${{ steps.target.outputs.folder }}/config.yaml'
-          
+           
           with open(const_path, 'r') as f:
               match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', f.read())
               version = match.group(1) if match else '0.0.0'
-          
+           
           os.system(f\"sed -i 's/^version:.*/version: {version}/' {config_path}\")
           with open(os.environ['GITHUB_OUTPUT'], 'a') as gh:
               gh.write(f'version={version}\n')
           "
 
-      # 6. Login GHCR
+      # --- NEW: Required for cross-compilation (aarch64) ---
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      # -----------------------------------------------------
+
+      # 6. Login to GHCR
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -85,37 +118,38 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 7. Bauen
+      # 7. Build Add-on
+      # Added --amd64 to build for standard PC as well
       - name: Build Add-on
         uses: home-assistant/builder@2024.03.5
         with:
           args: |
+            --amd64 \
             --aarch64 \
             --target /data/addon/${{ steps.target.outputs.folder }} \
             --image "${{ steps.target.outputs.image_name }}" \
             --docker-hub "ghcr.io/${{ github.repository_owner }}" \
             --addon
 
-      # 8. Source Code wieder löschen (Sicherheitsmaßnahme)
-      # Obwohl .gitignore hilft, löschen wir es physisch vor dem Commit
+      # 8. Cleanup source code
       - name: Cleanup Source Code
         run: |
           rm -rf addon/${{ steps.target.outputs.folder }}/src
           echo "Source code removed from runner."
 
-      # 9. Commit & Push (landet im entsprechenden Branch)
+      # 9. Commit & Push config update
       - name: Commit Config Update
         working-directory: ./addon
         run: |
           git config --global user.name "SmartHub Bot"
           git config --global user.email "bot@smarthub.local"
-          
+           
           FILE="smart_hub_beta/config.yaml"
           if [[ "${{ inputs.release_type }}" == "public" ]]; then
             FILE="smart_hub/config.yaml"
           fi
-          
-          # Nur config.yaml adden, nichts anderes!
+           
+          # Only commit config.yaml
           if [[ -n $(git status --porcelain $FILE) ]]; then
             git add $FILE
             git commit -m "Release ${{ inputs.release_type }}: ${{ steps.versioning.outputs.version }}"
