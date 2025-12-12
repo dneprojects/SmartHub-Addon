@@ -36,6 +36,7 @@ jobs:
           repository: dneprojects/SmartHub # <--- ANPASSEN
           path: source_temp
           ref: main
+          token: ${{ secrets.PAT_TOKEN }}
 
       # 3. Variablen setzen
       - name: Set Environment
