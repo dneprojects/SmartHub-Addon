@@ -30,7 +30,7 @@ jobs:
       - name: Checkout SmartHub Source
         uses: actions/checkout@v4
         with:
-          repository: DEIN_USER/SmartHub # <--- ANPASSEN
+          repository: dneprojects/SmartHub
           path: source_temp
           ref: main
 
@@ -52,13 +52,13 @@ jobs:
           import yaml
 
           # Pfade definieren
-          const_path = 'addon/smart_hub/src/const.py' # <--- Pfad zur const.py anpassen falls nötig
+          const_path = 'addon/smart_hub/src/const.py' 
           config_path = 'addon/smart_hub/config.yaml'
 
           # 1. Version aus const.py lesen
           with open(const_path, 'r') as f:
               content = f.read()
-              # Suche nach VERSION = 'x.x.x' oder ähnlichem
+              # Suche nach SMHUB_VERSION = 'x.x.x' oder ähnlichem
               match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', content)
               if match:
                   version = match.group(1)
