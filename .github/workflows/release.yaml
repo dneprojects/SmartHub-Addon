@@ -1,83 +1,96 @@
-name: Manual Build & Release
+# .github/workflows/release.yaml
+name: Manage Releases (Beta & Public)
 
 on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Wähle den Modus:'
+        description: 'Select Release Channel'
         required: true
-        default: 'test'
+        default: 'beta'
         type: choice
         options:
-          - test
-          - public_release
+          - beta
+          - public
 
 jobs:
-  build_and_release:
+  build_and_publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
 
     steps:
-      # 1. Checkout Addon Repo
+      # 1. Checkout the Addon repository
       - name: Checkout Addon Repo
         uses: actions/checkout@v4
         with:
           path: addon
 
-      # 2. Checkout Source Code (SmartHub)
-      - name: Checkout SmartHub Source
+      # 2. Checkout the source code from SmartHub repo
+      - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
-          repository: dneprojects/SmartHub
+          repository: DEIN_USER/SmartHub  # <--- REPLACE THIS
           path: source_temp
           ref: main
 
-      # 3. Struktur vorbereiten (Source in src/ kopieren)
-      - name: Prepare Directory Structure
+      # 3. Determine target directory based on selection
+      - name: Set Target Variables
+        id: target
         run: |
-          mkdir -p addon/smart_hub/src
-          cp -R source_temp/* addon/smart_hub/src/
-          rm -rf source_temp
-          echo "Source code injected into addon/smart_hub/src"
+          if [[ "${{ inputs.release_type }}" == "beta" ]]; then
+            echo "folder=smart_hub_beta" >> $GITHUB_OUTPUT
+            echo "image_name=smart_hub_beta" >> $GITHUB_OUTPUT
+            echo "Selected BETA channel."
+          else
+            echo "folder=smart_hub" >> $GITHUB_OUTPUT
+            echo "image_name=smart_hub" >> $GITHUB_OUTPUT
+            echo "Selected PUBLIC channel."
+          fi
 
-      # 4. Version aus const.py extrahieren und in config.yaml schreiben
-      - name: Sync Version Number
+      # 4. Inject source code into the correct addon folder
+      - name: Inject Source Code
+        run: |
+          TARGET="addon/${{ steps.target.outputs.folder }}/src"
+          mkdir -p $TARGET
+          cp -R source_temp/* $TARGET/
+          rm -rf source_temp
+          echo "Code injected into $TARGET"
+
+      # 5. Extract version from const.py and update config.yaml
+      - name: Update Version in Config
         id: versioning
         run: |
-          # Wir nutzen Python für sauberes Parsing
           python3 -c "
           import re
-          import yaml
+          import os
 
-          # Pfade definieren
-          const_path = 'addon/smart_hub/src/const.py' 
-          config_path = 'addon/smart_hub/config.yaml'
+          # Define paths
+          target_folder = '${{ steps.target.outputs.folder }}'
+          const_path = f'addon/{target_folder}/src/const.py'
+          config_path = f'addon/{target_folder}/config.yaml'
 
-          # 1. Version aus const.py lesen
+          # Read version from const.py
           with open(const_path, 'r') as f:
               content = f.read()
-              # Suche nach SMHUB_VERSION = 'x.x.x' oder ähnlichem
               match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', content)
               if match:
                   version = match.group(1)
                   print(f'Found version: {version}')
               else:
-                  print('Error: Could not find VERSION in const.py')
+                  print('Error: Version not found in const.py')
                   exit(1)
 
-          # 2. config.yaml aktualisieren (nur die Version Zeile, ohne Kommentare zu zerstören)
-          # Da YAML Parser oft Formatierung ändern, nutzen wir hier sed für minimale Invasivität
-          import os
+          # Update config.yaml using sed
           os.system(f\"sed -i 's/^version:.*/version: {version}/' {config_path}\")
           
-          # Output für GitHub Actions setzen
+          # Set output for next steps
           with open(os.environ['GITHUB_OUTPUT'], 'a') as gh_out:
               gh_out.write(f'version={version}\n')
           "
 
-      # 5. Login bei GitHub Container Registry
+      # 6. Login to GitHub Container Registry
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -85,32 +98,33 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 6. Build & Push Docker Image
-      # Wir nutzen den HA Builder. Er taggt automatisch basierend auf der Version in config.yaml
-      - name: Build Addon
+      # 7. Build and Push the Docker Image
+      - name: Build Add-on
         uses: home-assistant/builder@2024.03.5
         with:
           args: |
             --aarch64 \
-            --target /data/addon/smart_hub \
-            --image "smart_hub" \
+            --target /data/addon/${{ steps.target.outputs.folder }} \
+            --image "${{ steps.target.outputs.image_name }}" \
             --docker-hub "ghcr.io/${{ github.repository_owner }}" \
             --addon
 
-      # 7. NUR BEI PUBLIC RELEASE: Commit & Push der neuen config.yaml
-      - name: Commit Version Update to Repo
-        if: inputs.release_type == 'public_release'
+      # 8. Commit the updated config.yaml back to the repo
+      # This triggers the update notification in Home Assistant
+      - name: Commit Config Update
         working-directory: ./addon
         run: |
           git config --global user.name "SmartHub Bot"
           git config --global user.email "bot@smarthub.local"
           
-          # Checken ob sich was geändert hat
-          if [[ -n $(git status --porcelain smart_hub/config.yaml) ]]; then
-            git add smart_hub/config.yaml
-            git commit -m "Release: Update version to ${{ steps.versioning.outputs.version }}"
+          FILE_TO_COMMIT="${{ steps.target.outputs.folder }}/config.yaml"
+          
+          # Only commit if changed
+          if [[ -n $(git status --porcelain $FILE_TO_COMMIT) ]]; then
+            git add $FILE_TO_COMMIT
+            git commit -m "Release (${{ inputs.release_type }}): ${{ steps.versioning.outputs.version }}"
             git push
-            echo "Public Release successful. Config.yaml updated."
+            echo "Config updated in repo. HA will see the update soon."
           else
-            echo "No changes in config.yaml detected (Version might be same as before)."
+            echo "No changes in config.yaml."
           fi
