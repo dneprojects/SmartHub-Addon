@@ -720,11 +720,23 @@ class HbtnRouter:
         new_module.status = (
             chr(mod_addr)
             + mod_typ.decode("iso8859-1")
-            + "\x00" * (MirrIdx.MOD_NAME - 3)
+            + "\x00" * (MirrIdx.T_SHORT - 3)
+            + "\x0a"    # default t_short 100ms
+            + "\x32"    # default t_long 500ms
+            + "\x01"    # default t_dim 1s
+            + "\x00" * (MirrIdx.CLIM_SETTINGS - MirrIdx.T_DIM - 1)
+            + "\x01"    # default clim settings
+            + "\x00" * (MirrIdx.DISPL_CONTR - MirrIdx.CLIM_SETTINGS - 1)
+            + "\x20"     # default display contrast
+            + "\x00" * (MirrIdx.MOD_NAME - MirrIdx.DISPL_CONTR - 1)
             + mod_name
             + "\x20" * (32 - len(mod_name))
             + mod_serial
-            + "\x00" * (MirrIdx.END - MirrIdx.MOD_SERIAL - 16)
+            + "\x00" * (MirrIdx.MOD_LIGHT_TIM - MirrIdx.MOD_SERIAL - 16)
+            + "\x64"  # default light time 100s
+            + "\x01"    # default language german
+            + "\x01"  # default controller 1
+            + "\x00" * (MirrIdx.END - MirrIdx.TMP_CTL_MD - 1)
         ).encode("iso8859-1")
         new_module.changed = MOD_CHANGED.NEW
         self.modules.append(new_module)
