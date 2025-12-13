@@ -15,7 +15,7 @@ on:
    
   # 2. Automatic trigger by SmartHub Repo
   repository_dispatch:
-    types: [build-beta-event]
+    types: [Automatic build of beta release]
 
 jobs:
   build_and_publish:
