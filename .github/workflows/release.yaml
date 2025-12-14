@@ -201,9 +201,23 @@ jobs:
           # Build .exe with icon and splash screen
           pyinstaller --onefile --noconsole -i assets/hbtn.ico --splash assets/smart-configurator.png SmartConfigurator.py
 
-      # Upload the result as a zip file in GitHub Actions summary
+      - name: Prepare Release Package
+        run: |
+          # Create a clean directory for the release
+          New-Item -ItemType Directory -Force -Path release_package
+          
+          # 1. Copy the built EXE
+          Copy-Item dist\SmartConfigurator.exe -Destination release_package\
+          
+          # 2. Copy the logging config file
+          Copy-Item logging_def.yaml -Destination release_package\
+          
+          # 3. Copy the web folder (recursive)
+          Copy-Item -Recurse web -Destination release_package\web
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: SmartConfigurator_v${{ steps.get_version.outputs.version }}
-          path: dist/SmartConfigurator.exe
+          # Upload the entire folder content
+          path: release_package/
