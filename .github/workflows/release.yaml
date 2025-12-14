@@ -199,7 +199,7 @@ jobs:
       - name: Build with PyInstaller
         run: |
           # Build .exe with icon and splash screen
-          pyinstaller --onefile --noconsole -i hbtn.ico --splash smart-configurator.png SmartConfigurator.py
+          pyinstaller --onefile --noconsole -i assets/hbtn.ico --splash assets/smart-configurator.png SmartConfigurator.py
 
       # Upload the result as a zip file in GitHub Actions summary
       - name: Upload Artifact
