@@ -200,49 +200,37 @@ jobs:
         run: |
           # Build .exe with icon and splash screen
           pyinstaller --onefile --noconsole -i assets/hbtn.ico --splash assets/smart-configurator.png SmartConfigurator.py
-
+          
       - name: Prepare Release Package
         shell: pwsh
         run: |
-          # 1. DEBUG: Zeige ALLE Dateien im Root an (damit wir sehen, wo logging_def.yaml wirklich ist)
-          echo "=== FILES IN ROOT DIRECTORY ==="
-          Get-ChildItem
-          echo "==============================="
+          # Create directories (silently)
+          New-Item -ItemType Directory -Force -Path release_package | Out-Null
+          New-Item -ItemType Directory -Force -Path release_package\web | Out-Null
 
-          # 2. Zielordner erstellen
-          New-Item -ItemType Directory -Force -Path release_package
-          New-Item -ItemType Directory -Force -Path release_package\web
-
-          # 3. EXE kopieren
+          # 1. Copy EXE
           if (Test-Path "dist\SmartConfigurator.exe") {
               Copy-Item "dist\SmartConfigurator.exe" -Destination release_package\
           } else {
-              Write-Error "STOP: SmartConfigurator.exe was not found in dist/!"
+              Write-Error "Error: 'dist\SmartConfigurator.exe' missing."
               exit 1
           }
 
-          # 4. Config kopieren (Strenge Prüfung!)
+          # 2. Copy Config
           if (Test-Path "logging_def.yaml") {
-              echo "Copying logging_def.yaml..."
               Copy-Item "logging_def.yaml" -Destination release_package\
           } else {
-              # Falls sie doch in einem Unterordner liegt (z.B. src?), wird das hier im Log sichtbar
-              Write-Error "STOP: logging_def.yaml not found in Root!"
+              Write-Error "Error: 'logging_def.yaml' missing."
               exit 1
           }
 
-          # 5. Web Ordner kopieren
+          # 3. Copy Web Folder
           if (Test-Path "web") {
-              echo "Copying web folder..."
               Copy-Item -Recurse -Force "web\*" -Destination release_package\web\
           } else {
-              Write-Error "STOP: web folder not found in Root!"
+              Write-Error "Error: 'web' folder missing."
               exit 1
           }
-
-          # 6. Endergebnis zeigen
-          echo "=== PACKAGE CONTENT ==="
-          Get-ChildItem -Recurse release_package
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
