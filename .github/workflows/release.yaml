@@ -1,7 +1,7 @@
 name: SmartHub Release Manager
 
 # Displays the selected target in the GitHub Actions list
-run-name: "Build: ${{ inputs.target || 'Auto-Beta' }}"
+run-name: "Build: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'Auto build: Smart Hub [Beta]' }}"
 
 on:
   # 1. Manual trigger
@@ -13,8 +13,8 @@ on:
         default: 'Addon [Beta]'
         type: choice
         options:
-          - 'Addon [Beta]'
-          - 'Addon [Public]'
+          - 'Smart Hub [Beta]'
+          - 'Smart Hub [Public]'
           - 'Smart Configurator [Windows]'
 
   # 2. Automatic trigger (Beta only)
