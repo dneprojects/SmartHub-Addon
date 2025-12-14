@@ -1,59 +1,63 @@
 name: SmartHub Release Manager
 
+# Displays the selected target in the GitHub Actions list
+run-name: "Build: ${{ inputs.target || 'Auto-Beta' }}"
+
 on:
   # 1. Manual trigger
   workflow_dispatch:
     inputs:
-      release_type:
-        description: 'Select channel:'
+      target:
+        description: 'Select build target:'
         required: true
-        default: 'beta'
+        default: 'Addon [Beta]'
         type: choice
         options:
-          - beta
-          - public
-   
-  # 2. Automatic trigger by SmartHub Repo
+          - 'Addon [Beta]'
+          - 'Addon [Public]'
+          - 'Smart Configurator [Windows]'
+
+  # 2. Automatic trigger (Beta only)
   repository_dispatch:
-    types: [Automatic build of beta release]
+    types: [build-beta-event]
 
 jobs:
-  build_and_publish:
+  # ----------------------------------------------------------------
+  # JOB 1: Home Assistant Add-on (Docker / Linux)
+  # Runs for 'Addon' selections or automatic triggers
+  # ----------------------------------------------------------------
+  build_addon:
+    name: Build Smart Hub Addon
+    # Run if input contains 'Addon' OR if triggered automatically
+    if: |
+      contains(inputs.target, 'Addon') || 
+      github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
 
     steps:
-      # Determine variable 'TYPE' (Manual input OR Auto payload)
-      # Fallback to 'beta'
-      - name: Determine Release Type
+      - name: Determine Release Mode
         id: config
         run: |
-          # Check for manual input
-          MANUAL="${{ inputs.release_type }}"
-          # Check for dispatch payload
-          AUTO="${{ github.event.client_payload.release_type }}"
-           
-          if [[ -n "$MANUAL" ]]; then
-            echo "mode=$MANUAL" >> $GITHUB_OUTPUT
-            echo "Selected mode (manual): $MANUAL"
-          elif [[ -n "$AUTO" ]]; then
-             echo "mode=$AUTO" >> $GITHUB_OUTPUT
-             echo "Selected mode (auto): $AUTO"
+          # Map input name to internal mode (beta/public)
+          INPUT="${{ inputs.target }}"
+          
+          if [[ "$INPUT" == "Addon [Public]" ]]; then
+            echo "mode=public" >> $GITHUB_OUTPUT
           else
-             echo "mode=beta" >> $GITHUB_OUTPUT
-             echo "No input found, defaulting to beta."
+            echo "mode=beta" >> $GITHUB_OUTPUT
           fi
 
-      # 1. Checkout correct branch (Public->main, Beta->beta)
+      # Checkout the correct branch where config.yaml lives
       - name: Checkout Addon Repo
         uses: actions/checkout@v4
         with:
           path: addon
           ref: ${{ steps.config.outputs.mode == 'beta' && 'beta' || 'main' }}
 
-      # 2. Checkout Source Code
+      # Checkout source code from private repo
       - name: Checkout SmartHub Source
         uses: actions/checkout@v4
         with:
@@ -62,8 +66,7 @@ jobs:
           ref: main
           token: ${{ secrets.PAT_TOKEN }}
 
-      # 3. Set variables
-      - name: Set Environment
+      - name: Set Environment Variables
         id: target
         run: |
           MODE="${{ steps.config.outputs.mode }}"
@@ -75,37 +78,39 @@ jobs:
             echo "image_name=smart_hub" >> $GITHUB_OUTPUT
           fi
 
-      # 4. Inject source code (ignored by .gitignore)
       - name: Inject Source Code
         run: |
           TARGET="addon/${{ steps.target.outputs.folder }}/src"
           mkdir -p $TARGET
           cp -R source_temp/* $TARGET/
           rm -rf source_temp
-          echo "Code temporarily injected into $TARGET"
-      # 5. Sync version (read const.py -> write config.yaml)
+
+      # Updates version in config.yaml based on const.py
       - name: Sync Version
         id: versioning
         run: |
           python3 -c "
           import re, os
-          const_path = 'addon/${{ steps.target.outputs.folder }}/src/const.py'
-          config_path = 'addon/${{ steps.target.outputs.folder }}/config.yaml'
-           
+          folder = '${{ steps.target.outputs.folder }}'
+          const_path = f'addon/{folder}/src/const.py'
+          config_path = f'addon/{folder}/config.yaml'
+          
+          # Read version from const.py
           with open(const_path, 'r') as f:
               match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', f.read())
               version = match.group(1) if match else '0.0.0'
-           
+          
+          # Update config.yaml
           os.system(f\"sed -i 's/^version:.*/version: {version}/' {config_path}\")
+          
           with open(os.environ['GITHUB_OUTPUT'], 'a') as gh:
               gh.write(f'version={version}\n')
           "
 
-      # --- Only QEMU, NO explicit Buildx setup ---
+      # Essential for building aarch64 on GitHub runners
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      # 6. Login to GHCR
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -113,7 +118,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 7. Build Add-on
+      # Build multi-arch image
       - name: Build Add-on
         uses: home-assistant/builder@2024.03.5
         with:
@@ -125,29 +130,80 @@ jobs:
             --docker-hub "ghcr.io/${{ github.repository_owner }}" \
             --addon
 
-      # 8. Cleanup source code
       - name: Cleanup Source Code
-        run: |
-          rm -rf addon/${{ steps.target.outputs.folder }}/src
-          echo "Source code removed from runner."
+        run: rm -rf addon/${{ steps.target.outputs.folder }}/src
 
-      # 9. Commit & Push config update
       - name: Commit Config Update
         working-directory: ./addon
         run: |
           git config --global user.name "SmartHub Bot"
           git config --global user.email "bot@smarthub.local"
-           
-          FILE="smart_hub_beta/config.yaml"
-          if [[ "${{ inputs.release_type }}" == "public" ]]; then
-            FILE="smart_hub/config.yaml"
-          fi
-           
-          # Only commit config.yaml
+          
+          FILE="${{ steps.target.outputs.folder }}/config.yaml"
           if [[ -n $(git status --porcelain $FILE) ]]; then
             git add $FILE
-            git commit -m "Release ${{ inputs.release_type }}: ${{ steps.versioning.outputs.version }}"
+            git commit -m "Release ${{ steps.config.outputs.mode }}: ${{ steps.versioning.outputs.version }}"
             git push
           else
-            echo "No version change detected."
+            echo "No changes to commit."
           fi
+
+  # ----------------------------------------------------------------
+  # JOB 2: Smart Configurator (Windows .exe)
+  # Runs only if 'Configurator' is selected
+  # ----------------------------------------------------------------
+  build_windows_exe:
+    name: Build Smart Configurator
+    if: contains(inputs.target, 'Configurator')
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          repository: dneprojects/SmartHub
+          ref: main
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' 
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          # Pillow is required for the --splash feature
+          pip install Pillow 
+          # Install other requirements if file exists
+          if (Test-Path requirements.txt) { pip install -r requirements.txt }
+
+      # Extract version from const.py for artifact naming
+      - name: Get Version
+        id: get_version
+        shell: python
+        run: |
+          import re, os
+          try:
+              with open('const.py', 'r') as f:
+                  content = f.read()
+                  match = re.search(r'VERSION\s*=\s*[\"\']([^\"\']+)[\"\']', content)
+                  version = match.group(1) if match else '0.0.0'
+          except:
+              version = '0.0.0'
+          
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as gh:
+              gh.write(f'version={version}\n')
+
+      - name: Build with PyInstaller
+        run: |
+          # Build .exe with icon and splash screen
+          pyinstaller --onefile --noconsole -i hbtn.ico --splash smart-configurator.png SmartConfigurator.py
+
+      # Upload the result as a zip file in GitHub Actions summary
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartConfigurator_v${{ steps.get_version.outputs.version }}
+          path: dist/SmartConfigurator.exe
