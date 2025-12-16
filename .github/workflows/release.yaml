@@ -10,7 +10,7 @@ on:
       target:
         description: 'Select build target:'
         required: true
-        default: 'Addon [Beta]'
+        default: 'Smart Hub [Beta]'
         type: choice
         options:
           - 'Smart Hub [Beta]'
@@ -28,9 +28,9 @@ jobs:
   # ----------------------------------------------------------------
   build_addon:
     name: Build Smart Hub Addon
-    # Run if input contains 'Addon' OR if triggered automatically
+    # Run if input contains 'Smart Hub' OR if triggered automatically
     if: |
-      contains(inputs.target, 'Addon') || 
+      contains(inputs.target, 'Smart Hub') || 
       github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
     permissions:
@@ -44,7 +44,7 @@ jobs:
           # Map input name to internal mode (beta/public)
           INPUT="${{ inputs.target }}"
           
-          if [[ "$INPUT" == "Addon [Public]" ]]; then
+          if [[ "$INPUT" == "Smart Hub [Public]" ]]; then
             echo "mode=public" >> $GITHUB_OUTPUT
           else
             echo "mode=beta" >> $GITHUB_OUTPUT
