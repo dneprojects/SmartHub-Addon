@@ -1,3 +1,13 @@
+## v2.9.0
+
+### Fix:
+- Enabled "System" automations for output modules
+
+## v2.8.7 - 2.8.9
+
+### Modified
+- Minor nonfunctional changes
+  
 ## v2.8.6
 
 ### Fix
