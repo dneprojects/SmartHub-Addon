@@ -65,6 +65,7 @@ jobs:
           path: source_temp
           ref: main
           token: ${{ secrets.PAT_TOKEN }}
+          lfs: true
 
       - name: Set Environment Variables
         id: target
