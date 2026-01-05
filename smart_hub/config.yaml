@@ -18,6 +18,7 @@ devices: ["dev/serial0"]
 uart: true
 devicetree: true
 ingress: true
+ingress_port: 8099
 ingress_stream : true
 panel_title: Smart Configurator
 panel_icon: hbt:habitron-logo
