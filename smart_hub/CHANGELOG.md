@@ -1,3 +1,13 @@
+## v2.9.2
+
+### Fix:
+- Sometime router diagnosis failed
+
+## v2.9.1
+
+### New:
+- Link to switch to home assistant device info of modules and router
+
 ## v2.9.0
 
 ### Fix:
