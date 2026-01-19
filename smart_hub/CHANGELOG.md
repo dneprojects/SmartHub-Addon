@@ -1,3 +1,13 @@
+## v2.9.4
+
+### Fix:
+- Startup phase
+
+## v2.9.3
+
+### Modified:
+- Logging in timeout cases
+
 ## v2.9.2
 
 ### Fix:
