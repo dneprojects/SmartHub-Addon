@@ -1,3 +1,9 @@
+## v2.9.5
+
+### New features
+- Support of analog output for Smart Controller
+- Documentation of cover times in web export document
+
 ## v2.9.4
 
 ### Fix:
