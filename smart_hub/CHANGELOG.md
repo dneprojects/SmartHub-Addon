@@ -1,3 +1,8 @@
+## v2.9.6
+
+### New features
+- Climate mode / climate controller number can be set by HA
+
 ## v2.9.5
 
 ### New features
