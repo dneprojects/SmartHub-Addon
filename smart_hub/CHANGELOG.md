@@ -1,3 +1,13 @@
+## v2.9.9.5
+
+### Fix:
+- Disabled triggers/actions in automation editor
+
+## v2.9.7 - v2.9.9
+
+### Modified
+- Robustness of startup, event server
+
 ## v2.9.6
 
 ### New features
