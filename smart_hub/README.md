@@ -1,4 +1,4 @@
-# Home Assistant Add-on: Smart Hub
+# Home Assistant App: Smart Hub
 
 Smart Hub for Habitron systems based on Raspberry Pi.
 
