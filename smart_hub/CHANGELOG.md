@@ -1,3 +1,8 @@
+## v3.0.0
+
+### New feature
+- Enhanced log download
+
 ## v2.9.9.5
 
 ### Fix:
