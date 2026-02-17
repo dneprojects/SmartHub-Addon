@@ -121,7 +121,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Add-on
-        uses: home-assistant/builder@2024.03.5
+        # Update from 2024.03.5 to a more recent stable version
+        uses: home-assistant/builder@2025.02.0 
         with:
           args: |
             --amd64 \
