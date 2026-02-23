@@ -1,3 +1,11 @@
+## v3.0.1
+
+### New firmware
+- Tronic 2/2026
+  
+### Fix
+- Default action in automation editor
+  
 ## v3.0.0
 
 ### New feature
