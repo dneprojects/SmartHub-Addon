@@ -1,7 +1,7 @@
 ## v3.0.3
 
 ### New feature
-- HTML export shows button and led names
+- HTML export shows button and led names, climate settings
 
 ### Fix
 - Conflict between white led and analog output
