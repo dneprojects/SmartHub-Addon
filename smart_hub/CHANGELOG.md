@@ -1,3 +1,16 @@
+## v3.0.3
+
+### New feature
+- HTML export shows button and led names
+
+### Fix
+- Conflict between white led and analog output
+
+## v3.0.2
+
+### New feature
+- Tech-in of modules
+
 ## v3.0.1
 
 ### New firmware
