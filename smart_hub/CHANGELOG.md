@@ -1,3 +1,9 @@
+## v3.0.4
+
+### New feature
+- HTML export compact table with buttons and leds
+- Improved ws reconnect
+
 ## v3.0.3
 
 ### New feature
