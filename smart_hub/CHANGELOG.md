@@ -1,3 +1,8 @@
+## v3.0.5
+
+### Fix
+- Improved firmware version check
+
 ## v3.0.4
 
 ### New feature
