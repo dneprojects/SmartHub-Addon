@@ -1,3 +1,9 @@
+## v3.0.6
+
+### Fix
+- Improved robustness setting server mode
+- GSM modem automations
+
 ## v3.0.5
 
 ### Fix
