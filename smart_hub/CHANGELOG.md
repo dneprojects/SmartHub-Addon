@@ -3,6 +3,7 @@
 ### Fix
 - Improved robustness setting server mode
 - GSM modem automations
+- LED numbers in HTML export
 
 ## v3.0.5
 
