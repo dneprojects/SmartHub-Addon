@@ -1,3 +1,8 @@
+## v3.0.7
+
+### New feature
+- Finish ISP mode
+
 ## v3.0.6
 
 ### Fix
