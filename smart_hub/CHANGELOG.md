@@ -1,3 +1,8 @@
+## v3.0.8
+
+### Fix
+- Automations mit LED #1
+
 ## v3.0.7
 
 ### New feature
