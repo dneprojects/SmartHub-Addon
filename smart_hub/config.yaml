@@ -13,7 +13,7 @@ full_access: false
 hassio_api: true
 homeassistant_api: true
 host_network: true
-map: [addon_config:rw]
+map: [addon_config:rw, share:rw]
 devices: ["dev/serial0"]
 uart: true
 devicetree: true
