@@ -1,3 +1,23 @@
+## v3.1.4
+
+### New feature
+- Auto baudrate select
+
+## V3.1.2
+
+### Fix
+- Improved robustness
+
+## v3.1.0
+
+### New Firmware
+- Smart Touch v1.2.7, v5.7 25
+
+## v3.0.9
+
+### New feature
+- Support for color leds
+  
 ## v3.0.8
 
 ### Fix
