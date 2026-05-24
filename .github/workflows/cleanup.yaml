@@ -24,3 +24,8 @@ jobs:
           # Delete runs older than 2 days
           retain_days: 2
           # Optional: delete_workflow_pattern: "SmartHub Release Manager"
+          delete_workflow_by_state_pattern: ALL
+          delete_run_by_conclusion_pattern: ALL
+          # Allows deletion of runs on existing, active branches
+          check_branch_existence: false 
+          save_period_runs_for_last_versions: false
