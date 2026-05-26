@@ -1,3 +1,26 @@
+## v3.2.0
+
+### New features:
+- Navigation gestures in Smart Configurator
+- Progress popups with waitbar
+
+### New Firmware
+- Smart Router v4.0 03 05/2026
+- Smart Controller v4.5 ef 05/2026
+- Smart Controller (new power ee) v4.6 0b 05/2026
+- Smart Controller Kompakt v4.6 02 05/2026
+- Smart Touch v6.0 02 05/2026
+- and more...
+
+### Fix
+- Day/night specification corrected
+
+## v3.1.5
+
+### New feature
+- Short flash 100ms
+- Support of button long end in automations
+  
 ## v3.1.4
 
 ### New feature
