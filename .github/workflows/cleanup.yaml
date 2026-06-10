@@ -23,7 +23,10 @@ jobs:
           keep_minimum_runs: 3
           # Delete runs older than 2 days
           retain_days: 2
-          delete_workflow_pattern: "SmartHub Release Manager, Cleanup Old Runs"
+          # Target both workflows. Mattraks/delete-workflow-runs separates
+          # multiple names with '|' (a comma is treated as one literal name
+          # that matches nothing, so nothing got deleted).
+          delete_workflow_pattern: "SmartHub Release Manager|Cleanup Old Runs"
           delete_workflow_by_state_pattern: ALL
           delete_run_by_conclusion_pattern: ALL
           # Allows deletion of runs on existing, active branches
