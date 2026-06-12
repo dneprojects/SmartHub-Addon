@@ -91,6 +91,8 @@ jobs:
           TARGET="addon/${{ steps.target.outputs.folder }}/src"
           mkdir -p $TARGET
           cp -R source_temp/* $TARGET/
+          # Sync changelog from SmartHub source into the addon folder
+          cp source_temp/CHANGELOG.md "addon/${{ steps.target.outputs.folder }}/CHANGELOG.md"
           rm -rf source_temp
 
       - name: Sync Version
