@@ -5,6 +5,16 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- API actions `MSG_SET`/`MSG_RESET` (30/17, action 1/0) are now implemented:
+  free-text messages (ISO 8859-1, 1–32 chars) are forwarded to the addressed
+  module as new module command 33 (`33 <act> <tlen> <chars>`). Texts over
+  16 chars are sent as two telegrams (act 2 = first 16 chars, preloaded only;
+  act 1 = remaining chars, appended and shown) because the router forwards at
+  most 24 bytes per module telegram; act 0 resets the message. Requires module
+  firmware with command-33 support (Raumcontroller/RC Compact/SC Touch,
+  in development).
+
 ## [3.3.2] — 2026-06-12
 
 ### Added
