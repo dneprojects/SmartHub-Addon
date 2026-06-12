@@ -1,140 +1,88 @@
-## v2.8.6
+# Changelog
 
-### Fix
-- Log file storage
+All notable changes to SmartHub are documented in this file. The format is
+based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## v2.8.5
+## [Unreleased]
 
-### Modified
-- HTML files, styles
+## [3.3.2] — 2026-06-12
 
-## v2.8.3
+### Added
+- Router diagnosis log viewer in the settings page (zurück/weiter and swipe through the stored logs).
+- Forward table is shown as an html page instead of a file download.
 
-### Modified
-- Improved UI in configurator
+### Changed
+- Diagnosis log restructured: header block with firmware, readout time and heal counters; one FROZEN and one LIVE block; latest commands first.
+- Forward table uses the standard tool table style with sortable columns.
+- Log viewer and forward table content are top-aligned in a scrollable area.
+- Config server and settings route handlers refactored to instance methods.
+- pre-commit ruff hooks run in isolated envs (PATH-independent, fixes commits on the Pi/pyenv).
+- Version bumped to 3.3.2.
 
-## v2.8.2
+### Fixed
+- Hub overview page builds fast again: addon slug cached with a request timeout, duplicate info readout removed, CPU arch via `platform` instead of `py-cpuinfo`.
+- Hub overview page no longer re-reads firmware files on every load: the router/module update status is already computed at startup (and refreshed on demand via the version-check endpoints), so the redundant per-module `check_firmware()` disk reads were removed — this was the main remaining multi-second delay on installations with many modules.
+- Swiping past the ends of the log history no longer reloads the page.
 
-### Fix
-- Bugfix of router command in 2.8.1
+## [3.3.1] — 2026-06-12
 
-## v2.8.1
+### Fixed
+- Router firmware version parsed correctly from the SMR (offset was one byte short).
+- Communication test page no longer returns HTTP 500 with error modules present.
+- System documentation titles the hub sheet `SmartHub '<host>'` instead of `Router '<host>'`.
 
-### New 
-- Special logging timeout events
+### Added
+- Commands log shows the heal/wedge counters with read-then-clear semantics (cmd 100/200/250).
 
-## v2.8.0
+## [3.3.0] — 2026-06-11
 
-### Modified
-- Improved UI for adding items in configurator
+### Changed
+- Comprehensive hardware-free test suite (every module covered), fully typed, `mypy --strict` clean, coverage gate 95%.
+- Version bumped to 3.3.0.
 
-## v2.7.9
+### Fixed
+- Event server recovers from serial glitches instead of dying silently.
+- Automation editor handles invalid/empty selections without crashing.
+- Renaming a logic/counter element refreshes its derived long name.
+- All three dimmer types get the dimmer settings UI and dimmer commands.
+- GSM SIM-PIN encode/decode/send fixed (4-digit PINs round-trip).
+- SMC module-list read handles area rollover beyond 256 packages.
+- Module documentation export works for modules without settings.
+- Action descriptions whitespace-normalized.
+- Smart Hub module image filename casing fixed (case-sensitive filesystems).
+- Logic element/input range checks accept element 10 and input 8.
+- `SmartConfigurator.main()` honors its `init_flag` parameter again.
+- Router firmware upload restores the serial baud rate on all error paths.
+- `get_module_image` falls back gracefully for unknown module types.
+- Firmware comparison no longer truncates space-less version strings.
+- `GET /upd_upload` returns `204 No Content` without the web lock.
+- `data_hdlr`/`admin_hdlr` validate the router number before indexing.
+- `save_descriptions_file` error path no longer masks the real error.
+- Multi-flag mirror events report each flag's correct on/off state.
+- Generated module serial maps the new-LE Smart Controller type correctly.
+- Priority-action description no longer overwritten by the fallback text.
+- `FLAG_SET`/`FLAG_RESET` abort on invalid arguments; unimplemented message paths return cleanly.
+- `EVENTSTOP` resets the ApiServer auto-restart flag.
+- Message forwarding keys on the router id and uses the 0-based router index.
+- Router type-2 descriptions are converted to group descriptors.
+- `supply_prio` encoding normalized on read; `err1_modules` no longer duplicated.
 
-### New
-- Added automation to send message to TTS
+### Removed
+- Dead code in several handlers.
 
-### Fix
-- Configurator web server if offline
+### Added
+- Serial-HW diagnosis snapshot in the commands log (router firmware Rev >= 07).
+- Deliverables: router firmware Rev 07 binary and SC-Touch APK v1.2.11.
 
-## v2.7.8
+## [3.2.3] — 2026-06-08
 
-### Fix
-- Problem with backups
+### Added
+- Apache-2.0 `LICENSE` file, `CHANGELOG.md`, project metadata in `pyproject.toml`.
+- GitHub Actions CI (Ruff lint/format, pytest on Python 3.11/3.12/3.13).
 
-## v2.7.7
+### Changed
+- Adopted the habitron_client Ruff rule set and applied the resulting fixes.
+- File handles use `with` context managers; mutable class attributes/defaults cleaned up.
 
-### Modified
-- Added climate mode to compact status
-
-## v2.7.6
-
-### Modified
-- Improved stability with router timeouts
-
-
-## v2.7.5
-
-### New
-- Router event: changed flag
-
-
-## v2.7.4
-
-### Fix:
-- Removing unavailable modules in boot phase
-
-## v2.7.3
-
-### New:
-- Improved check of module boot status
-
-## v2.7.2
-
-### New:
-- Improved synchronization with router on startup
-
-
-## v2.7.1
-
-### New:
-- Cover autostop delay
-
-## v2.7.0
-
-### New:
-- Advanced settings for installers
-
-## v2.6.9
-
-### New:
-- Improved version check for firmware files
-
-## v2.6.8
-
-### New:
-- Description for long button press (only SC Touch)
-- Disable of upload buttons, if no file is chosen
-
-## v2.6.7
-
-### New:
-- Day-/night switching with option for identical daily entries
-- New firmware for Smart Detect 180-1
-- Other small improvements
-
-### Fix:
-- Day-/night switching only time: switching was disabled
-
-## v2.6.6
-
-### New:
-- Menu Settings for installers: read-out of forward table
-
-## v2.6.5
-
-### New:
-- Option for flashing without compatibility check
-
-## v2.6.4
-
-### New:
-- Firmware support for Smart Touch
-
-## v2.6.3
-
-### Fix:
-- Warning of external automation if ext. module is missing: now only once
-
-## v2.6.2
-
-### New features:
-- GSM triggers
-- IR remote long press trigger
-- Weather station luminance with full range trigger
-- Forward table re-init on router special page
-- Improved usability with popup default button, external module preselection
-- Sensor module support of sensor air qualitiy, humidity
-
-### Fixes:
-- Climate action additional last argument 0
-- Automation prefill for external modules fails sometimes
+### Notes
+- `mypy --strict` and the coverage gate were introduced on the `quality-testing` branch.
