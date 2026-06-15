@@ -22,6 +22,15 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   strings. They are now int-converted on save, and the export compares them
   defensively.
 
+### Changed
+- `post_settings` now stores every numeric scalar form field (display, button
+  timing, dimmer, temperature, motion level) via explicit, type-annotated
+  assignments (`settings: ModuleSettings | RouterSettings`, narrowed with
+  `isinstance`) instead of the previous dynamic `__setattr__` string fallback.
+  This removes the footgun behind the `temp_1_2` crash, fixes `mov_level` (same
+  latent string type), and lets `mypy --strict` statically reject a wrong-typed
+  save at the write site.
+
 ## [3.3.2] — 2026-06-12
 
 ### Added
