@@ -14,8 +14,20 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   most 24 bytes per module telegram; act 0 resets the message. Requires module
   firmware with command-33 support (Raumcontroller/RC Compact/SC Touch,
   in development).
+- Long button presses ("Tastendruck lang") are now available for all room
+  controllers (Smart Controller XL-1/XL-2/XL-2 LE2) and the Smart Controller
+  Mini, not only the Touch. The settings pages, configuration export and
+  automation triggers expose the long-press labels accordingly (driven by the
+  module's io-properties). Requires module firmware that emits long-button
+  events for the respective type.
 
 ### Fixed
+- Module firmware update no longer bricks the Home Assistant integration. An
+  oversized firmware file (more than 255 packets / 62730 bytes) is rejected at
+  upload with a clear message instead of crashing the transfer mid-way, and the
+  network interface block is now always released (`try/finally`) on the router
+  and module update paths — a failed update can no longer leave all entities
+  permanently unavailable until a restart.
 - Configuration export crashed (`'>' not supported between instances of 'str'
   and 'int'`) when a module's climate-control radios had been saved via the
   settings form: `post_settings` stored `temp_1_2`/`temp_ctl` as raw form
