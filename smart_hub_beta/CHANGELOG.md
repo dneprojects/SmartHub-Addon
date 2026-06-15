@@ -15,6 +15,13 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   firmware with command-33 support (Raumcontroller/RC Compact/SC Touch,
   in development).
 
+### Fixed
+- Configuration export crashed (`'>' not supported between instances of 'str'
+  and 'int'`) when a module's climate-control radios had been saved via the
+  settings form: `post_settings` stored `temp_1_2`/`temp_ctl` as raw form
+  strings. They are now int-converted on save, and the export compares them
+  defensively.
+
 ## [3.3.2] — 2026-06-12
 
 ### Added
