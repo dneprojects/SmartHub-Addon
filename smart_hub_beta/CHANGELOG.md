@@ -20,6 +20,19 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   automation triggers expose the long-press labels accordingly (driven by the
   module's io-properties). Requires module firmware that emits long-button
   events for the respective type.
+- Saving module/router settings and module automations now shows the same
+  progress bar in the wait popup as a configuration-file upload, instead of a
+  bare spinner. The save handlers hold `web_lock` and drive `wait_progress`
+  (the module list upload already reports its fraction), and the
+  settings/automation pages load `progress.js` so the shared `Progress` popup
+  (with bar) is used, falling back to the plain wait popup when unavailable.
+- The wait popup now updates its title per module/phase during every transfer:
+  `send_module_smg`/`send_module_list` set the phase to
+  "<module name>: Einstellungen" / "<module name>: Verknüpfungen", and the
+  config-file upload labels the router and each module ("Router wird
+  übertragen", "Modul N wird übertragen"). This makes multi-module restores and
+  automation saves (incl. external action modules) show which module is being
+  written. `WaitProgress.start_multi` now also clears any stale phase label.
 
 ### Fixed
 - Module firmware update no longer bricks the Home Assistant integration. An
