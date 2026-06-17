@@ -11,7 +11,7 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Cyclic per-module problem monitoring: the periodic router-status query now
   also requests the module boot/problem status (router cmd 106) fire-and-forget
   in operate mode; the event server parses the response and keeps each module's
-  `boot_err_mask` and the router `mod_boot_errors` up to date without
+  `boot_err_mask` and the router `mod_comm_errors` up to date without
   interrupting events ("Forward problems" = incomplete forward-table collection
   for that module). Foundation for forward-table self-healing.
 - API actions `MSG_SET`/`MSG_RESET` (30/17, action 1/0) are now implemented:
@@ -41,6 +41,9 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   übertragen", "Modul N wird übertragen"). This makes multi-module restores and
   automation saves (incl. external action modules) show which module is being
   written. `WaitProgress.start_multi` now also clears any stale phase label.
+- Deliverables: updated bundled firmware binaries — RaumController (RMG v4.5
+  f4, RMG1 v4.6 0f), RC Compact (RMK v4.6 05) and router (VMV2 v4.0 Rev 11,
+  commok_set Bit-6 reset).
 
 ### Fixed
 - Module firmware update no longer bricks the Home Assistant integration. An
@@ -56,6 +59,15 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   defensively.
 
 ### Changed
+- Module communication errors are now shown as a list of single-bit F-codes
+  instead of one combined code: a fault byte of 3 (timeout + comm error) is
+  displayed as `F1, F2` rather than the misleading `F3`. This keeps `F3` free
+  as a dedicated code for a future forward-table fault and matches the bitwise
+  origin of the codes (each `Fx` carries its own tooltip). The per-module
+  problem property was renamed `mod_boot_errors` → `mod_comm_errors` (it is no
+  longer boot-specific), and the router overview now shows a cyclically fresh
+  "Modulrückmeldungen" row (Korrekt / Mit Fehlern, with the fault text as
+  tooltip) driven by it.
 - Automation display adapted to named long button presses: for buttons the
   short/long qualifier now precedes the name (e.g. `Taste 8 lang: 'Rollladen
   Haus ab'` instead of `Taste 8: 'Rollladen Haus ab' lang`), since the
