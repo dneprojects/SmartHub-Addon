@@ -13,7 +13,18 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   in operate mode; the event server parses the response and keeps each module's
   `boot_err_mask` and the router `mod_comm_errors` up to date without
   interrupting events ("Forward problems" = incomplete forward-table collection
-  for that module). Foundation for forward-table self-healing.
+  for that module).
+- Forward-table self-healing (SmartHub side): a module that reports an
+  incomplete forward-table collection ("Forward problems") while reachable is
+  re-requested via `START_RT_FORW_MOD` — once per cyclic status poll (which
+  spaces the retries without an extra timer), up to three attempts. If it still
+  does not recover, the module is flagged with the dedicated code `F3`
+  ("Weiterleitungstabelle nicht geheilt", new `RT_ERROR_CODE[3]`); during the
+  retries the status text shows the attempt counter ("wird geheilt (Versuch
+  n/3)"). Healing only runs in operate mode (the router collects forward tables
+  itself during boot) and resets as soon as the forward bit clears. The retry
+  re-request is fire-and-forget (router command 68), so it never interrupts the
+  event stream.
 - API actions `MSG_SET`/`MSG_RESET` (30/17, action 1/0) are now implemented:
   free-text messages (ISO 8859-1, 1–32 chars) are forwarded to the addressed
   module as new module command 33 (`33 <act> <tlen> <chars>`). Texts over
