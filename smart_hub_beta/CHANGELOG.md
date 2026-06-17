@@ -5,6 +5,33 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- Module-table transfer ("Module verwalten" → "Übertragen") now (re)assigns
+  module addresses via **broadcast** (router `cs` → module cmd 178 by serial)
+  instead of addressing the module via its existing address. This reaches a
+  module on any channel and even in factory state 0,0, so address and channel
+  changes no longer depend on the module still being reachable under its old
+  address. The router maintains and persists its own address table for the
+  broadcast; the intended channel assignment is written authoritatively by the
+  final `send_rt_channels`. The per-module `del_mod_addr`/`set_module_address`
+  bookkeeping (incl. the now-redundant channel-only branch) was removed.
+  `RtHdlr.set_module_address_by_serial` gained a `batch_mode` flag (default
+  `False`) so the transfer can keep its network block held across the whole
+  operation and leave the staged target model untouched.
+- On a persistent address-change failure the transfer now **aborts without
+  committing** the channel/group tables (so the router never points at an
+  address a module never took); transient module replies (codes 252/250/251/255)
+  are retried up to three times, the deterministic old-firmware reply (249) is
+  not. Remaining modules stay pending for a later retry, and the abort page
+  names the offending module and reason.
+
+### Added
+- Progress popup for the module-table transfer: the shared wait popup now shows
+  an overall progress bar plus a scrolling result log (one line per step, e.g.
+  "Modul an Kanal k von Adresse … auf … gesetzt"). `WaitProgress` gained a
+  `log()` line buffer, `/wait_status` reports it as a third `|`-segment, and
+  `progress.js` renders it — reusable by other multi-step operations.
+
 ## [3.4.0] — 2026-06-17
 
 ### Added
