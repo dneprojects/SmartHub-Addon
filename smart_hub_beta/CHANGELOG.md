@@ -56,6 +56,11 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   defensively.
 
 ### Changed
+- Automation display adapted to named long button presses: for buttons the
+  short/long qualifier now precedes the name (e.g. `Taste 8 lang: 'Rollladen
+  Haus ab'` instead of `Taste 8: 'Rollladen Haus ab' lang`), since the
+  long-press label is a trigger intention, not a button name. Inputs and
+  switches keep the previous layout.
 - `post_settings` now stores every numeric scalar form field (display, button
   timing, dimmer, temperature, motion level) via explicit, type-annotated
   assignments (`settings: ModuleSettings | RouterSettings`, narrowed with
