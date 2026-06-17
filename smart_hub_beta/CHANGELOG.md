@@ -74,11 +74,13 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   A fault byte of 3 (timeout + comm error) is shown as `F1, F2` instead of the
   misleading combined `F3`, which keeps `F3` free as the dedicated code for an
   unhealed forward table; the comm-error codes (router cmd 101) and that `F3`
-  are merged per module. The router overview and the router diagnosis page use
-  the same layout and labels ("Modulfehler" / "Letzter Modulfehler"); the
-  separate "Modulrückmeldungen" summary row was dropped on both, and the "last
-  fault" row is hidden while current faults are present. The per-module problem
-  property was renamed `mod_boot_errors` → `mod_comm_errors` (it is no longer
+  are merged per module. A module-mirror problem (router cmd 106 bit 0x02) is
+  likewise surfaced as the dedicated code `F5` ("Spiegelung gestört") in the
+  same list. The router overview and the router diagnosis page use the same
+  layout and labels ("Modulfehler" / "Letzter Modulfehler"); the separate
+  "Modulrückmeldungen" summary row was dropped on both, and the "last fault" row
+  is hidden while current faults are present. The per-module problem property
+  was renamed `mod_boot_errors` → `mod_comm_errors` (it is no longer
   boot-specific).
 - Automation display adapted to named long button presses: for buttons the
   short/long qualifier now precedes the name (e.g. `Taste 8 lang: 'Rollladen
