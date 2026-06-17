@@ -11,39 +11,33 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   instead of addressing the module via its existing address. This reaches a
   module on any channel and even in factory state 0,0, so address and channel
   changes no longer depend on the module still being reachable under its old
-  address. The router maintains and persists its own address table for the
-  broadcast; the intended channel assignment is written authoritatively by the
-  final `send_rt_channels`. The per-module `del_mod_addr`/`set_module_address`
-  bookkeeping (incl. the now-redundant channel-only branch) was removed.
-  `RtHdlr.set_module_address_by_serial` gained a `batch_mode` flag (default
-  `False`) so the transfer can keep its network block held across the whole
-  operation and leave the staged target model untouched.
-- On a persistent address-change failure the transfer now **aborts without
-  committing** the channel/group tables (so the router never points at an
-  address a module never took); transient module replies (codes 252/250/251/255)
-  are retried up to three times, the deterministic old-firmware reply (249) is
-  not. Remaining modules stay pending for a later retry, and the abort page
-  names the offending module and reason.
-- After a transfer that changed addresses or removed modules, SmartHub now
-  **restarts the router automatically and re-reads the full system**, so the
-  router's per-address mirror (module identity/config) reflects the new
-  addressing. Without this, an address swap left the previous occupant's
-  identity cached at the old address (visible as a duplicated module that
-  survived SmartHub reboots, since the config lives in the module and only a
-  router restart re-reads it). Pure channel changes still need manual re-wiring
-  and a restart. Re-init is factored into a shared `reinit_router_model` helper
-  used by both the transfer and `re_init_hub`.
+  address. `RtHdlr.set_module_address_by_serial` gained a `batch_mode` flag
+  (default `False`) so the transfer keeps its network block held across the
+  whole operation and leaves the staged target model untouched.
+- SmartHub no longer rewrites the router's address/channel table on transfer.
+  The broadcast makes the router maintain and persist its own address table,
+  migrate each module's group membership, and rebuild its forward table itself
+  (verified on hardware incl. in-place address swaps). The previous
+  `send_rt_channels` / per-module `del_mod_addr`/`set_module_address`
+  bookkeeping corrupted that correct router state on a swap (it rewrote a
+  broadcast-churned table) and was removed — as was the experimental automatic
+  router restart, which is no longer needed.
+- A module is **deleted via a broadcast to address 0** (resets it to 0,0 — the
+  module sets `adresse=0` and `raum=0`; the router drops it from its table),
+  replacing the old `del_mod_addr`.
+- On a persistent address-change failure the transfer aborts; transient module
+  replies (codes 252/250/251/255) are retried up to three times, the
+  deterministic old-firmware reply (249) is not. Remaining modules stay pending
+  for a later retry, and the abort page names the offending module and reason.
+  A delete that cannot reach its module is non-fatal (warning).
 
 ### Fixed
-- Module-table transfer now **forces router config mode (`set_mode(0, 75)`)
-  before `send_rt_channels`**. The broadcast (`cs`) command can leave the router
-  in a non-config mode, and `send_rt_channels` only relies on `set_config_mode()`
-  which is a no-op while already in server mode — so the router silently
-  rejected the channel-table write and kept the broadcast-churned table. On an
-  address swap (A 1→9, B 9→1) the second module's broadcast removes the first
-  module's freshly-set address from the router table; without the accepted
-  rewrite, that address (and its module) was lost after the restart even though
-  the module was correctly programmed on the bus.
+- Address-swap group membership: an in-place swap (A 1→9, B 9→1) makes the
+  router's own per-address group migration lose a value across the reused
+  address. After all address changes the transfer now re-applies the per-address
+  group membership once from the model. An `old → new` address map (0 = deleted)
+  is collected during the transfer for this fix-up and for a planned automation
+  address fix-up.
 - `set_module_address_by_serial` no longer logs a misleading "at <new> set to
   address <new>" line in batch mode (the model already carries the new id at
   transfer time); the transfer now logs the accurate "from <old> to <new>".
