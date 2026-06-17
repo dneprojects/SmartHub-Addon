@@ -35,6 +35,15 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   used by both the transfer and `re_init_hub`.
 
 ### Fixed
+- Module-table transfer now **forces router config mode (`set_mode(0, 75)`)
+  before `send_rt_channels`**. The broadcast (`cs`) command can leave the router
+  in a non-config mode, and `send_rt_channels` only relies on `set_config_mode()`
+  which is a no-op while already in server mode — so the router silently
+  rejected the channel-table write and kept the broadcast-churned table. On an
+  address swap (A 1→9, B 9→1) the second module's broadcast removes the first
+  module's freshly-set address from the router table; without the accepted
+  rewrite, that address (and its module) was lost after the restart even though
+  the module was correctly programmed on the bus.
 - `set_module_address_by_serial` no longer logs a misleading "at <new> set to
   address <new>" line in batch mode (the model already carries the new id at
   transfer time); the transfer now logs the accurate "from <old> to <new>".
