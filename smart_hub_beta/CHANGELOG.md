@@ -5,7 +5,15 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.4.0] — 2026-06-17
+
 ### Added
+- Cyclic per-module problem monitoring: the periodic router-status query now
+  also requests the module boot/problem status (router cmd 106) fire-and-forget
+  in operate mode; the event server parses the response and keeps each module's
+  `boot_err_mask` and the router `mod_boot_errors` up to date without
+  interrupting events ("Forward problems" = incomplete forward-table collection
+  for that module). Foundation for forward-table self-healing.
 - API actions `MSG_SET`/`MSG_RESET` (30/17, action 1/0) are now implemented:
   free-text messages (ISO 8859-1, 1–32 chars) are forwarded to the addressed
   module as new module command 33 (`33 <act> <tlen> <chars>`). Texts over
