@@ -24,6 +24,20 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   are retried up to three times, the deterministic old-firmware reply (249) is
   not. Remaining modules stay pending for a later retry, and the abort page
   names the offending module and reason.
+- After a transfer that changed addresses or removed modules, SmartHub now
+  **restarts the router automatically and re-reads the full system**, so the
+  router's per-address mirror (module identity/config) reflects the new
+  addressing. Without this, an address swap left the previous occupant's
+  identity cached at the old address (visible as a duplicated module that
+  survived SmartHub reboots, since the config lives in the module and only a
+  router restart re-reads it). Pure channel changes still need manual re-wiring
+  and a restart. Re-init is factored into a shared `reinit_router_model` helper
+  used by both the transfer and `re_init_hub`.
+
+### Fixed
+- `set_module_address_by_serial` no longer logs a misleading "at <new> set to
+  address <new>" line in batch mode (the model already carries the new id at
+  transfer time); the transfer now logs the accurate "from <old> to <new>".
 
 ### Added
 - Progress popup for the module-table transfer: the shared wait popup now shows
