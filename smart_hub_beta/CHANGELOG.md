@@ -19,12 +19,11 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   re-requested via `START_RT_FORW_MOD` — once per cyclic status poll (which
   spaces the retries without an extra timer), up to three attempts. If it still
   does not recover, the module is flagged with the dedicated code `F3`
-  ("Weiterleitungstabelle nicht geheilt", new `RT_ERROR_CODE[3]`); during the
-  retries the status text shows the attempt counter ("wird geheilt (Versuch
-  n/3)"). Healing only runs in operate mode (the router collects forward tables
-  itself during boot) and resets as soon as the forward bit clears. The retry
-  re-request is fire-and-forget (router command 68), so it never interrupts the
-  event stream.
+  ("Weiterleitungstabelle nicht geheilt", new `RT_ERROR_CODE[3]`) in the module
+  fault list. Healing only runs in operate mode (the router collects forward
+  tables itself during boot) and resets as soon as the forward bit clears. The
+  retry re-request is fire-and-forget (router command 68), so it never
+  interrupts the event stream.
 - API actions `MSG_SET`/`MSG_RESET` (30/17, action 1/0) are now implemented:
   free-text messages (ISO 8859-1, 1–32 chars) are forwarded to the addressed
   module as new module command 33 (`33 <act> <tlen> <chars>`). Texts over
@@ -70,15 +69,17 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   defensively.
 
 ### Changed
-- Module communication errors are now shown as a list of single-bit F-codes
-  instead of one combined code: a fault byte of 3 (timeout + comm error) is
-  displayed as `F1, F2` rather than the misleading `F3`. This keeps `F3` free
-  as a dedicated code for a future forward-table fault and matches the bitwise
-  origin of the codes (each `Fx` carries its own tooltip). The per-module
-  problem property was renamed `mod_boot_errors` → `mod_comm_errors` (it is no
-  longer boot-specific), and the router overview now shows a cyclically fresh
-  "Modulrückmeldungen" row (Korrekt / Mit Fehlern, with the fault text as
-  tooltip) driven by it.
+- Module faults are now shown as a per-module list of single-bit F-codes in the
+  "Modulfehler" row, e.g. `Modul 5: F1, F3`, each code carrying its own tooltip.
+  A fault byte of 3 (timeout + comm error) is shown as `F1, F2` instead of the
+  misleading combined `F3`, which keeps `F3` free as the dedicated code for an
+  unhealed forward table; the comm-error codes (router cmd 101) and that `F3`
+  are merged per module. The router overview and the router diagnosis page use
+  the same layout and labels ("Modulfehler" / "Letzter Modulfehler"); the
+  separate "Modulrückmeldungen" summary row was dropped on both, and the "last
+  fault" row is hidden while current faults are present. The per-module problem
+  property was renamed `mod_boot_errors` → `mod_comm_errors` (it is no longer
+  boot-specific).
 - Automation display adapted to named long button presses: for buttons the
   short/long qualifier now precedes the name (e.g. `Taste 8 lang: 'Rollladen
   Haus ab'` instead of `Taste 8: 'Rollladen Haus ab' lang`), since the
