@@ -41,6 +41,16 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `set_module_address_by_serial` no longer logs a misleading "at <new> set to
   address <new>" line in batch mode (the model already carries the new id at
   transfer time); the transfer now logs the accurate "from <old> to <new>".
+- Module-table transfer now waits, after each broadcast address change, until
+  the router has (re)loaded the changed module's mirror (router cmd 106, mirror
+  bit 0x02) before the next change — graduated wait (immediate, +3 s, +7 s).
+  This serializes the in-place ring swap so the next change's displacement never
+  rushes a still-busy module (which previously timed out and dropped the
+  module's address from the router table on a repeated swap). The same
+  per-module mirror-ready wait now gates module read-in at startup/re-init: a
+  module whose mirror is not delivered in time is removed as faulty instead of
+  read with stale/garbled data — fixing the unreliable post-reboot read that
+  needed a second pass. New helpers `HbtnRouter.mirror_ok` / `wait_mirror_ready`.
 
 ### Added
 - Progress popup for the module-table transfer: the shared wait popup now shows
