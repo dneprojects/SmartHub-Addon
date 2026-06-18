@@ -66,7 +66,15 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   change or in-place swap. Cross-router forwards and local triggers are left
   alone; a reference to a deleted module stays dangling (no new address). New
   helpers `remap_automation_triggers` / `fixup_automation_addresses` in
-  `config_setup`, driven by the transfer's `addr_map`.
+  `config_setup`, driven by the transfer's `addr_map`. The cached
+  `ModuleSettings` of each rewritten module is rebuilt from the corrected list
+  so the parsed automations (and the freshly resolved source-module trigger
+  objects) match the new addresses, and a later save cannot re-derive from a
+  stale definition.
+- The transfer now ends by re-sorting `rtr.modules` by the new addresses and
+  rebuilding the positionally correlated `rtr.mod_addrs` from it, so an in-place
+  swap leaves both sorted and consistent for `get_module` (new helper
+  `resort_modules_by_address`).
 
 ### Added
 - Progress popup for the module-table transfer: the shared wait popup now shows
