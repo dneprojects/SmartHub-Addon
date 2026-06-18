@@ -33,6 +33,11 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Bundled router firmware in `firmware/` updated to VM V4.0 Rev 12 (clears the
   per-address mirror flag on an address change; pairs with the cmd-106
   mirror-ready wait).
+- Adding a module ("Module verwalten" → "Modul anlegen") is now purely
+  model-side: it no longer arms the button-press learn (`NEXT_MD_ADDR`). The
+  module's address is assigned later on "Übertragen" via broadcast, so adding
+  works identically offline (save the configuration as a file) and online
+  (transfer it in one go).
 
 ### Fixed
 - Address-swap group membership: an in-place swap (A 1→9, B 9→1) makes the
@@ -61,6 +66,11 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   "Modul an Kanal k von Adresse … auf … gesetzt"). `WaitProgress` gained a
   `log()` line buffer, `/wait_status` reports it as a third `|`-segment, and
   `progress.js` renders it — reusable by other multi-step operations.
+- The settings learn "Moduladresse auf Kanalpaar anlernen" now opens a ~1-minute
+  wait popup, holds the router in config (server) mode for the duration, and
+  polls the router's module list (cmd 0x63) — reporting success as soon as the
+  learned address appears (or a timeout). Online only; the busy/offline cases
+  report a clear message instead of starting.
 
 ## [3.4.0] — 2026-06-17
 
