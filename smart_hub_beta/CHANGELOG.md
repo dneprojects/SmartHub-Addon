@@ -59,6 +59,14 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   module whose mirror is not delivered in time is removed as faulty instead of
   read with stale/garbled data — fixing the unreliable post-reboot read that
   needed a second pass. New helpers `HbtnRouter.mirror_ok` / `wait_mirror_ready`.
+- Module-table transfer now pulls a changed module address through every
+  module's **external automation triggers**: an automation triggered by a moved
+  module (source address in automation byte 1, src_mod) is re-addressed to the
+  module's new address, so external triggers keep working after an address
+  change or in-place swap. Cross-router forwards and local triggers are left
+  alone; a reference to a deleted module stays dangling (no new address). New
+  helpers `remap_automation_triggers` / `fixup_automation_addresses` in
+  `config_setup`, driven by the transfer's `addr_map`.
 
 ### Added
 - Progress popup for the module-table transfer: the shared wait popup now shows
