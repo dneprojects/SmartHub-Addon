@@ -6,6 +6,16 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- The automation address fix-up + module re-sort now run **model-side at
+  "Übernehmen"** (`apply_id_chan_changes` returns the per-call `old → new` map;
+  `tbl_apply` calls the new `apply_automation_address_changes`), not at transfer.
+  The model (and a save-to-file) is therefore already correct, and the cached
+  `ModuleSettings` is rebuilt without touching the SMC CRC. The transfer only
+  **persists** the rewritten lists (`persist_changed_module_lists`): each upload
+  is retried (immediate, +2 s, +5 s) and a persistent failure is non-fatal
+  (logged) — fixes a 500 where a module list-upload issued right after an
+  in-place address swap timed out because the router was still forwarding/
+  rebuilding its mirror, aborting the whole transfer.
 - Module-table transfer ("Module verwalten" → "Übertragen") now (re)assigns
   module addresses via **broadcast** (router `cs` → module cmd 178 by serial)
   instead of addressing the module via its existing address. This reaches a
