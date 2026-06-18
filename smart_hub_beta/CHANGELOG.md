@@ -30,6 +30,9 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   deterministic old-firmware reply (249) is not. Remaining modules stay pending
   for a later retry, and the abort page names the offending module and reason.
   A delete that cannot reach its module is non-fatal (warning).
+- Bundled router firmware in `firmware/` updated to VM V4.0 Rev 12 (clears the
+  per-address mirror flag on an address change; pairs with the cmd-106
+  mirror-ready wait).
 
 ### Fixed
 - Address-swap group membership: an in-place swap (A 1→9, B 9→1) makes the
