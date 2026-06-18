@@ -5,19 +5,6 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Fixed
-- The automation-list persist after an in-place address swap timed out (every
-  retry: `index out of range`), for **both** the swapped and an unrelated
-  module. Root cause: `send_rt_group_no`'s closing `set_config_mode(False)` ran
-  `reset_config_mode`, which set the router's **global mode 32** and so pulled
-  it out of server mode (75); the following SMC upload's `set_server_mode` was a
-  no-op (`_opr_mode` still `False`), so the write went out in the wrong router
-  mode and the router never forwarded it. `set_config_mode` is now symmetric: in
-  server mode both entering and leaving config mode are no-ops (config mode is
-  implicit there), and the operate-mode exit goes through `set_operate_mode`
-  instead of `reset_config_mode`. The manual SMC upload always worked because it
-  has no preceding group write / mode reset.
-
 ### Changed
 - The automation address fix-up + module re-sort now run **model-side at
   "Übernehmen"** (`apply_id_chan_changes` returns the per-call `old → new` map;
