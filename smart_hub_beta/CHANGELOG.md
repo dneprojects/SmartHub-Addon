@@ -15,8 +15,14 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   trigger, which stays unchanged); `prepare_trigger_lists` fills all three via
   distinct placeholders that all render as "-- Taster wählen --". The save path
   reads the button index from `trigger_button` (short) or `trigger_button_long`
-  (long/end); the index is identical in both. (`automation_edit_template.html`,
-  `trigger.js`, `automtn_trigger.py`)
+  (long/end); the index is identical in both. A button named in only one press
+  type still appears in BOTH lists; the unnamed press type shows the synthetic
+  label "B<n> kurz" / "B<n> lang" so it stays selectable (both lists thus carry
+  the same value set, which also makes the short↔long carry-over reliable). If
+  an existing automation references a button that is unnamed in both fields, the
+  selector adds that option on the fly ("B<n> (ohne Name)") on load so the entry
+  stays editable and round-trips on save instead of being dropped.
+  (`automation_edit_template.html`, `trigger.js`, `automtn_trigger.py`)
 - Renamed the shared `asyncio.Lock` `web_lock` → `command_lock` (in
   `config_commons.py` and all users), reflecting its real scope: it serializes
   every router-bus command and mode switch, not just web/config-server requests.
