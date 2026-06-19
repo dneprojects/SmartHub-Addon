@@ -6,6 +6,9 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- Renamed the shared `asyncio.Lock` `web_lock` → `command_lock` (in
+  `config_commons.py` and all users), reflecting its real scope: it serializes
+  every router-bus command and mode switch, not just web/config-server requests.
 - The automation address fix-up + module re-sort now run **model-side at
   "Übernehmen"** (`apply_id_chan_changes` returns the per-call `old → new` map;
   `tbl_apply` calls the new `apply_automation_address_changes`), not at transfer.
@@ -58,10 +61,25 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the router back to Operate mid-upload **and** cleared the save's network block.
   The next SMC packet then read the 2-byte Operate-mode sentinel buffer
   (`_resp_buffer[8]` → IndexError). The loop now serializes its command
-  processing under the same `web_lock` the save/transfer hold for their whole
-  upload (`readexactly` stays outside the lock so it can't starve a waiting
-  save); `_api_cmd_processing` is set inside the lock. A poll arriving during a
-  save now waits cleanly instead of corrupting the in-flight upload.
+  processing under the same `command_lock` the save/transfer hold for their
+  whole upload (`readexactly` stays outside the lock so it can't starve a
+  waiting save); `_api_cmd_processing` is set inside the lock. A poll arriving
+  during a save now waits cleanly instead of corrupting the in-flight upload.
+- The eKey log read/delete (`prepare_log_list`, `ekey_logs`) and the air-quality
+  calibration (`get_aircal`) drove the router bus (mode switches +
+  `block_network_if`) **without** holding `command_lock`, so a concurrent
+  network-API command could collide with them exactly like the save crash above.
+  All three now run inside `async with command_lock`.
+- The diagnostics/test UI (`config_testing.py`) had the same class of gap in 12
+  more handlers that drive the bus without `command_lock`: `test_router`,
+  `test_communication`, `reset_comm_errors`, `start_test`, `stop_test`,
+  `set_output`, `set_sys_settings`, `set_cov_autostop`, `chan_reset`,
+  `isp_reset`, `new_chan_id`, `chg_chan_id`. All now wrap their bus access in
+  `async with command_lock` (waiting, not aborting — these are short operations
+  that should complete even if a brief Home-Assistant command holds the lock).
+  The long-running handlers (`rt_reboot`, `rt_set_baud`, `rt_reinit_fwdtbl`,
+  `prop_chan_id`, uploads, firmware updates, `re_init_hub`) keep their existing
+  "abort with 204 if busy" guard.
 - Address-swap group membership: an in-place swap (A 1→9, B 9→1) makes the
   router's own per-address group migration lose a value across the reused
   address. After all address changes the transfer now re-applies the per-address
