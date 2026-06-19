@@ -90,6 +90,19 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (transfer it in one go).
 
 ### Fixed
+- Address-swap transfer corrupting a module's automations: after an in-place
+  address swap (A 1→9, B 9→1) `remap_automation_triggers` rewrote each external
+  trigger's source-module byte **in place** without re-sorting. The module
+  stores its automation lines sorted by `(src_rt, src_mod, …)`; swapping e.g.
+  `(1,1)→(1,9)` left it ahead of `(1,4)`, so the list was no longer ascending
+  and the module rejected the SMC upload with error flag 255 — which empties the
+  module (all automations gone). A module with only a single affected trigger
+  (e.g. the partner module) stayed sorted and uploaded fine, which is why only
+  the multi-trigger module lost its list. `remap_automation_triggers` now
+  re-sorts the automation lines by `(src_rt, src_mod)` after any change; a stable
+  sort is exact here because `src_rt` is never changed and the remap is a
+  bijection on `src_mod`, so each resulting group keeps its original internal
+  order. The names/trailing section is untouched.
 - Saving a module list (automations/settings) could fail with `index out of
   range` when the SmartConfig app's periodic status poll arrived mid-upload. The
   network-API loop only honoured the `_netw_blocked` flag at the top of the loop
