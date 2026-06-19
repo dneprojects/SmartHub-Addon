@@ -9,6 +9,17 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Renamed the shared `asyncio.Lock` `web_lock` → `command_lock` (in
   `config_commons.py` and all users), reflecting its real scope: it serializes
   every router-bus command and mode switch, not just web/config-server requests.
+- Config-server bus handlers that previously **aborted with HTTP 204** when the
+  bus was busy (`command_lock` held) now **wait** for the lock and complete:
+  `get_localupload`, `get_upload`, `post_loc_update`, `post_upd_upload`,
+  `get_update_router`, `get_update_modules` (config_server), `re_init_hub`
+  (config_setup), and `rt_reboot`, `rt_set_baud`, `rt_reinit_fwdtbl`,
+  `prop_chan_id` (config_testing). A user action is no longer silently dropped
+  because a brief Home-Assistant command happened to hold the lock. `turnoff_config`
+  keeps the 204-abort (turning config mode off while a bus op runs may not be
+  wanted). The progress-polling endpoints `get_update_status` / `get_wait_status`
+  still check `command_lock.locked()` to *report* progress — they must return
+  immediately and are not affected.
 - The automation address fix-up + module re-sort now run **model-side at
   "Übernehmen"** (`apply_id_chan_changes` returns the per-call `old → new` map;
   `tbl_apply` calls the new `apply_automation_address_changes`), not at transfer.
