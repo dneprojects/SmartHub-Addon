@@ -50,6 +50,18 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (transfer it in one go).
 
 ### Fixed
+- Saving a module list (automations/settings) could fail with `index out of
+  range` when the SmartConfig app's periodic status poll arrived mid-upload. The
+  network-API loop only honoured the `_netw_blocked` flag at the top of the loop
+  (before `readexactly`), so a poll already in flight when a config-server save
+  raised the block was processed anyway: its `_auto_restart_opr` path switched
+  the router back to Operate mid-upload **and** cleared the save's network block.
+  The next SMC packet then read the 2-byte Operate-mode sentinel buffer
+  (`_resp_buffer[8]` → IndexError). The loop now serializes its command
+  processing under the same `web_lock` the save/transfer hold for their whole
+  upload (`readexactly` stays outside the lock so it can't starve a waiting
+  save); `_api_cmd_processing` is set inside the lock. A poll arriving during a
+  save now waits cleanly instead of corrupting the in-flight upload.
 - Address-swap group membership: an in-place swap (A 1→9, B 9→1) makes the
   router's own per-address group migration lose a value across the reused
   address. After all address changes the transfer now re-applies the per-address
