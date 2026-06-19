@@ -6,6 +6,17 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- Automation editor, button (Taster) trigger: the two dependent selectors are
+  swapped — the press type (kurz / lang / Ende lang) now comes first, the button
+  name second. The name selector depends on the press type: short press lists
+  the short names (`settings.buttons`), long / long-end list the long-press names
+  (`settings.buttonslong`). Implemented as three selects (`button-select` kurz,
+  `button-long-select` lang, `button-dimm-select` for the separate Dimmen
+  trigger, which stays unchanged); `prepare_trigger_lists` fills all three via
+  distinct placeholders that all render as "-- Taster wählen --". The save path
+  reads the button index from `trigger_button` (short) or `trigger_button_long`
+  (long/end); the index is identical in both. (`automation_edit_template.html`,
+  `trigger.js`, `automtn_trigger.py`)
 - Renamed the shared `asyncio.Lock` `web_lock` → `command_lock` (in
   `config_commons.py` and all users), reflecting its real scope: it serializes
   every router-bus command and mode switch, not just web/config-server requests.
