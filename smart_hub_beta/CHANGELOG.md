@@ -6,6 +6,15 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- Automation editor: the on-the-fly option insertion (so an automation that
+  references an entity whose name was cleared in the settings stays editable and
+  round-trips on save instead of being silently dropped) is now applied to **all
+  entity selectors** in both the trigger and action editors — not just buttons.
+  Generalized `setButtonElement` → `setEntityElement(id, value)` (no-op for
+  non-`<select>` elements and the empty placeholder; adds a "<value> (ohne Name)"
+  option only when the referenced value is missing). Fixed/computed selectors
+  (on/off, press type, modes, sensor types, day/month, percentages, …) and input
+  fields keep plain `setElement`. (`init`-paths in `trigger.js`, `action.js`)
 - Automation editor, button (Taster) trigger: the two dependent selectors are
   swapped — the press type (kurz / lang / Ende lang) now comes first, the button
   name second. The name selector depends on the press type: short press lists
