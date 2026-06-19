@@ -6,6 +6,16 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- Module-table transfer progress bar is now one continuous 0→100 % without the
+  backward jump that happened when a second module list started uploading. The
+  bar is weighted: the address changes share the first 20 %, the (much slower)
+  list uploads share the remaining 80 %, each upload getting its own slice.
+  Implemented via a new `WaitProgress.start_band(lo, hi, n)` that subdivides a
+  sub-band (keeping the label/log), plus `set_fraction(1, 1)` per address step
+  and `next_item()` per uploaded list.
+- SMC list-upload log messages now name the module by its actual target address
+  (`mod_addr`) instead of the handler's possibly stale `mod_id`, so after an
+  address change the "transferred … to module N" line shows the new address.
 - Automation editor: the on-the-fly option insertion (so an automation that
   references an entity whose name was cleared in the settings stays editable and
   round-trips on save instead of being silently dropped) is now applied to **all
