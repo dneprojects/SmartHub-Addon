@@ -99,6 +99,17 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   works identically offline (save the configuration as a file) and online
   (transfer it in one go).
 
+### Tests
+- Sharpened the status↔smg serialization tests with a real 156-byte `smg_upload`
+  captured from a RaumController ("RC2 - Büro, Gäste", type `0x01 0x02`,
+  SC2 V4.5). The new `TestRealRaumControllerSmg` pins the exact
+  `build_status → build_smg` round-trip on real data and characterizes the
+  decoded cover times (Rollladenzeiten 20 / 24 / 24 s, all "down" → `COVER_POL`
+  `0xAAAA`, no blade/tilt times), the button times (`T_SHORT`/`T_LONG`/`T_DIM`
+  = 6 / 50 / 1), the input polarity (`SWMOD` 0 / 14 / 0) and the parsed
+  name/serial/version — values a synthetic ramp fixture could not have caught at
+  the real interpolation offsets (20 s → 200/1, 24 s → 240/1).
+
 ### Fixed
 - Address-swap transfer corrupting a module's automations: after an in-place
   address swap (A 1→9, B 9→1) `remap_automation_triggers` rewrote each external
