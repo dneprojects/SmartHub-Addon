@@ -149,6 +149,15 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   types captured in the same session as their mirrors.
 
 ### Fixed
+- Setting the system or a single group mode at runtime logged a spurious
+  "handle_router_cmd_resp called in Opr mode, return 0 0" warning and returned a
+  bogus `\x00` ack to SmartConfig. `RtHdlr.set_mode` always used the
+  response-reading command variant, but in operate mode the event server owns the
+  serial reader so no response can be read. It now sends the mode command
+  fire-and-forget in operate mode (the router confirms via the event stream) and
+  echoes the mode as the one-byte ack, mirroring how `set_output` already works.
+  The mode change itself was never lost; only the warning and return value were
+  wrong.
 - Address-swap transfer corrupting a module's automations: after an in-place
   address swap (A 1→9, B 9→1) `remap_automation_triggers` rewrote each external
   trigger's source-module byte **in place** without re-sorting. The module
