@@ -126,6 +126,27 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the RaumController does not reach: the Mini button range (arg 10/11), the
   "Ambient" LED-0 finalization, 253-prefixed direct-command descriptions and
   flags.
+- Added `TestRealModuleMirrorRoundtrip`, driving `build_smg`/`build_status` over
+  real full 242-byte status mirrors (live cmd-0x87 read-outs) of eight further
+  module-type families: a motion detector ("Smart Detect 360", type 0x50 0x65),
+  a weather sensor ("Smart Nature", type 0x14 0x01), a 24 V input module
+  ("Smart In 8/24V-1", type 0x0b 0x1f), a dimmer ("Smart Dimm-2", type 0x0a 0x16),
+  a GSM modem ("Smart GSM", type 0x1e 0x03), a 230 V input ("Smart In 8/230V",
+  type 0x0b 0x01), a relay output ("Smart Out 8/R-1", type 0x0a 0x32) and an
+  ekey fingerprint reader ("Fanekey", type 0x1e 0x01), and the two
+  config-richest controller families: "Smart Controller XL-2" (type 0x01 0x02,
+  whose name exercises latin-1 umlaut decoding) and "Smart Controller Touch"
+  (type 0x01 0x04). Pins type/name/serial/version and the smg round-trip. The
+  mirror extraction is cross-validated against module 9, whose mirror's
+  `build_smg` reproduces the independently verified `REAL_SCK_SMG`.
+- Added `test_mirror_running_real_operate_frame`, pinning `mirror_running()` and
+  the config-mode marker against a real 43-byte router channel-status frame
+  (cmd 10 4 4) captured just after a hub restart — the synthetic fixture used a
+  too-short 41-byte buffer.
+- Added `TestRealCompactStatus`, cross-validating `module.get_status(compact)`
+  (the 107-byte record the cmd 10 5 2 all-module dump is built from) against the
+  device's own compact output sliced from a real live dump, for five module
+  types captured in the same session as their mirrors.
 
 ### Fixed
 - Address-swap transfer corrupting a module's automations: after an in-place
