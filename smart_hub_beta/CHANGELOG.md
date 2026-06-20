@@ -109,6 +109,15 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   = 6 / 50 / 1), the input polarity (`SWMOD` 0 / 14 / 0) and the parsed
   name/serial/version — values a synthetic ramp fixture could not have caught at
   the real interpolation offsets (20 s → 200/1, 24 s → 240/1).
+- Added `TestGetNamesRealRaumController` driving `ModuleSettingsBase.get_names`
+  with the real complete 2976-byte / 159-line SMC list of the same
+  RaumController (automation lines + full event-235 names trailer). This is the
+  path that crashed in the field ("Parsing of names … index out of range"), so
+  the test asserts header/line-length integrity over all 159 records, that the
+  trailer parses with **no** error logged, and the real decoded names — buttons,
+  long buttons (arg 106-108), inputs, outputs incl. the lone area-2 output and
+  the two Smart-Controller dimmers, LEDs, and vis-commands with their packed
+  2-byte codes (e.g. 0x0505 → "Szene 5 aus").
 
 ### Fixed
 - Address-swap transfer corrupting a module's automations: after an in-place
