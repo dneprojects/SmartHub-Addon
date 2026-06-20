@@ -118,6 +118,14 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   long buttons (arg 106-108), inputs, outputs incl. the lone area-2 output and
   the two Smart-Controller dimmers, LEDs, and vis-commands with their packed
   2-byte codes (e.g. 0x0505 → "Szene 5 aus").
+- Added real-data tests for a second module type, a Smart Controller Mini
+  (type 0x32 0x01, "Kleener im Büro & so"): `TestRealSCKMiniSmg` pins the
+  coverless smg round-trip (covers=0 → `calc_cover_times` is 32 zero bytes) plus
+  button times and name/serial/version, and `TestGetNamesRealSCKMini` drives the
+  real 944-byte SMC through `get_names`, covering the Mini-only parse branches
+  the RaumController does not reach: the Mini button range (arg 10/11), the
+  "Ambient" LED-0 finalization, 253-prefixed direct-command descriptions and
+  flags.
 
 ### Fixed
 - Address-swap transfer corrupting a module's automations: after an in-place
