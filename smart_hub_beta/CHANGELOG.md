@@ -5,6 +5,9 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Automation editor: the RGB/Farblicht action now offers **wechseln** (toggle) for the 5 colour LEDs (Ambient + 4 corners), mapped to Befehl 35 task 3 (replaces the previously non-functional "temporär setzen"). The on/off entries are relabelled "einschalten"/"ausschalten" and the selector is ordered einschalten/ausschalten/wechseln/colours. Requires module firmware RC-Compact ≥ rev 07 / SC Touch ≥ rev 05.
+
 ### Changed
 - Module-table transfer progress bar is now one continuous 0→100 % without the
   backward jump that happened when a second module list started uploading. The
