@@ -159,13 +159,24 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   removed anything. It now switches the router into config mode for the call
   (`block_network_if(True)` / `finally(False)`) like the other router-table
   handlers, plus an offline guard.
-- Full system restore (backup) wrote the wrong module's name and settings to
-  modules that were absent from the backup. The restore loop iterated the
-  router's *current* module addresses and matched each to a backup part by its
-  stored address (`smg[0]` = `MirrIdx.ADDR`); on no match the inner loop fell
-  through and the *last* backup part was sent to that module. It now iterates the
-  backup parts and sends each to the address recorded in its own data, mirroring
-  the (already correct) single-module restore.
+- Backup restore loaded the **wrong module's** data (name, type, settings), and
+  could raise an `IndexError` (HTTP 500) on modules with high addresses such as
+  motion detectors / outdoor modules. Two causes, both fixed:
+  - The *full* restore looped over the router's *current* addresses and matched
+    each to a backup part by its stored address; on no match the inner loop fell
+    through and the *last* backup part was written to that module. It now
+    iterates the backup parts themselves.
+  - The *single-module* restore picked the part positionally
+    (`content_parts[mod_addr]`) instead of by stored address, so it grabbed the
+    wrong block when addresses are non-contiguous and raised `IndexError` for an
+    address beyond the number of parts. It now matches by stored address
+    (`find_module_part`) and warns if the module is absent from the backup.
+  - As a safety net for every path, `send_to_module` now writes a backup part
+    only when **both** the address (`smg[0]` = `MirrIdx.ADDR`) **and** the module
+    type (`smg[1:3]`) match the target module. An address that is not present in
+    the router is only created from the backup in offline mode; online a missing
+    address is left untouched (nothing is loaded). `send_to_module` returns
+    True/False and rejected parts are logged.
 - Module deletion in the setup-table transfer now also drops the module from the
   router via `del_mod_addr(mod._id)` after the broadcast-to-0. A non-responding
   or absent module cannot report its old address, so the router could not remove
