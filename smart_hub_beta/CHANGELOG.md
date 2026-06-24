@@ -153,6 +153,24 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   types captured in the same session as their mirrors.
 
 ### Fixed
+- Settings page, **Moduladresse entfernen**: the router only honours the delete
+  command (`del_mod_addr`, 99/180) in config mode (modus 75); in operate mode it
+  silently no-ops. The handler only took `command_lock`, so the button never
+  removed anything. It now switches the router into config mode for the call
+  (`block_network_if(True)` / `finally(False)`) like the other router-table
+  handlers, plus an offline guard.
+- Full system restore (backup) wrote the wrong module's name and settings to
+  modules that were absent from the backup. The restore loop iterated the
+  router's *current* module addresses and matched each to a backup part by its
+  stored address (`smg[0]` = `MirrIdx.ADDR`); on no match the inner loop fell
+  through and the *last* backup part was sent to that module. It now iterates the
+  backup parts and sends each to the address recorded in its own data, mirroring
+  the (already correct) single-module restore.
+- Module deletion in the setup-table transfer now also drops the module from the
+  router via `del_mod_addr(mod._id)` after the broadcast-to-0. A non-responding
+  or absent module cannot report its old address, so the router could not remove
+  the stale entry by itself; the SmartHub knows the id and removes it explicitly
+  (router rev ≥ 13 never registers address 0).
 - Setting the system or a single group mode at runtime logged a spurious
   "handle_router_cmd_resp called in Opr mode, return 0 0" warning and returned a
   bogus `\x00` ack to SmartConfig. `RtHdlr.set_mode` always used the
