@@ -7,6 +7,7 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - Automation editor: the RGB/Farblicht action now offers **wechseln** (toggle) for the 5 colour LEDs (Ambient + 4 corners), mapped to Befehl 35 task 3 (replaces the previously non-functional "temporär setzen"). The on/off entries are relabelled "einschalten"/"ausschalten" and the selector is ordered einschalten/ausschalten/wechseln/colours. Requires module firmware RC-Compact ≥ rev 07 / SC Touch ≥ rev 05.
+- Settings page: new **Moduladresse entfernen** action (above "Moduladresse auf Kanalpaar anlernen") that removes a module address from the router via `del_mod_addr` (route `/test/del_chan_id`). Edit field (`input#del_mod_id`) and button (`#btn_del_mod_id`) are added to the same style.css/general.css selector lists as the sibling legacy controls, so the styling is identical.
 
 ### Changed
 - Module-table transfer progress bar is now one continuous 0→100 % without the
