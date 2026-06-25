@@ -1,8 +1,8 @@
 ---
 name: "Smart Hub"
 description: "Habitron Smart Hub as Home Assistant App"
-version: 3.4.0
-slug: "smart_hub"
+version: "3.5.0"
+slug: smart_hub
 arch:
   - aarch64
 ports:
@@ -19,7 +19,7 @@ uart: true
 devicetree: true
 ingress: true
 ingress_port: 8099
-ingress_stream : true
+ingress_stream: true
 panel_title: Smart Configurator
 panel_icon: hbt:habitron-logo
 panel_admin: true

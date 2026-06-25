@@ -5,6 +5,12 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.0] — 2026-06-25
+
+### Added
+- Automation editor: the RGB/Farblicht action now offers **wechseln** (toggle) for the 5 colour LEDs (Ambient + 4 corners), mapped to Befehl 35 task 3 (replaces the previously non-functional "temporär setzen"). The on/off entries are relabelled "einschalten"/"ausschalten" and the selector is ordered einschalten/ausschalten/wechseln/colours. Requires module firmware RC-Compact ≥ rev 07 / SC Touch ≥ rev 05.
+- Settings page: new **Moduladresse entfernen** action (above "Moduladresse auf Kanalpaar anlernen") that removes a module address from the router via `del_mod_addr` (route `/test/del_chan_id`). Edit field (`input#del_mod_id`) and button (`#btn_del_mod_id`) are added to the same style.css/general.css selector lists as the sibling legacy controls, so the styling is identical.
+
 ### Changed
 - Module-table transfer progress bar is now one continuous 0→100 % without the
   backward jump that happened when a second module list started uploading. The
@@ -90,14 +96,21 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   deterministic old-firmware reply (249) is not. Remaining modules stay pending
   for a later retry, and the abort page names the offending module and reason.
   A delete that cannot reach its module is non-fatal (warning).
-- Bundled router firmware in `firmware/` updated to VM V4.0 Rev 12 (clears the
-  per-address mirror flag on an address change; pairs with the cmd-106
-  mirror-ready wait).
+- Bundled router firmware in `firmware/` updated to VM V4.0 Rev 13: clears the
+  per-address mirror flag on an address change (pairs with the cmd-106
+  mirror-ready wait — that part landed in Rev 12) and, when a module is deleted
+  via broadcast-to-0, never registers address 0 and leaves `modigruppe[0]`
+  untouched (Rev 13).
 - Adding a module ("Module verwalten" → "Modul anlegen") is now purely
   model-side: it no longer arms the button-press learn (`NEXT_MD_ADDR`). The
   module's address is assigned later on "Übertragen" via broadcast, so adding
   works identically offline (save the configuration as a file) and online
   (transfer it in one go).
+- Deliverables: bundled firmware in `firmware/` updated — router VMV2 v4.0
+  Rev 13, RC Compact RMK v4.6 rev 07 and SC Touch RMT v6.0 rev 05 (RGB toggle
+  plus the RGB pseudo-output fix). RaumController RMG v4.5 f4 / RMG1 v4.6 0f are
+  unchanged; the customer-specific RMG1 v4.7 is deliberately never bundled (it
+  must not be flashed onto regular 01/03 modules).
 
 ### Tests
 - Sharpened the status↔smg serialization tests with a real 156-byte `smg_upload`
@@ -149,6 +162,38 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   types captured in the same session as their mirrors.
 
 ### Fixed
+- Settings page, **Moduladresse entfernen**: the router only honours the delete
+  command (`del_mod_addr`, 99/180) in config mode (modus 75); in operate mode it
+  silently no-ops. The handler only took `command_lock`, so the button never
+  removed anything. It now switches the router into config mode for the call
+  (`block_network_if(True)` / `finally(False)`) like the other router-table
+  handlers, plus an offline guard.
+- Backup restore loaded the **wrong module's** data (name, type, settings), and
+  could raise an `IndexError` (HTTP 500) on modules with high addresses such as
+  motion detectors / outdoor modules. Two causes, both fixed:
+  - The *full* restore looped over the router's *current* addresses and matched
+    each to a backup part by its stored address; on no match the inner loop fell
+    through and the *last* backup part was written to that module. It now
+    iterates the backup parts themselves.
+  - The *single-module* restore picked the part positionally
+    (`content_parts[mod_addr]`) instead of by stored address, so it grabbed the
+    wrong block when addresses are non-contiguous and raised `IndexError` for an
+    address beyond the number of parts. It now matches by stored address
+    (`find_module_part`) and warns if the module is absent from the backup.
+  - As a safety net for every path, `send_to_module` now writes a backup part
+    only when **both** the address (`smg[0]` = `MirrIdx.ADDR`) **and** the module
+    type (`smg[1:3]`) match the target module. An address that is not present in
+    the router is only created from the backup in offline mode; online a missing
+    address is left untouched (nothing is loaded). `send_to_module` returns
+    True/False and rejected parts are logged. The type check honours
+    `COMPATIBLE_MODULE_TYPES`: types that differ only in the power stage are
+    interchangeable, so a Smart Controller XL-2 (01/02) backup still loads into
+    a newer-power-stage XL-2 (LE2) (01/03) and vice versa.
+- Module deletion in the setup-table transfer now also drops the module from the
+  router via `del_mod_addr(mod._id)` after the broadcast-to-0. A non-responding
+  or absent module cannot report its old address, so the router could not remove
+  the stale entry by itself; the SmartHub knows the id and removes it explicitly
+  (router rev ≥ 13 never registers address 0).
 - Setting the system or a single group mode at runtime logged a spurious
   "handle_router_cmd_resp called in Opr mode, return 0 0" warning and returned a
   bogus `\x00` ack to SmartConfig. `RtHdlr.set_mode` always used the
