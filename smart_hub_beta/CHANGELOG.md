@@ -176,7 +176,10 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
     type (`smg[1:3]`) match the target module. An address that is not present in
     the router is only created from the backup in offline mode; online a missing
     address is left untouched (nothing is loaded). `send_to_module` returns
-    True/False and rejected parts are logged.
+    True/False and rejected parts are logged. The type check honours
+    `COMPATIBLE_MODULE_TYPES`: types that differ only in the power stage are
+    interchangeable, so a Smart Controller XL-2 (01/02) backup still loads into
+    a newer-power-stage XL-2 (LE2) (01/03) and vice versa.
 - Module deletion in the setup-table transfer now also drops the module from the
   router via `del_mod_addr(mod._id)` after the broadcast-to-0. A non-responding
   or absent module cannot report its old address, so the router could not remove
