@@ -5,6 +5,8 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.0] — 2026-06-25
+
 ### Added
 - Automation editor: the RGB/Farblicht action now offers **wechseln** (toggle) for the 5 colour LEDs (Ambient + 4 corners), mapped to Befehl 35 task 3 (replaces the previously non-functional "temporär setzen"). The on/off entries are relabelled "einschalten"/"ausschalten" and the selector is ordered einschalten/ausschalten/wechseln/colours. Requires module firmware RC-Compact ≥ rev 07 / SC Touch ≥ rev 05.
 - Settings page: new **Moduladresse entfernen** action (above "Moduladresse auf Kanalpaar anlernen") that removes a module address from the router via `del_mod_addr` (route `/test/del_chan_id`). Edit field (`input#del_mod_id`) and button (`#btn_del_mod_id`) are added to the same style.css/general.css selector lists as the sibling legacy controls, so the styling is identical.
@@ -94,14 +96,21 @@ based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   deterministic old-firmware reply (249) is not. Remaining modules stay pending
   for a later retry, and the abort page names the offending module and reason.
   A delete that cannot reach its module is non-fatal (warning).
-- Bundled router firmware in `firmware/` updated to VM V4.0 Rev 12 (clears the
-  per-address mirror flag on an address change; pairs with the cmd-106
-  mirror-ready wait).
+- Bundled router firmware in `firmware/` updated to VM V4.0 Rev 13: clears the
+  per-address mirror flag on an address change (pairs with the cmd-106
+  mirror-ready wait — that part landed in Rev 12) and, when a module is deleted
+  via broadcast-to-0, never registers address 0 and leaves `modigruppe[0]`
+  untouched (Rev 13).
 - Adding a module ("Module verwalten" → "Modul anlegen") is now purely
   model-side: it no longer arms the button-press learn (`NEXT_MD_ADDR`). The
   module's address is assigned later on "Übertragen" via broadcast, so adding
   works identically offline (save the configuration as a file) and online
   (transfer it in one go).
+- Deliverables: bundled firmware in `firmware/` updated — router VMV2 v4.0
+  Rev 13, RC Compact RMK v4.6 rev 07 and SC Touch RMT v6.0 rev 05 (RGB toggle
+  plus the RGB pseudo-output fix). RaumController RMG v4.5 f4 / RMG1 v4.6 0f are
+  unchanged; the customer-specific RMG1 v4.7 is deliberately never bundled (it
+  must not be flashed onto regular 01/03 modules).
 
 ### Tests
 - Sharpened the status↔smg serialization tests with a real 156-byte `smg_upload`
