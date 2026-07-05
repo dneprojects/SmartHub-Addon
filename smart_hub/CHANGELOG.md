@@ -6,6 +6,24 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Operate-mode runtime fault detection: the cyclic router status now watches the
+  system-fault and module-feedback flags and, only when one is set, reads the
+  per-module detail on demand. Module faults are surfaced per module (incl. a new
+  per-module `SYS_ERR` event to Home Assistant) so a hung/timed-out module is
+  visible without a mode switch.
+
+### Changed
+- The cyclic status query no longer sends the boot-status command (106) back-to-
+  back with the status command (100); the router dropped that second telegram, so
+  the per-module problem data was never received. It is now fetched on demand.
+
+### Fixed
+- Day/night schedule was shown as "nur Zeit" although the router ran a twilight
+  switch: a legacy config written by an older SmartHub (firmware mode 2 with
+  light threshold 0) is now correctly shown as "Zeit oder Helligkeit". Re-saving
+  such a schedule converts it to true pure time (mode 1).
+
 ## [3.5.0] — 2026-06-25
 
 ### Added
