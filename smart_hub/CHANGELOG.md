@@ -6,6 +6,8 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.1] — 2026-07-05
+
 ### Added
 - Operate-mode runtime fault detection: the cyclic router status now watches the
   system-fault and module-feedback flags and, only when one is set, reads the
