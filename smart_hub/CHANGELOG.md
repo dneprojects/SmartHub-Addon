@@ -6,6 +6,11 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.3] — 2026-07-06
+
+### Changed
+- Forward-table self-healing now re-collects in server mode (a short config-mode window) instead of operate mode, where the re-request never completed against the live mirror; F3 is only flagged after the server-mode heals fail.
+
 ## [3.5.2] — 2026-07-05
 
 ### Added
