@@ -6,6 +6,15 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.2] — 2026-07-05
+
+### Added
+- A module address learned or created ("Moduladresse auf Kanalpaar anlernen/anlegen") is read in immediately, without a SmartHub restart.
+
+### Changed
+- "Moduladresse entfernen" now also drops the module from the running state and frees its address, so it can be re-learned on another channel right away (no restart).
+- Router diagnosis: the "Moduladresse entfernen" input is aligned one column to the right with the other single-value fields.
+
 ## [3.5.1] — 2026-07-05
 
 ### Added
