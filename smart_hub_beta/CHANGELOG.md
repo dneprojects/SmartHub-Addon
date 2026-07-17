@@ -6,6 +6,11 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.4] — 2026-07-06
+
+### Added
+- The router serial number is generated and written back when the router has no valid one (does not start with "004001"), analogous to the module serial.
+
 ## [3.5.3] — 2026-07-06
 
 ### Changed
