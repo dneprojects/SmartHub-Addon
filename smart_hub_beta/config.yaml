@@ -1,7 +1,7 @@
 ---
 name: "Smart Hub (Beta)"
 description: "Habitron Smart Hub as Home Assistant App"
-version: "3.5.4-beta.27"
+version: "3.5.5-beta.29"
 slug: smart_hub_beta
 arch:
   - aarch64
