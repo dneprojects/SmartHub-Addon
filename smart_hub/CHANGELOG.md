@@ -12,7 +12,7 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Automations can now be configured for the Smart Sensor: an event from another module can change its temperature setpoint or switch its controller between heating and cooling.
 
 ### Changed
-- Bundled firmware updated: SC Touch RMT v6.0 rev 06 (the older rev 05 is removed so the module firmware is selected unambiguously) and Smart Sensor UGTF-1 V1.2 01.
+- Bundled firmware updated: SC Touch RMT v6.0 rev 07 (older revisions are removed so the module firmware is selected unambiguously) and Smart Sensor UGTF-1 V1.2 01.
 
 ## [3.5.4] — 2026-07-06
 
