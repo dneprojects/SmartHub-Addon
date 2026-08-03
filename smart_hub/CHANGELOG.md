@@ -6,6 +6,11 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.6] — 2026-08-03
+
+### Fixed
+- Saving the cover autostop delay as -1 ("inactive") no longer fails with an HTTP 500 error.
+
 ## [3.5.5] — 2026-07-29
 
 ### Added
