@@ -6,6 +6,14 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.7] — 2026-09-07
+
+### Fixed
+- A router read that fails is no longer mistaken for "the router has no lists", which could replace all areas with a single "House" and delete the global flags and collective commands on the next save.
+- A failed upload of the router lists is now detected and repeated at once — an aborted upload used to leave the router with an empty list table without any notice.
+- Saving reports it when the areas, flags and collective commands could not be stored in the router, instead of always claiming success.
+- Home Assistant is told that the lists are unavailable instead of receiving an empty set, so it keeps its existing entities and retries.
+
 ## [3.5.6] — 2026-08-03
 
 ### Fixed
