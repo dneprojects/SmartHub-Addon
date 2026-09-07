@@ -6,6 +6,9 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- A token file that cannot be interpreted is now reported as such instead of as "cannot open the file", which pointed at the wrong cause.
+
 ## [3.5.7] — 2026-09-07
 
 ### Fixed
