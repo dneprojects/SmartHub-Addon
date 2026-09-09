@@ -6,6 +6,8 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.8] — 2026-09-09
+
 ### Changed
 - The hub's MAC addresses are read more robustly: interfaces with other names (eno1, enp3s0, enx...) are recognised, virtual interfaces are ignored, and a missing one no longer prevents the start.
 - A token file that cannot be interpreted is now reported as such instead of as "cannot open the file", which pointed at the wrong cause.
