@@ -6,6 +6,14 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.9] — 2026-09-12
+
+### Fixed
+- A module in factory state (area 0 and address 0) can be learned again: when nobody answers the serial broadcast, the address and the router id are now written with a second, area-0 addressed pair of commands.
+
+### Changed
+- Bundled firmware updated: router VM V4.0 Rev 14 (replaces Rev 13, which the rescue path requires).
+
 ## [3.5.8] — 2026-09-09
 
 ### Changed
