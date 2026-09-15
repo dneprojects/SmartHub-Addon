@@ -6,10 +6,11 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.10] — 2026-09-15
+
 ### Fixed
 - A reserved address without a module no longer shifts every module above it: module lookup goes by address, so the config pages name the right module and module status and forward-table healing reach the right one.
 - A re-initialisation that fails part way no longer leaves the router in server mode (where it runs no module-to-module automation) until the hub is restarted, and a router kept there for lack of a client connection is now reported in the log.
-
 - A module restored from a backup while offline is registered with its address, so it is no longer invisible to everything that works by address, and a second restore updates it instead of creating a duplicate.
 - A router error or an unusable response is no longer passed on as a module list: the hub falls back to the addresses it already knows, and a start without any module list fails instead of coming up as an installation without modules.
 - A module is no longer dropped at start-up for a missing mirror that could not fill in the first place: the hub waits longer, has the router rebuild its module mirror once (which only works in operate mode) and gives the module a second chance. A router that gives no answer at all no longer counts against the module either.
