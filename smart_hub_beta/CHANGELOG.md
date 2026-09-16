@@ -1,10 +1,9 @@
 # Changelog
 
-Concise, user-facing notes for each release. Detailed developer notes (with
-implementation specifics) are in [developer_doc.md](developer_doc.md). The format
-is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-
 ## [Unreleased]
+
+### Changed
+- The changelog in Home Assistant's update dialog no longer starts with the repository introduction (whose link led nowhere) or an empty "Unreleased" section.
 
 ## [3.5.11] — 2026-09-16
 
