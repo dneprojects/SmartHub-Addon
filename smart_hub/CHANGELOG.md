@@ -10,6 +10,7 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - A firmware update started from the web page no longer repeats itself: reloading the page after a flash used to send the update again and flash the router or the modules once more.
+- The hub page no longer shows another app's name as the Smart Center's name (e.g. "core-samba.local.hass.io"): as an app the name now comes from the Home Assistant host.
 
 ## [3.5.10] — 2026-09-15
 
