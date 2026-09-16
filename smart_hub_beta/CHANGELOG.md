@@ -6,6 +6,11 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [3.5.11] — 2026-09-16
+
+### Fixed
+- A firmware update started from the web page no longer repeats itself: reloading the page after a flash used to send the update again and flash the router or the modules once more.
+
 ## [3.5.10] — 2026-09-15
 
 ### Fixed
