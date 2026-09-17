@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.6.1] — 2026-09-17
+
+### Fixed
+- After a module firmware update the hub page no longer keeps offering the update for that module type, and Home Assistant receives the version the module actually runs.
+- A module firmware update started from Home Assistant no longer leaves the hub blocked if the flash fails.
+
 ## [3.6.0] — 2026-09-17
 
 ### Changed
