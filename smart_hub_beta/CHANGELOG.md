@@ -1,9 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [3.6.0] — 2026-09-17
 
 ### Changed
 - The changelog in Home Assistant's update dialog no longer starts with the repository introduction (whose link led nowhere) or an empty "Unreleased" section.
+- Bundled firmware updated: modules can be learned by button again and are reachable by the serial broadcast in factory state (all module types), SC Touch app 1.3.1.
 
 ## [3.5.11] — 2026-09-16
 
