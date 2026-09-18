@@ -1,9 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [3.6.3] — 2026-09-18
 
 ### Changed
-- After a firmware update the module is asked for its version directly instead of waiting 15 seconds for the router to refresh its copy; the version is logged as the module sends it.
+- After a firmware update the module is asked for its version directly instead of waiting 15 seconds for the router to refresh its copy; the version is logged as the module sends it, once for all modules that report the same one.
+- A finished module update now says how it ended ("finished: OK", "failed", "skipped") instead of only that it finished.
 
 ## [3.6.2] — 2026-09-18
 
