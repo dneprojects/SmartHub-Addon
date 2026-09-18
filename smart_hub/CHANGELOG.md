@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.6.2] — 2026-09-18
+
+### Fixed
+- After a module firmware update the hub re-reads only the module's version instead of its whole configuration list, which the module often cannot deliver right after its restart, and asks again if it does not answer at once.
+- A module type with several matching firmware files is offered the newest one instead of the file read last.
+
+### Changed
+- The log now names the version a module reports next to the version of the firmware file, so an update that keeps being offered can be traced.
+
 ## [3.6.1] — 2026-09-17
 
 ### Fixed
