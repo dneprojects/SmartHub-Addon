@@ -1,5 +1,20 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- A router answer that never arrived, arrived corrupted, or belonged to a different command is now named in the log instead of being processed as if it were data - until now the hub could work with invented values and say nothing. Everything else behaves exactly as before.
+- A command the router rejects is logged with the reason it gave.
+- A failed command no longer leaves the hub blocked: Home Assistant keeps working instead of losing every entity until a restart.
+- A failed router firmware update releases the network block again and puts the serial port back to its normal speed.
+- An interrupted start-up no longer leaves the router in server mode, where it runs no module-to-module automation.
+- The boot wait after a router restart no longer ends in an error when the router does not answer at once, and a failed firmware transfer can report itself again.
+- A start-up that is interrupted no longer leaves the hub waiting forever: until now Home Assistant could hang on the hub without any message.
+- Reading the system or a group mode no longer sends the same command over and over when the router answers something else; it now gives up after a few tries and says so.
+- A firmware update that cannot reach the serial port now restarts the router instead of leaving it in programming mode, where it does nothing at all.
+
+### Removed
+- A network-block release flag that was never set, and the middleware that read it.
 ## [3.6.3] — 2026-09-18
 
 ### Changed
