@@ -16,7 +16,7 @@
 
 ### Changed
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
-- "Abbruch" on the module table now shows the wait popup as well: it reads the whole system in again, which takes about a minute and gave no feedback at all until now.
+- The "Neustart" button on the module table now shows the wait popup as well: it reads the whole system in again, which takes about a minute and gave no feedback at all until now.
 
 ### Removed
 - A network-block release flag that was never set, and the middleware that read it.
