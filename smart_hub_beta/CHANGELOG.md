@@ -12,6 +12,10 @@
 - A start-up that is interrupted no longer leaves the hub waiting forever: until now Home Assistant could hang on the hub without any message.
 - Reading the system or a group mode no longer sends the same command over and over when the router answers something else; it now gives up after a few tries and says so.
 - A firmware update that cannot reach the serial port now restarts the router instead of leaving it in programming mode, where it does nothing at all.
+- A page that works longer than a minute is no longer carried out several times: Home Assistant re-sends the request after 60 seconds, which used to run a full system read-in five times over from a single click. The repeat now waits for the first one and is answered with its result, so the page you expect still appears.
+
+### Changed
+- The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
 
 ### Removed
 - A network-block release flag that was never set, and the middleware that read it.
