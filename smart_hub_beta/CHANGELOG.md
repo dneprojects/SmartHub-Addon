@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.6.4] — 2026-09-21
 
 ### Fixed
 - A router answer that never arrived, arrived corrupted, or belonged to a different command is now named in the log instead of being processed as if it were data - until now the hub could work with invented values and say nothing. Everything else behaves exactly as before.
@@ -58,6 +58,7 @@
 
 ### Removed
 - A network-block release flag that was never set, and the middleware that read it.
+
 ## [3.6.3] — 2026-09-18
 
 ### Changed
