@@ -18,6 +18,7 @@
 ### Changed
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
 - The wait popup opens empty instead of showing the result lines of whatever ran before it.
+- The hourglass in the wait popup is the deep red of the rest of the interface instead of a bright signal red.
 - A module that could not be read in now says why, and says that it was removed from the installation, instead of claiming it had been skipped.
 - The wait popup can clear its result list again, so lines from an earlier step no longer stay on screen for the rest of the run.
 - Pressing a button twice in quick succession acts twice, as it did before: only a repeat that arrives a minute later - which is Home Assistant retrying, not you - is folded into the first.
