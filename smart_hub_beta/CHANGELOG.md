@@ -18,6 +18,9 @@
 ### Changed
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
 - The wait popup opens empty instead of showing the result lines of whatever ran before it.
+- A module that could not be read in now says why, and says that it was removed from the installation, instead of claiming it had been skipped.
+- The wait popup can clear its result list again, so lines from an earlier step no longer stay on screen for the rest of the run.
+- Pressing a button twice in quick succession acts twice, as it did before: only a repeat that arrives a minute later - which is Home Assistant retrying, not you - is folded into the first.
 - The progress bar matches the module count it shows: a re-initialisation stood at 70 % while reading module 11 of 24, because it used the scale of the router restart, where the first half is the router booting.
 - The log shown in Home Assistant now holds normal progress and real faults only. Retries that then worked, fallbacks that held, discarded leftovers and drained buffers moved to the detailed log file - and where such a fallback does not hold, the log says so.
 - A fallback that keeps holding is now reported once, and again when it is over: a router that stops delivering its module list or its channel status used to serve the values from before in complete silence, which made a module added or removed go unnoticed.
