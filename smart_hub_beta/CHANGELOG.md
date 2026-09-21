@@ -25,6 +25,10 @@
 - A serial port that will not open reports a new reason when the reason changes, instead of staying with the first one.
 - Uploading a configuration leaves the wait popup empty again, so the next one does not open on the last upload's progress.
 - The hourglass in the wait popup is the deep red of the rest of the interface instead of a bright signal red.
+- Module faults are named in German, like the rest of the interface.
+- The wait popup says when an operation has stopped reporting instead of standing still without a word, and it measures that from the last change rather than from the start - so a long operation that keeps moving is never cut off.
+- Uploading a configuration no longer switches the router back to operate mode halfway through, which let the event server read the same port the upload was still writing to.
+- Transferring the module table asks who is asking, like every page around it.
 - A module that could not be read in now says why, and says that it was removed from the installation, instead of claiming it had been skipped.
 - The wait popup can clear its result list again, so lines from an earlier step no longer stay on screen for the rest of the run.
 - Pressing a button twice in quick succession acts twice, as it did before: only a repeat that arrives a minute later - which is Home Assistant retrying, not you - is folded into the first.
