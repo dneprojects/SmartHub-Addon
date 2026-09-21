@@ -18,7 +18,11 @@
 - Adding a module by its type works again.
 - Pages that read their arguments from the address no longer see the one-time token in front of them, which left the settings and step pages without an answer.
 
+- The log speaks English again at every level: module faults are put into words where they are shown, so the interface stays German.
+- Messages about sending, about a refused restore and about a failed file copy are English in the log.
 ### Changed
+- A page is no longer kept by the browser, so going back and pressing the same button acts again instead of answering from the first result.
+- The message after a configuration upload is German, like the page it appears on.
 - A popup stays centred on the screen, but on a window wider than the page it goes no further right than the middle of the header and footer, instead of sitting off to the side.
 - The configuration file popup keeps its size: aligning the "Nur Änderungen" box no longer stretches it across the screen.
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
