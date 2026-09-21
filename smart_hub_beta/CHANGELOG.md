@@ -20,6 +20,10 @@
 - The wait popup opens empty instead of showing the result lines of whatever ran before it.
 - The progress bar matches the module count it shows: a re-initialisation stood at 70 % while reading module 11 of 24, because it used the scale of the router restart, where the first half is the router booting.
 - The log shown in Home Assistant now holds normal progress and real faults only. Retries that then worked, fallbacks that held, discarded leftovers and drained buffers moved to the detailed log file - and where such a fallback does not hold, the log says so.
+- A fallback that keeps holding is now reported once, and again when it is over: a router that stops delivering its module list or its channel status used to serve the values from before in complete silence, which made a module added or removed go unnoticed.
+- An aborted address transfer says in the log which module refused and why; until now that existed only in the popup, which is gone the moment the transfer ends.
+- A bus that stays at half speed because the switch to 38400 failed is reported again, and so is the reason a serial port could not be opened.
+- A module firmware update after a router update reports its progress again instead of running silently to the end.
 - A module firmware update writes one progress line per percent instead of one per package, which was up to 255 lines per module.
 - Waiting for the router to boot, or for the serial port, is now said once instead of once per second.
 - The Home Assistant token and the SIM pin no longer appear in the log.
