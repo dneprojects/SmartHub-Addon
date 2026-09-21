@@ -17,6 +17,7 @@
 ### Changed
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
 - The wait popup opens empty instead of showing the result lines of whatever ran before it.
+- The progress bar matches the module count it shows: a re-initialisation stood at 70 % while reading module 11 of 24, because it used the scale of the router restart, where the first half is the router booting.
 - The log shown in Home Assistant now holds normal progress and real faults only. Retries that then worked, fallbacks that held, discarded leftovers and drained buffers moved to the detailed log file - and where such a fallback does not hold, the log says so.
 - A module firmware update writes one progress line per percent instead of one per package, which was up to 255 lines per module.
 - Waiting for the router to boot, or for the serial port, is now said once instead of once per second.
