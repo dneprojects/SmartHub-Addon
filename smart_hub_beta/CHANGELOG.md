@@ -14,6 +14,8 @@
 - A firmware update that cannot reach the serial port now restarts the router instead of leaving it in programming mode, where it does nothing at all.
 - A page that works longer than a minute is no longer carried out several times: Home Assistant re-sends the request after 60 seconds, which used to run a full system read-in five times over from a single click. Every form now carries a one-time token, so a repeat is recognised as the same submission and is answered with the first one's result - the page you expect still appears.
 - A module firmware update answered with an error page: the one-time token of the form was read as a module number. Nothing is carried into a form's own fields any more.
+- The "Neustart" button on the module table opens the wait popup again, instead of looking like a dead button while it read the whole system in.
+- Adding a module by its type works again.
 - Pages that read their arguments from the address no longer see the one-time token in front of them, which left the settings and step pages without an answer.
 
 ### Changed
