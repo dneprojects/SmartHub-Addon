@@ -1,5 +1,64 @@
 # Changelog
 
+## [3.6.4] — 2026-09-21
+
+### Fixed
+- A router answer that never arrived, arrived corrupted, or belonged to a different command is now named in the log instead of being processed as if it were data - until now the hub could work with invented values and say nothing. Everything else behaves exactly as before.
+- A command the router rejects is logged with the reason it gave.
+- A failed command no longer leaves the hub blocked: Home Assistant keeps working instead of losing every entity until a restart.
+- A failed router firmware update releases the network block again and puts the serial port back to its normal speed.
+- An interrupted start-up no longer leaves the router in server mode, where it runs no module-to-module automation.
+- The boot wait after a router restart no longer ends in an error when the router does not answer at once, and a failed firmware transfer can report itself again.
+- A start-up that is interrupted no longer leaves the hub waiting forever: until now Home Assistant could hang on the hub without any message.
+- Reading the system or a group mode no longer sends the same command over and over when the router answers something else; it now gives up after a few tries and says so.
+- A firmware update that cannot reach the serial port now restarts the router instead of leaving it in programming mode, where it does nothing at all.
+- A page that works longer than a minute is no longer carried out several times: Home Assistant re-sends the request after 60 seconds, which used to run a full system read-in five times over from a single click. Every form now carries a one-time token, so a repeat is recognised as the same submission and is answered with the first one's result - the page you expect still appears.
+- A module firmware update answered with an error page: the one-time token of the form was read as a module number. Nothing is carried into a form's own fields any more.
+- The "Neustart" button on the module table opens the wait popup again, instead of looking like a dead button while it read the whole system in.
+- Adding a module by its type works again.
+- Pages that read their arguments from the address no longer see the one-time token in front of them, which left the settings and step pages without an answer.
+
+- The log speaks English again at every level: module faults and the new-firmware notice are put into words where they are shown, so the interface stays German.
+- Messages about sending, about a refused restore and about a failed file copy are English in the log.
+### Changed
+- A page is no longer kept by the browser, so going back and pressing the same button acts again instead of answering from the first result.
+- The message after a configuration upload is German, like the page it appears on.
+- A popup stays centred on the screen, but on a window wider than the page it goes no further right than the middle of the header and footer, instead of sitting off to the side.
+- The configuration file popup keeps its size: aligning the "Nur Änderungen" box no longer stretches it across the screen.
+- The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
+- The wait popup opens empty instead of showing the result lines of whatever ran before it.
+- A re-initialisation that fails now says so on the page instead of answering with a bare error, which used to leave the installation without a single module until the hub was restarted.
+- Automations belonging to a serial number that no module carries are reported instead of being dropped in silence.
+- A transfer that was aborted no longer ends on a full progress bar.
+- A module that cannot be read in is reported the same way every time, and the message says it is no longer reachable rather than claiming it was removed from the installation.
+- A file transfer from the configurator no longer shows the progress of whatever the web pages did last.
+- A serial port that will not open reports a new reason when the reason changes, instead of staying with the first one.
+- Uploading a configuration leaves the wait popup empty again, so the next one does not open on the last upload's progress.
+- The hourglass in the wait popup is the deep red of the rest of the interface instead of a bright signal red.
+- Module faults are named in German, like the rest of the interface.
+- The wait popup says when an operation has stopped reporting instead of standing still without a word. It measures that from the last change rather than from the start, so an operation that keeps moving is never cut off - and it waits a minute on a bar that has stopped, five on the hourglass alone, which has nothing it could move.
+- A router restart shows its bar from the first moment instead of spending its first seconds on the hourglass.
+- Restoring a configuration or a backup shows the same progress as everything else - a bar, the module it is working on and a line per module - instead of an hourglass that said nothing while the server was already reporting all of it.
+- Uploading a configuration no longer switches the router back to operate mode halfway through, which let the event server read the same port the upload was still writing to.
+- Transferring the module table asks who is asking, like every page around it.
+- A module that could not be read in now says why, and says that it was removed from the installation, instead of claiming it had been skipped.
+- The wait popup can clear its result list again, so lines from an earlier step no longer stay on screen for the rest of the run.
+- Pressing a button twice in quick succession acts twice, as it did before: only a repeat that arrives a minute later - which is Home Assistant retrying, not you - is folded into the first.
+- The progress bar matches the module count it shows: a re-initialisation stood at 70 % while reading module 11 of 24, because it used the scale of the router restart, where the first half is the router booting.
+- The log shown in Home Assistant now holds normal progress and real faults only. Retries that then worked, fallbacks that held, discarded leftovers and drained buffers moved to the detailed log file - and where such a fallback does not hold, the log says so.
+- A fallback that keeps holding is now reported once, and again when it is over: a router that stops delivering its module list or its channel status used to serve the values from before in complete silence, which made a module added or removed go unnoticed.
+- An aborted address transfer says in the log which module refused and why; until now that existed only in the popup, which is gone the moment the transfer ends.
+- A bus that stays at half speed because the switch to 38400 failed is reported again, and so is the reason a serial port could not be opened.
+- A module firmware update after a router update reports its progress again instead of running silently to the end.
+- A module firmware update writes one progress line per percent instead of one per package, which was up to 255 lines per module.
+- Waiting for the router to boot, or for the serial port, is now said once instead of once per second.
+- A router that cold-started has its module mirror rebuilt again before the modules are read: making the boot message appear once had erased the very note that the boot had happened, which could leave modules missing after a restart.
+- The Home Assistant token and the SIM pin no longer appear in the log.
+- The "Neustart" button on the module table now shows the wait popup as well: it reads the whole system in again, which takes about a minute and gave no feedback at all until now.
+
+### Removed
+- A network-block release flag that was never set, and the middleware that read it.
+
 ## [3.6.3] — 2026-09-18
 
 ### Changed
