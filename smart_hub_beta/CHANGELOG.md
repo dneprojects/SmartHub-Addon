@@ -13,7 +13,7 @@
 - Reading the system or a group mode no longer sends the same command over and over when the router answers something else; it now gives up after a few tries and says so.
 - A firmware update that cannot reach the serial port now restarts the router instead of leaving it in programming mode, where it does nothing at all.
 - A page that works longer than a minute is no longer carried out several times: Home Assistant re-sends the request after 60 seconds, which used to run a full system read-in five times over from a single click. The repeat now waits for the first one and is answered with its result, so the page you expect still appears.
-- Uploading a file works again: the guard above briefly broke every firmware, backup and configuration upload. It now only ever applies to page requests without a body.
+- Uploading a file works again: the guard above briefly broke every firmware, backup and configuration upload. File uploads are now left alone entirely, while an ordinary form - the router restart among them - is still protected against the repeat.
 
 ### Changed
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
