@@ -13,8 +13,12 @@
 - Reading the system or a group mode no longer sends the same command over and over when the router answers something else; it now gives up after a few tries and says so.
 - A firmware update that cannot reach the serial port now restarts the router instead of leaving it in programming mode, where it does nothing at all.
 - A page that works longer than a minute is no longer carried out several times: Home Assistant re-sends the request after 60 seconds, which used to run a full system read-in five times over from a single click. Every form now carries a one-time token, so a repeat is recognised as the same submission and is answered with the first one's result - the page you expect still appears.
+- A module firmware update answered with an error page: the one-time token of the form was read as a module number. Nothing is carried into a form's own fields any more.
+- Pages that read their arguments from the address no longer see the one-time token in front of them, which left the settings and step pages without an answer.
 
 ### Changed
+- A popup is centred over the page instead of over the whole browser window, so on a wide screen it no longer sits off to the side.
+- The configuration file popup keeps its size: aligning the "Nur Änderungen" box no longer stretches it across the screen.
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
 - The wait popup opens empty instead of showing the result lines of whatever ran before it.
 - A re-initialisation that fails now says so on the page instead of answering with a bare error, which used to leave the installation without a single module until the hub was restarted.
