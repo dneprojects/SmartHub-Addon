@@ -17,6 +17,10 @@
 ### Changed
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
 - The wait popup opens empty instead of showing the result lines of whatever ran before it.
+- The log shown in Home Assistant now holds normal progress and real faults only. Retries that then worked, fallbacks that held, discarded leftovers and drained buffers moved to the detailed log file - and where such a fallback does not hold, the log says so.
+- A module firmware update writes one progress line per percent instead of one per package, which was up to 255 lines per module.
+- Waiting for the router to boot, or for the serial port, is now said once instead of once per second.
+- The Home Assistant token and the SIM pin no longer appear in the log.
 - The "Neustart" button on the module table now shows the wait popup as well: it reads the whole system in again, which takes about a minute and gave no feedback at all until now.
 
 ### Removed
