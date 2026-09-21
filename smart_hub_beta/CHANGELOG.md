@@ -20,6 +20,9 @@
 - A re-initialisation that fails now says so on the page instead of answering with a bare error, which used to leave the installation without a single module until the hub was restarted.
 - Automations belonging to a serial number that no module carries are reported instead of being dropped in silence.
 - A transfer that was aborted no longer ends on a full progress bar.
+- A module that cannot be read in is reported the same way every time, and the message says it is no longer reachable rather than claiming it was removed from the installation.
+- A file transfer from the configurator no longer shows the progress of whatever the web pages did last.
+- A serial port that will not open reports a new reason when the reason changes, instead of staying with the first one.
 - Uploading a configuration leaves the wait popup empty again, so the next one does not open on the last upload's progress.
 - The hourglass in the wait popup is the deep red of the rest of the interface instead of a bright signal red.
 - A module that could not be read in now says why, and says that it was removed from the installation, instead of claiming it had been skipped.
