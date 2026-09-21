@@ -12,12 +12,15 @@
 - A start-up that is interrupted no longer leaves the hub waiting forever: until now Home Assistant could hang on the hub without any message.
 - Reading the system or a group mode no longer sends the same command over and over when the router answers something else; it now gives up after a few tries and says so.
 - A firmware update that cannot reach the serial port now restarts the router instead of leaving it in programming mode, where it does nothing at all.
-- A page that works longer than a minute is no longer carried out several times: Home Assistant re-sends the request after 60 seconds, which used to run a full system read-in five times over from a single click. The repeat now waits for the first one and is answered with its result, so the page you expect still appears.
-- Uploading a file works again: the guard above briefly broke every firmware, backup and configuration upload. File uploads are now left alone entirely, while an ordinary form - the router restart among them - is still protected against the repeat.
+- A page that works longer than a minute is no longer carried out several times: Home Assistant re-sends the request after 60 seconds, which used to run a full system read-in five times over from a single click. Every form now carries a one-time token, so a repeat is recognised as the same submission and is answered with the first one's result - the page you expect still appears.
 
 ### Changed
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
 - The wait popup opens empty instead of showing the result lines of whatever ran before it.
+- A re-initialisation that fails now says so on the page instead of answering with a bare error, which used to leave the installation without a single module until the hub was restarted.
+- Automations belonging to a serial number that no module carries are reported instead of being dropped in silence.
+- A transfer that was aborted no longer ends on a full progress bar.
+- Uploading a configuration leaves the wait popup empty again, so the next one does not open on the last upload's progress.
 - The hourglass in the wait popup is the deep red of the rest of the interface instead of a bright signal red.
 - A module that could not be read in now says why, and says that it was removed from the installation, instead of claiming it had been skipped.
 - The wait popup can clear its result list again, so lines from an earlier step no longer stay on screen for the rest of the run.
@@ -30,6 +33,7 @@
 - A module firmware update after a router update reports its progress again instead of running silently to the end.
 - A module firmware update writes one progress line per percent instead of one per package, which was up to 255 lines per module.
 - Waiting for the router to boot, or for the serial port, is now said once instead of once per second.
+- A router that cold-started has its module mirror rebuilt again before the modules are read: making the boot message appear once had erased the very note that the boot had happened, which could leave modules missing after a restart.
 - The Home Assistant token and the SIM pin no longer appear in the log.
 - The "Neustart" button on the module table now shows the wait popup as well: it reads the whole system in again, which takes about a minute and gave no feedback at all until now.
 
