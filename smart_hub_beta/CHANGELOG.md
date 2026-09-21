@@ -17,7 +17,7 @@
 - Pages that read their arguments from the address no longer see the one-time token in front of them, which left the settings and step pages without an answer.
 
 ### Changed
-- A popup is centred over the page instead of over the whole browser window, so on a wide screen it no longer sits off to the side.
+- A popup stays centred on the screen, but on a window wider than the page it goes no further right than the middle of the header and footer, instead of sitting off to the side.
 - The configuration file popup keeps its size: aligning the "Nur Änderungen" box no longer stretches it across the screen.
 - The wait popup during a router restart now names the module being read in and lists the result per module, instead of showing a moving bar under an unchanged title.
 - The wait popup opens empty instead of showing the result lines of whatever ran before it.
