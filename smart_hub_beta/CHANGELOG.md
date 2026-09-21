@@ -28,6 +28,7 @@
 - Module faults are named in German, like the rest of the interface.
 - The wait popup says when an operation has stopped reporting instead of standing still without a word. It measures that from the last change rather than from the start, so an operation that keeps moving is never cut off - and it waits a minute on a bar that has stopped, five on the hourglass alone, which has nothing it could move.
 - A router restart shows its bar from the first moment instead of spending its first seconds on the hourglass.
+- Restoring a configuration or a backup shows the same progress as everything else - a bar, the module it is working on and a line per module - instead of an hourglass that said nothing while the server was already reporting all of it.
 - Uploading a configuration no longer switches the router back to operate mode halfway through, which let the event server read the same port the upload was still writing to.
 - Transferring the module table asks who is asking, like every page around it.
 - A module that could not be read in now says why, and says that it was removed from the installation, instead of claiming it had been skipped.
