@@ -18,7 +18,7 @@
 - Adding a module by its type works again.
 - Pages that read their arguments from the address no longer see the one-time token in front of them, which left the settings and step pages without an answer.
 
-- The log speaks English again at every level: module faults are put into words where they are shown, so the interface stays German.
+- The log speaks English again at every level: module faults and the new-firmware notice are put into words where they are shown, so the interface stays German.
 - Messages about sending, about a refused restore and about a failed file copy are English in the log.
 ### Changed
 - A page is no longer kept by the browser, so going back and pressing the same button acts again instead of answering from the first result.
