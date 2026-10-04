@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Added
-- BT bridges are found on the network and shown on the hub page with their clients, firmware and radio link; bridges can also be added by IP address and given their token under settings.
+- BT bridges are found on the network and shown on the router page with their clients, firmware and radio link; bridges can also be added by IP address and given their token under settings.
 - BT bridge firmware is updated from the hub like module firmware: "BT-Bridge" appears in the update list when a master or client is older than the file, master first, then each chosen client over its own WLAN or, failing that, over the radio link.
 - While a BT bridge is updated, the modules behind it are not reported to Home Assistant as faulty and show "Update" in the communication table; their error counters are reset afterwards.
 
