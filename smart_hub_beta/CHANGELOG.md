@@ -8,6 +8,7 @@
 - While a BT bridge is updated, the modules behind it are not reported to Home Assistant as faulty and show "Update" in the communication table; their error counters are reset afterwards.
 - The system backup keeps one line per BT bridge master, between the router and the modules; a restore enters the bridges again.
 - Under settings, all BT bridge masters can be given new WLAN credentials at once through the router, or open its set-up hotspot with a one-time password for a master that has lost its WLAN.
+- A BT bridge image can be uploaded in the browser for one update; it is removed afterwards, and only the shipped files are offered.
 
 ## [3.6.4] — 2026-09-21
 
