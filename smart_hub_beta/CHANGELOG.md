@@ -9,6 +9,7 @@
 - The system backup keeps one line per BT bridge master, between the router and the modules; a restore enters the bridges again.
 - Under settings, all BT bridge masters can be given new WLAN credentials at once through the router, or open its set-up hotspot with a one-time password, shown as a QR code a phone can join for a master that has lost its WLAN.
 - The hub asks the BT bridge masters for their status through the router every minute in normal operation, so the page shows a master that has lost its WLAN and whether its hotspot is still open.
+- Each BT bridge client on the bridges page has a button that asks it for its radio level through the router right away.
 - A BT bridge image can be uploaded in the browser for one update; it is removed afterwards, and only the shipped files are offered.
 
 ## [3.6.4] — 2026-09-21
