@@ -8,6 +8,7 @@
 - While a BT bridge is updated, the modules behind it are not reported to Home Assistant as faulty and show "Update" in the communication table; their error counters are reset afterwards.
 - The system backup keeps one line per BT bridge master, between the router and the modules; a restore enters the bridges again.
 - Under settings, all BT bridge masters can be given new WLAN credentials at once through the router, or open its set-up hotspot with a one-time password, shown as a QR code a phone can join for a master that has lost its WLAN.
+- The hub asks the BT bridge masters for their status through the router every minute in normal operation, so the page shows a master that has lost its WLAN and whether its hotspot is still open.
 - A BT bridge image can be uploaded in the browser for one update; it is removed afterwards, and only the shipped files are offered.
 
 ## [3.6.4] — 2026-09-21
@@ -31,6 +32,7 @@
 - The log speaks English again at every level: module faults and the new-firmware notice are put into words where they are shown, so the interface stays German.
 - Messages about sending, about a refused restore and about a failed file copy are English in the log.
 ### Changed
+- BT bridge masters are found by mDNS only and need no file of their own; the entry by IP address is gone.
 - A page is no longer kept by the browser, so going back and pressing the same button acts again instead of answering from the first result.
 - The message after a configuration upload is German, like the page it appears on.
 - A popup stays centred on the screen, but on a window wider than the page it goes no further right than the middle of the header and footer, instead of sitting off to the side.
