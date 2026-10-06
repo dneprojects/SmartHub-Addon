@@ -37,6 +37,7 @@
 - The log speaks English again at every level: module faults and the new-firmware notice are put into words where they are shown, so the interface stays German.
 - Messages about sending, about a refused restore and about a failed file copy are English in the log.
 ### Changed
+- Switching the router to server mode waits only until the router reports it, instead of a fixed second.
 - BT bridge masters are found by mDNS only and need no file of their own; the entry by IP address is gone.
 - A page is no longer kept by the browser, so going back and pressing the same button acts again instead of answering from the first result.
 - The message after a configuration upload is German, like the page it appears on.
