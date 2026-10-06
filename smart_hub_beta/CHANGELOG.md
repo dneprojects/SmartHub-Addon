@@ -56,6 +56,7 @@
 - The log speaks English again at every level: module faults and the new-firmware notice are put into words where they are shown, so the interface stays German.
 - Messages about sending, about a refused restore and about a failed file copy are English in the log.
 ### Changed
+- A BT bridge found in the network is shown only once a module of this router reports it, so a second hub in the same network no longer picks up another hub's bridge.
 - A BT bridge client that gives no status (bridge switched off or removed) is asked every 10 minutes instead of every minute.
 - During a BT bridge update Home Assistant keeps working: the router is held only for the few short commands, not for the whole update.
 - A lost switch to server mode is sent again; BT bridge queries are skipped without confirmed server mode instead of waiting 10 s, bridge commands switch silently, and counter resets log at debug.
