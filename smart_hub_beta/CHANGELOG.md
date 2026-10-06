@@ -13,7 +13,7 @@
 - BT bridge masters are read over WLAN only every 10 minutes and when their page opens; their counters come through the router, shown per client and resettable under settings.
 - With BT bridge 1.2.14 the status through the router also carries the BT reserve, the WLAN level and stale WLAN data, so the page and the update offer stay current between the web reads.
 - BT bridge firmware 1.2.14 is shipped.
-- The BT bridges page asks the clients anew when it opens; counters show per client as shares of its requests.
+- The BT bridge status is read through the router once a minute in a short, silent server-mode turn, since the router passes module answers on only there; the page shows the current state. Counters show per client as shares of its requests.
 - A BT bridge image can be uploaded in the browser for one update; it is removed afterwards, and only the shipped files are offered.
 
 ## [3.6.4] — 2026-09-21
