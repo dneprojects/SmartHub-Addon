@@ -19,6 +19,10 @@
 ## [3.6.4] — 2026-09-21
 
 ### Fixed
+- Automation descriptions are right for local flag 8, SC Mini inputs, shutter position from transfer and the 8th logic input; unknown automation lines are kept on save.
+- Module list read-in, dimming of unknown modules, offline cover positions, the license page and a stuck router during module flashing are handled correctly.
+- BT bridges: commands go through a connected client, counters are reset only after a real update attempt, odd values from the bridge no longer break the pages.
+- Configuration pages: adding a module waits for running bus commands, settings forms change only their own fields, restore opens only offered backups.
 - Changing a module address keeps reserved addresses without a module intact.
 - If switching to server mode for a BT bridge query fails, the hub returns to operate mode.
 - Opening and cancelling the automation dialog no longer changes the rule, and rules triggered by mode or collective commands or forwarded from another router open without an error.
@@ -52,6 +56,7 @@
 - The log speaks English again at every level: module faults and the new-firmware notice are put into words where they are shown, so the interface stays German.
 - Messages about sending, about a refused restore and about a failed file copy are English in the log.
 ### Changed
+- A BT bridge client that gives no status (bridge switched off or removed) is asked every 10 minutes instead of every minute.
 - During a BT bridge update Home Assistant keeps working: the router is held only for the few short commands, not for the whole update.
 - A lost switch to server mode is sent again; BT bridge queries are skipped without confirmed server mode instead of waiting 10 s, bridge commands switch silently, and counter resets log at debug.
 - BT bridge firmware 1.3.0 is shipped.
