@@ -37,6 +37,9 @@
 - The log speaks English again at every level: module faults and the new-firmware notice are put into words where they are shown, so the interface stays German.
 - Messages about sending, about a refused restore and about a failed file copy are English in the log.
 ### Changed
+- BT bridge firmware 1.3.0 is shipped.
+- The BT bridge refresh button asks status and counters in one silent server-mode switch.
+- BT bridge page: per client a "Kommunikation" row (slow, retried, unanswered in %) without the request count; first router status only in the debug log.
 - Switching the router to server mode waits only until the router reports it, instead of a fixed second.
 - BT bridge masters are found by mDNS only and need no file of their own; the entry by IP address is gone.
 - A page is no longer kept by the browser, so going back and pressing the same button acts again instead of answering from the first result.
