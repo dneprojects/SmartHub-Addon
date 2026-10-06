@@ -10,6 +10,9 @@
 - Under settings, all BT bridge masters can be given new WLAN credentials at once through the router, or open its set-up hotspot with a one-time password, shown as a QR code a phone can join for a master that has lost its WLAN.
 - The hub asks the BT bridge masters for their status through the router every minute in normal operation, so the page shows a master that has lost its WLAN and whether its hotspot is still open.
 - Each BT bridge client on the bridges page has a button that checks it through the router and reads its BT reserve again.
+- BT bridge masters are read over WLAN only every 10 minutes and when their page opens; their counters come through the router, shown per client and resettable under settings.
+- With BT bridge 1.2.14 the status through the router also carries the BT reserve, the WLAN level and stale WLAN data, so the page and the update offer stay current between the web reads.
+- BT bridge firmware 1.2.14 is shipped.
 - A BT bridge image can be uploaded in the browser for one update; it is removed afterwards, and only the shipped files are offered.
 
 ## [3.6.4] — 2026-09-21
