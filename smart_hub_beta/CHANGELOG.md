@@ -19,6 +19,21 @@
 ## [3.6.4] — 2026-09-21
 
 ### Fixed
+- Changing a module address keeps reserved addresses without a module intact.
+- If switching to server mode for a BT bridge query fails, the hub returns to operate mode.
+- Opening and cancelling the automation dialog no longer changes the rule, and rules triggered by mode or collective commands or forwarded from another router open without an error.
+- A corrupted router frame or a lost mode answer no longer stalls the event server or a configuration command.
+- Names with quotes or angle brackets are shown and saved correctly on the settings pages instead of being cut off.
+- A module list upload survives a lost answer, gives up instead of running forever on a module that never acknowledges, and is repeated next time after a refused package.
+- Air sensor calibration, baud rate change, forward table and router test pages release the router if a router answer is lost, instead of cutting off Home Assistant until a restart.
+- Automations step 3: deleting or changing a forward acts on the forward chosen, not on an external trigger.
+- Saving settings or automations is refused if another module was opened meanwhile, instead of writing into that module.
+- A module whose setup failed no longer stops the event server; SC XL-1 and FanMatrix are no longer dropped at start.
+- A failed start closes the serial port before retrying, and after three failed starts the hub starts without reading the system.
+- Setpoint 2 of Smart Controllers is uploaded from the right bytes instead of an absurd value.
+- Automations triggered by a mode or collective command are no longer duplicated in the target module on each save.
+- An unknown network command no longer repeats the previous command.
+- The configuration pages serve no files outside their folders, accept the HA user header only from the HA network, refuse actions triggered by foreign web pages, and answer each network client on its own connection.
 - A router answer that never arrived, arrived corrupted, or belonged to a different command is now named in the log instead of being processed as if it were data - until now the hub could work with invented values and say nothing. Everything else behaves exactly as before.
 - A command the router rejects is logged with the reason it gave.
 - A failed command no longer leaves the hub blocked: Home Assistant keeps working instead of losing every entity until a restart.
@@ -37,6 +52,7 @@
 - The log speaks English again at every level: module faults and the new-firmware notice are put into words where they are shown, so the interface stays German.
 - Messages about sending, about a refused restore and about a failed file copy are English in the log.
 ### Changed
+- During a BT bridge update Home Assistant keeps working: the router is held only for the few short commands, not for the whole update.
 - A lost switch to server mode is sent again; BT bridge queries are skipped without confirmed server mode instead of waiting 10 s, bridge commands switch silently, and counter resets log at debug.
 - BT bridge firmware 1.3.0 is shipped.
 - The BT bridge refresh button asks status and counters in one silent server-mode switch.
