@@ -19,6 +19,8 @@
 ## [3.6.4] — 2026-09-21
 
 ### Fixed
+- A module that still sits in its boot loader after a firmware update (version request answered with FF 02) gets its channel power pulsed once, which starts the new firmware; the outcome is logged.
+- The module update page shows "Abschluss..." instead of "Update: OK" until the router has reported the result of a module.
 - A module that does not answer at start is logged as "not responding" and left out, instead of being read in with an empty automation list.
 - Automation descriptions are right for local flag 8, SC Mini inputs, shutter position from transfer and the 8th logic input; unknown automation lines are kept on save.
 - Module list read-in, dimming of unknown modules, offline cover positions, the license page and a stuck router during module flashing are handled correctly.
