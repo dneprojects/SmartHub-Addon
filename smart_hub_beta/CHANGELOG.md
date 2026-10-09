@@ -6,6 +6,7 @@
 - BT bridges are found on the network and shown on their own page below the router, with their clients, firmware and radio link; settings behind the page's settings button.
 - BT bridge firmware is updated from the hub like module firmware: "BT-Bridge" appears in the update list when a master or client is older than the file, master first, then each chosen client over its own WLAN or, failing that, over the radio link. The commands go through the router; the bridge's web interface is only read.
 - While a BT bridge is updated, the modules behind it are not reported to Home Assistant as faulty and show "Update" in the communication table; their error counters are reset afterwards.
+- System settings: "BT-Bridge ins WLAN bringen" opens the set-up hotspot of a bridge that is not in the WLAN yet, by cable through one of its modules, and shows the one-time password.
 - The system backup keeps one line per BT bridge master, between the router and the modules; a restore enters the bridges again.
 - Under settings, all BT bridge masters can be given new WLAN credentials at once through the router, or open its set-up hotspot with a one-time password, shown as a QR code a phone can join for a master that has lost its WLAN.
 - The hub asks the BT bridge masters for their status through the router every minute in normal operation, so the page shows a master that has lost its WLAN and whether its hotspot is still open.
