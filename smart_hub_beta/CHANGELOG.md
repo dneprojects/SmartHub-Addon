@@ -7,6 +7,7 @@
 - BT bridge firmware is updated from the hub like module firmware: "BT-Bridge" appears in the update list when a master or client is older than the file, master first, then each chosen client over its own WLAN or, failing that, over the radio link. The commands go through the router; the bridge's web interface is only read.
 - While a BT bridge is updated, the modules behind it are not reported to Home Assistant as faulty and show "Update" in the communication table; their error counters are reset afterwards.
 - The "BT-Bridges" menu entry and page stay as long as a bridge is registered (a module flagged as wireless, or a master found in the network); without a confirmed master the page names what is known and points to the set-up row.
+- A BT bridge master is asked over the router through the wireless addresses the router reports, also when mDNS finds nothing: the log says whether it is in the WLAN, and a master that answers is taken over by its address.
 - BT-Bridges settings: without a master in the WLAN the WLAN name and password can still be sent by cable to the master in front of a module address (unverified by the master).
 - System settings: "BT-Bridge ins WLAN bringen" opens the set-up hotspot of a bridge that is not in the WLAN yet, by cable through one of its modules, and shows the one-time password.
 - The system backup keeps one line per BT bridge master, between the router and the modules; a restore enters the bridges again.
